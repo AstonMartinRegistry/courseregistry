@@ -133,9 +133,12 @@ export default function Home() {
             height: 100dvh;
             min-height: 100vh; /* Fallback for browsers without dvh support */
             overflow: hidden;
+            position: relative;
           }
           .mobile-scrollable {
             overflow-y: auto;
+            min-height: 100vh;
+            position: relative;
           }
           .mobile-title {
             font-size: 1.8em !important;
@@ -155,8 +158,12 @@ export default function Home() {
           .mobile-container {
             padding-top: 10px !important;
             padding-right: 10px !important;
-            padding-bottom: 10px !important;
+            padding-bottom: 60px !important;
             padding-left: 10px !important;
+          }
+          .mobile-footer {
+            position: fixed !important;
+            bottom: 20px !important;
           }
         }
       `}</style>
@@ -352,7 +359,7 @@ export default function Home() {
       )}
 
       {!hasSearched && (
-        <div style={styles.footerText}>
+        <div className="mobile-footer" style={styles.footerText}>
           Ver Natus
         </div>
       )}
