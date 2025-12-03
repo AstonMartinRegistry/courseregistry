@@ -115,54 +115,6 @@ export default function Home() {
     setPagination({ hasMore: false, lastScore: null, lastId: null });
   };
 
-  // Prevent scrolling on mobile when not searched
-  useEffect(() => {
-    const isMobile = window.innerWidth <= 768;
-    
-    const preventScroll = (e: TouchEvent) => {
-      if (!hasSearched && isMobile) {
-        e.preventDefault();
-      }
-    };
-
-    if (isMobile && !hasSearched) {
-      // Prevent body scroll
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.height = "100%";
-      document.body.style.top = "0";
-      document.body.style.left = "0";
-      
-      // Prevent touch scrolling
-      document.addEventListener("touchmove", preventScroll, { passive: false });
-      document.addEventListener("touchstart", preventScroll, { passive: false });
-    } else {
-      // Restore scrolling
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.height = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      
-      document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("touchstart", preventScroll);
-    }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.height = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.removeEventListener("touchmove", preventScroll);
-      document.removeEventListener("touchstart", preventScroll);
-    };
-  }, [hasSearched]);
-
   return (
     <>
       <style>{`
@@ -176,20 +128,11 @@ export default function Home() {
         }
         @media (max-width: 768px) {
           .mobile-fixed {
-            height: 100dvh;
             height: 100vh;
             overflow: hidden;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            touch-action: none;
-            -webkit-overflow-scrolling: none;
           }
           .mobile-scrollable {
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
           }
           .mobile-title {
             font-size: 1.5em !important;
