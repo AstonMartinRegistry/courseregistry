@@ -126,6 +126,12 @@ export default function Home() {
             background-position: -200% 0;
           }
         }
+
+        /* Debug border around all divs */
+        div {
+          border: 1px solid #000000;
+        }
+
         @media (max-width: 768px) {
           .mobile-fixed {
             height: 100vh;
@@ -143,6 +149,10 @@ export default function Home() {
           }
           .mobile-results-container {
             width: 95% !important;
+            max-width: none !important;
+          }
+          .mobile-content {
+            width: 100% !important;
             max-width: none !important;
           }
           .mobile-container {
@@ -171,7 +181,7 @@ export default function Home() {
         <div style={styles.glassSquares}></div>
       </div>
       {!hasSearched && (
-        <div style={styles.contentWrapper}>
+        <div className="mobile-content" style={styles.contentWrapper}>
           <h1 className="mobile-title" style={styles.title}>Stanford Course<br />Registry</h1>
           <div style={styles.subtitle}>Winter 26 Edition</div>
           <form onSubmit={handleSearch} className="mobile-search-container" style={styles.searchContainer}>
@@ -209,7 +219,25 @@ export default function Home() {
                 }
               }}
             >
-              {loading ? "..." : "→"}
+              {loading ? (
+                "..."
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                </svg>
+              )}
             </button>
           </form>
         </div>
