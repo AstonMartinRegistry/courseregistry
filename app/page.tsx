@@ -132,16 +132,7 @@ export default function Home() {
           border: 1px solid #000000;
         }
 
-        @media screen and (max-width: 768px) {
-          body {
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-
+        @media (max-width: 768px) {
           .mobile-fixed {
             height: 100vh;
             overflow: hidden;
