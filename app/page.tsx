@@ -126,11 +126,40 @@ export default function Home() {
             background-position: -200% 0;
           }
         }
+        @media (max-width: 768px) {
+          .mobile-fixed {
+            height: 100vh;
+            overflow: hidden;
+          }
+          .mobile-scrollable {
+            overflow-y: auto;
+          }
+          .mobile-title {
+            font-size: 1.5em !important;
+          }
+          .mobile-search-container {
+            width: 95% !important;
+            max-width: none !important;
+          }
+          .mobile-results-container {
+            width: 95% !important;
+            max-width: none !important;
+          }
+          .mobile-container {
+            padding-top: 10px !important;
+            padding-right: 10px !important;
+            padding-bottom: 10px !important;
+            padding-left: 10px !important;
+          }
+        }
       `}</style>
-      <div style={{
-        ...styles.container,
-        ...((loading || hasSearched) ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
-      }}>
+      <div 
+        className={`${!hasSearched ? "mobile-fixed" : "mobile-scrollable"} mobile-container`}
+        style={{
+          ...styles.container,
+          ...((loading || hasSearched) ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
+        }}
+      >
         {!hasSearched && (
           <div style={styles.aboutContainer}>
             <div style={styles.aboutText}>About</div>
@@ -143,9 +172,9 @@ export default function Home() {
       </div>
       {!hasSearched && (
         <div style={styles.contentWrapper}>
-          <h1 style={styles.title}>Stanford Course<br />Registry</h1>
+          <h1 className="mobile-title" style={styles.title}>Stanford Course<br />Registry</h1>
           <div style={styles.subtitle}>Winter 26 Edition</div>
-          <form onSubmit={handleSearch} style={styles.searchContainer}>
+          <form onSubmit={handleSearch} className="mobile-search-container" style={styles.searchContainer}>
             <textarea
               placeholder="Describe your dream course"
               value={query}
@@ -187,7 +216,7 @@ export default function Home() {
       )}
 
       {loading && (
-        <div style={styles.resultsContainer}>
+        <div className="mobile-results-container" style={styles.resultsContainer}>
           {[1, 2, 3].map((i) => (
             <div key={i} style={styles.resultCard}>
               <div style={styles.skeleton}>
@@ -212,7 +241,7 @@ export default function Home() {
       {error && <div style={styles.error}>{error}</div>}
 
       {!loading && results.length > 0 && (
-        <div style={styles.resultsContainer}>
+        <div className="mobile-results-container" style={styles.resultsContainer}>
           {results.map((course, index) => (
             <CourseResultCard
               key={course.id}
