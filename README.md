@@ -8,3 +8,4 @@ npm run dev
 
 Edit `app/page.jsx` to add content.
 # courseregistry
+# courseregistry
