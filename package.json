@@ -6,24 +6,32 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "scrape:winter-2026": "node scripts/scrape-winter-2026.js",
+    "scrape:winter-2026:by-day-career": "node scripts/scrape-winter-2026-by-day-career.js",
+    "filter:winter-2026": "node scripts/filter-winter-2026.js",
+    "dedupe:by-course-instructors": "node scripts/dedupe-by-course-instructors.js",
+    "count:instructors": "node scripts/count-instructors.js",
+    "count:duplicate-descriptions": "node scripts/count-duplicate-descriptions.js",
+    "find:shortest-descriptions": "node scripts/find-shortest-descriptions.js",
+    "create:ultimate-filtered": "node scripts/create-ultimate-filtered.js",
+    "describe:descriptions": "node scripts/describe-descriptions.js",
+    "load:courses-to-supabase": "node scripts/load-courses-to-supabase.js",
+    "load:embeddings-to-supabase": "node scripts/load-embeddings-to-supabase.js",
+    "generate": "node scripts/generate-rewritten-descriptions.js",
+    "generate:rewritten-descriptions": "node scripts/generate-rewritten-descriptions.js",
+    "analyze:description-lengths": "node scripts/analyze-rewritten-lengths.js",
+    "count:description-words": "node scripts/count-description-words.js"
   },
   "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "dotenv": "^17.2.3",
     "next": "15.5.4",
-    "@supabase/supabase-js": "^2",
-    "@supabase/ssr": "^0.5.0"
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }

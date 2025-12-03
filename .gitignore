@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# data files
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# scripts
+/scripts/
