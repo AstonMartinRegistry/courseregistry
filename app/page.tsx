@@ -127,11 +127,6 @@ export default function Home() {
           }
         }
 
-        /* Debug border around all divs */
-        div {
-          border: 1px solid #000000;
-        }
-
         @media (max-width: 768px) {
           .mobile-fixed {
             /* Use dynamic viewport height on modern mobile browsers to resist URL bar show/hide */
@@ -174,7 +169,8 @@ export default function Home() {
       >
        {!hasSearched && (
          <div style={styles.topNote}>
-           A continuation of{" "}
+           A continuation of
+           <br />
            <a
              href="https://stanfordbikeregistry.com"
              target="_blank"
@@ -567,16 +563,15 @@ const styles: Record<string, React.CSSProperties> = {
   topNote: {
     position: "absolute",
     top: "20px",
-    left: 0,
+    left: "50%",
+    transform: "translateX(-50%)",
     width: "100%",
+    maxWidth: "700px",
     fontSize: "12px",
     color: "#1a1a1a",
     zIndex: 10,
     textAlign: "center",
     padding: "0.25rem 0.5rem",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
   },
   contentWrapper: {
     display: "flex",
