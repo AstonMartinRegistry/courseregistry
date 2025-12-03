@@ -170,12 +170,29 @@ export default function Home() {
           ...((loading || hasSearched) ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
-        {!hasSearched && (
-          <div style={styles.aboutContainer}>
-            <div style={styles.aboutText}>About</div>
-          </div>
-        )}
-      <div style={styles.watercolorWrapper}>
+       {!hasSearched && (
+         <div style={styles.topNote}>
+           A continuation of{" "}
+           <a
+             href="https://stanfordbikeregistry.com"
+             target="_blank"
+             rel="noopener noreferrer"
+             style={{ textDecoration: "underline", color: "inherit" }}
+           >
+             stanfordbikeregistry.com
+           </a>{" "}
+           &{" "}
+           <a
+             href="https://stanfordlabregistry.com"
+             target="_blank"
+             rel="noopener noreferrer"
+             style={{ textDecoration: "underline", color: "inherit" }}
+           >
+             stanfordlabregistry.com
+           </a>
+         </div>
+       )}
+       <div style={styles.watercolorWrapper}>
         <div style={styles.watercolorBlock}></div>
         <div style={styles.grainOverlay}></div>
         <div style={styles.glassSquares}></div>
@@ -336,7 +353,11 @@ export default function Home() {
         <div style={styles.error}>No results found. Try a different search.</div>
       )}
 
-      {!hasSearched && <div style={styles.footerText}>Ver Natus</div>}
+      {!hasSearched && (
+        <div style={styles.footerText}>
+          Ver Natus
+        </div>
+      )}
       </div>
     </>
   );
@@ -541,17 +562,19 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#000000",
     position: "relative",
   },
-  aboutContainer: {
+  topNote: {
     position: "absolute",
     top: "20px",
-    right: "20px",
-    zIndex: 10,
-  },
-  aboutText: {
-    fontSize: "0.9rem",
+    left: 0,
+    width: "100%",
+    fontSize: "12px",
     color: "#1a1a1a",
-    cursor: "pointer",
-    transition: "opacity 0.2s",
+    zIndex: 10,
+    textAlign: "center",
+    padding: "0.25rem 0.5rem",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   contentWrapper: {
     display: "flex",
@@ -616,13 +639,13 @@ const styles: Record<string, React.CSSProperties> = {
       "0 0 1px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,0.6), -1px -1px 0 rgba(255,255,255,0.4), 1px -1px 0 rgba(255,255,255,0.4), -1px 1px 0 rgba(255,255,255,0.4), 1px 1px 0 rgba(255,255,255,0.4)",
   },
   subtitle: {
-    fontSize: "0.9rem",
+    fontSize: "12px",
     color: "#666666",
     marginBottom: "4rem",
     textAlign: "center",
   },
   searchContainer: {
-    width: "80%",
+    width: "90%",
     maxWidth: "700px",
     position: "relative",
     paddingBottom: "10px",
@@ -656,7 +679,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#8e0202",
     color: "#FFFFFF",
     borderRadius: "5px",
-    fontSize: "0.8rem",
+    fontSize: "12px",
     fontWeight: "bold",
     cursor: "pointer",
     transition: "background-color 0.2s, color 0.2s, box-shadow 0.1s",
@@ -678,13 +701,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "8px",
     maxWidth: "700px",
     width: "80%",
-    fontSize: "0.8rem",
+    fontSize: "12px",
   },
   resultsContainer: {
     marginTop: "20px",
     width: "44%",
     maxWidth: "800px",
-    fontSize: "0.8rem",
+    fontSize: "12px",
   },
   resultsTitle: {
     fontSize: "1rem",
@@ -700,7 +723,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "8px",
     background:
       "linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(250, 250, 250, 0.25), rgba(245, 245, 245, 0.2))",
-    fontSize: "0.8rem",
+    fontSize: "12px",
     position: "relative",
     backdropFilter: "blur(10px)",
     color: "rgb(23, 23, 23)",
@@ -764,7 +787,7 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: "nowrap",
   },
   courseDescr: {
-    fontSize: "0.8rem",
+    fontSize: "12px",
     color: "rgb(23, 23, 23)",
     lineHeight: "1.3",
     marginTop: "18px",
@@ -820,7 +843,7 @@ const styles: Record<string, React.CSSProperties> = {
     bottom: "20px",
     left: "50%",
     transform: "translateX(-50%)",
-    fontSize: "0.9rem",
+    fontSize: "12px",
     color: "#1a1a1a",
     zIndex: 10,
   },
