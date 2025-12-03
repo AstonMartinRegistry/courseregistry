@@ -134,7 +134,9 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .mobile-fixed {
-            height: 100vh;
+            /* Use dynamic viewport height on modern mobile browsers to resist URL bar show/hide */
+            height: 100dvh;
+            min-height: 100vh; /* Fallback for browsers without dvh support */
             overflow: hidden;
           }
           .mobile-scrollable {
