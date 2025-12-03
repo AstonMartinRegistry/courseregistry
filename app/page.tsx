@@ -645,7 +645,7 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     fontSize: "12px",
     color: "#666666",
-    marginBottom: "4rem",
+    marginBottom: "3.5rem",
     textAlign: "center",
   },
   searchContainer: {
