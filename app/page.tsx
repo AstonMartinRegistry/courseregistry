@@ -141,7 +141,7 @@ export default function Home() {
             overflow-y: auto;
           }
           .mobile-title {
-            font-size: 1.5em !important;
+            font-size: 1.8em !important;
           }
           .mobile-search-container {
             width: 95% !important;
@@ -611,13 +611,14 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "0.5rem 1rem",
     textAlign: "center",
     color: "#1a1a1a",
+    fontWeight: "normal",
     textShadow:
       "0 0 1px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,0.6), -1px -1px 0 rgba(255,255,255,0.4), 1px -1px 0 rgba(255,255,255,0.4), -1px 1px 0 rgba(255,255,255,0.4), 1px 1px 0 rgba(255,255,255,0.4)",
   },
   subtitle: {
     fontSize: "0.9rem",
     color: "#666666",
-    marginBottom: "2.5rem",
+    marginBottom: "4rem",
     textAlign: "center",
   },
   searchContainer: {
