@@ -8,7 +8,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY;
-const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || "llama-3.3-70b";
+const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || "llama3.1-8b";
 const CEREBRAS_API_URL = "https://api.cerebras.ai/v1/chat/completions";
 
 async function generateEmbedding(text: string): Promise<number[]> {
@@ -233,8 +233,10 @@ function sleep(ms: number) {
 export async function POST(request: NextRequest) {
   try {
     const { query, limit, lastScore, lastId, excludeIds } = await request.json();
+    console.log("🔍 API: Received search request", { query, limit, lastScore, lastId, excludeIds });
 
     if (!query || typeof query !== "string" || query.trim().length === 0) {
+      console.error("❌ API: Invalid query");
       return NextResponse.json(
         { error: "Query is required and must be a non-empty string" },
         { status: 400 },
@@ -242,13 +244,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate embedding for the query
+    console.log("📊 API: Generating embedding for query:", query.trim());
     const embedding = await generateEmbedding(query.trim());
+    console.log("✅ API: Embedding generated, length:", embedding.length);
 
     // Normalize the embedding to ensure fair comparison
     const normalizedEmbedding = normalizeVector(embedding);
+    console.log("✅ API: Embedding normalized");
 
     // Search for similar courses with pagination
     const searchLimit = limit || 3;
+    console.log("🔎 API: Searching courses with limit:", searchLimit);
     const results = await searchCourses(
       normalizedEmbedding,
       searchLimit,
@@ -256,11 +262,14 @@ export async function POST(request: NextRequest) {
       lastId || null,
       excludeIds || null,
     );
+    console.log("📦 API: Raw search results:", results.length, "courses");
+    console.log("📋 API: Course titles:", results.map((r: any) => r.course_title));
 
     // Enrich each result with a personalized explanation (best-effort, sequential to avoid rate limits)
     const enrichedResults: any[] = [];
     for (let i = 0; i < results.length; i++) {
       const course: any = results[i];
+      console.log(`💭 API: Generating explanation for course ${i + 1}/${results.length}: ${course.course_title}`);
 
       const explanation = await generateCourseExplanation({
         query: query.trim(),
@@ -270,10 +279,13 @@ export async function POST(request: NextRequest) {
 
       // Only include courses with successfully generated explanations
       if (explanation && explanation.trim().length > 0) {
+        console.log(`✅ API: Explanation generated for: ${course.course_title}`);
         enrichedResults.push({
           ...course,
           explanation,
         });
+      } else {
+        console.warn(`⚠️ API: No explanation generated for: ${course.course_title}`);
       }
 
       // Small delay between calls to be kinder to Cerebras rate limits
@@ -288,6 +300,9 @@ export async function POST(request: NextRequest) {
     const lastResult = enrichedResults[enrichedResults.length - 1];
     const nextLastScore = lastResult?.similarity || null;
     const nextLastId = lastResult?.id || null;
+
+    console.log("📤 API: Returning response with", enrichedResults.length, "enriched results");
+    console.log("📊 API: Pagination:", { hasMore, nextLastScore, nextLastId });
 
     return NextResponse.json({
       results: enrichedResults,

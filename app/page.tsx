@@ -33,6 +33,7 @@ export default function Home() {
       return;
     }
 
+    console.log("🔍 Starting search with query:", query.trim());
     setLoading(true);
     setError(null);
     setResults([]);
@@ -40,23 +41,32 @@ export default function Home() {
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
+      const requestBody = { query: query.trim(), limit: 3 };
+      console.log("📤 Sending request:", requestBody);
+      
       const response = await fetch("/api/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query: query.trim(), limit: 3 }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log("📥 Response status:", response.status, response.statusText);
       const data = await response.json();
+      console.log("📦 Response data:", data);
 
       if (!response.ok) {
+        console.error("❌ Response not OK:", data.error);
         throw new Error(data.error || "Search failed");
       }
 
+      console.log("✅ Results received:", data.results?.length || 0, "courses");
+      console.log("📊 Full results:", data.results);
       setResults(data.results || []);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
     } catch (err) {
+      console.error("💥 Search error:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
@@ -604,8 +614,8 @@ const styles: Record<string, React.CSSProperties> = {
     bottom: "-10%",
     left: "-5%",
     background:
-      "linear-gradient(to top, rgba(100, 10, 20, 0.9), rgba(120, 15, 25, 0.7), rgba(140, 20, 30, 0.5), transparent)",
-    filter: "blur(60px) contrast(1.4) saturate(1.6)",
+      "linear-gradient(to top, rgba(80, 5, 15, 1), rgba(100, 10, 20, 0.85), rgba(120, 15, 25, 0.65), transparent)",
+    filter: "blur(60px) contrast(1.5) saturate(1.8)",
   },
   grainOverlay: {
     position: "absolute",
@@ -614,8 +624,8 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     height: "100%",
     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='8' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.8'/%3E%3C/svg%3E")`,
-    backgroundSize: "20px 20px",
-    opacity: 0.4,
+    backgroundSize: "80px 80px",
+    opacity: 0.7,
     pointerEvents: "none",
   },
   glassSquares: {
