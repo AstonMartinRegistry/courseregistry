@@ -6,7 +6,6 @@ const EMBEDDING_MODEL =
 const DEEPINFRA_API_URL = "https://api.deepinfra.com/v1/embeddings";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
 const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY;
 const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || "llama3.1-8b";
 const CEREBRAS_API_URL = "https://api.cerebras.ai/v1/chat/completions";
