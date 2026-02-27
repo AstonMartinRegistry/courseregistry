@@ -77,7 +77,7 @@ export default function Home() {
       return;
     }
     window.scrollTo(0, 0);
-    if (Math.random() < 1 / 72) {
+    if (Math.random() < 1 / 32) {
       setLoading(false);
       setError(null);
       setResults([]);
