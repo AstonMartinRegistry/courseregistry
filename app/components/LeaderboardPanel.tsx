@@ -50,14 +50,31 @@ export function LeaderboardPanel({ onClose }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: "url(/dithered-image-5.jpeg)",
+            backgroundSize: "220%",
+            backgroundPosition: "-25% center",
+            opacity: 1,
+          }}
+        />
         <h2
           style={{
             fontSize: "1.4em",
             margin: 0,
             fontFamily: '"Jersey 15", sans-serif',
             color: "#1a1a1a",
+            position: "relative",
+            zIndex: 1,
           }}
         >
           Top 100 most searched
@@ -73,9 +90,11 @@ export function LeaderboardPanel({ onClose }: Props) {
             color: "#f0f0f0",
             border: "none",
             cursor: "pointer",
+            position: "relative",
+            zIndex: 1,
           }}
         >
-          ← back
+          Back
         </button>
       </div>
       <div

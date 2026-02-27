@@ -27,6 +27,7 @@ export default function Home() {
   const [wrapperSize, setWrapperSize] = useState<{ width: number; height: number } | null>(null);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [showSecretPage, setShowSecretPage] = useState(false);
+  const [showNewSecretPage, setShowNewSecretPage] = useState(false);
   const [saladEmail, setSaladEmail] = useState("");
   const [saladEmailError, setSaladEmailError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -78,13 +79,27 @@ export default function Home() {
       return;
     }
     window.scrollTo(0, 0);
-    if (Math.random() < 1 / 2) {
+    const saladWins = Math.random() < 1 / 4;
+    const newPageWins = Math.random() < 1 / 2;
+    if (saladWins) {
       setLoading(false);
       setError(null);
       setResults([]);
       setExplanations({});
       setHasSearched(true);
       setShowSecretPage(true);
+      setShowNewSecretPage(false);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
+    if (newPageWins) {
+      setLoading(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(true);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
@@ -96,6 +111,7 @@ export default function Home() {
     setExplanations({});
     setHasSearched(true);
     setShowSecretPage(false);
+    setShowNewSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
@@ -190,13 +206,27 @@ export default function Home() {
     if (!query.trim() || loadingMore || !pagination.hasMore) {
       return;
     }
-    if (Math.random() < 1 / 2) {
+    const saladWins = Math.random() < 1 / 4;
+    const newPageWins = Math.random() < 1 / 2;
+    if (saladWins) {
       setLoadingMore(false);
       setError(null);
       setResults([]);
       setExplanations({});
       setHasSearched(true);
       setShowSecretPage(true);
+      setShowNewSecretPage(false);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
+    if (newPageWins) {
+      setLoadingMore(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(true);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
@@ -211,6 +241,7 @@ export default function Home() {
     setLoadingMore(true);
     setError(null);
     setShowSecretPage(false);
+    setShowNewSecretPage(false);
 
     try {
       const response = await fetch("/api/search", {
@@ -295,6 +326,7 @@ export default function Home() {
     setError(null);
     setHasSearched(false);
     setShowSecretPage(false);
+    setShowNewSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
   };
 
@@ -553,16 +585,16 @@ export default function Home() {
         }
       `}</style>
       <div 
-        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage) ? " mobile-has-results" : ""}`}
+        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage) ? " mobile-has-results" : ""}`}
         style={{
           ...styles.container,
           ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
       <div
-        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "has-results" : ""}`}
+        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage)) ? "has-results" : ""}`}
         style={
-          leaderboardOpen || showSecretPage
+          leaderboardOpen || showSecretPage || showNewSecretPage
             ? undefined
             : wrapperSize && hasSearched && !loading && !loadingMore && results.length === 0
               ? {
@@ -581,16 +613,18 @@ export default function Home() {
                 <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
                   <div style={styles.secretPageContent}>
                     <p style={styles.secretPageText}>
-                      This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook.
+                      Welcome to the salad bar!! Consider yourself lucky, there was a 1/4 chance for this page to appear!
                     </p>
-                    <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
                     <p style={styles.secretPageText}>
-                      You also get an invitation to join the salad bar!!
+                      This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad makers will use the ingredients at their disposal is another question. However, a well stocked pantry and a complete list should be made available so they may cook.
                     </p>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "80%", imageRendering: "pixelated" }} />
+                    </div>
                     <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
                       <input
                         type="email"
-                        placeholder="your@stanford.edu"
+                        placeholder="Drop your @stanford.edu for a surprise"
                         value={saladEmail}
                         onChange={(e) => { setSaladEmail(e.target.value); setSaladEmailError(false); }}
                         style={styles.saladEmailInput}
@@ -627,7 +661,7 @@ export default function Home() {
                   <div style={styles.resultsPage} className="results-page">
                     <div style={styles.secretPageContent}>
                       <p style={styles.secretPageText}>
-                        This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook. Perhaps some more pickles or even some pomegranates?
+                        This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad makers will use the ingredients at their disposal is another question. However, a well stocked pantry and a complete list should be made available so they may cook. Perhaps some more pickles or even some pomegranates?
                       </p>
                       <div style={{ display: "flex", justifyContent: "center" }}>
                         <img src="/dithered-image-6.jpeg" alt="" style={{ maxWidth: "75%", imageRendering: "pixelated" }} />
@@ -638,7 +672,7 @@ export default function Home() {
                       <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
                         <input
                           type="email"
-                          placeholder="your@stanford.edu"
+                          placeholder="Drop your @stanford.edu for a surprise"
                           value={saladEmail}
                           onChange={(e) => { setSaladEmail(e.target.value); setSaladEmailError(false); }}
                           style={styles.saladEmailInput}
@@ -661,6 +695,28 @@ export default function Home() {
                 </div>
               </>
             )}
+          </div>
+        ) : showNewSecretPage ? (
+          <div style={styles.resultsBox}>
+            <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
+              <div style={styles.secretPageContent}>
+                <p style={styles.secretPageText}>
+                  Perhaps some more olives with that?
+                </p>
+                <img src="/dithered-image-7.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
+                <p style={{ ...styles.secretPageText, marginTop: "2em" }}>
+                  Right, you want classes, nevermind
+                </p>
+              </div>
+            </div>
+            <div style={styles.resultsBottomBar}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                New query
+              </button>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                Load more
+              </button>
+            </div>
           </div>
         ) : !hasSearched ? (
           <>
