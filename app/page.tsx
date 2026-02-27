@@ -98,7 +98,8 @@ export default function Home() {
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
-      const requestBody = { query: query.trim(), limit: isMobile ? 2 : 4 };
+      const mobileView = typeof window !== "undefined" && window.innerWidth <= 768;
+      const requestBody = { query: query.trim(), limit: mobileView ? 2 : 4 };
       console.log("📤 Sending request:", requestBody);
       
       const response = await fetch("/api/search", {
@@ -131,9 +132,10 @@ export default function Home() {
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       await new Promise((r) => setTimeout(r, 400));
 
-      // Stream explanations for each course in parallel
+      // Stream explanations for each course in parallel (only for courses we'll display)
+      const coursesToExplain = mobileView ? courses.slice(0, 2) : courses;
       await Promise.all(
-        courses.map(async (course) => {
+        coursesToExplain.map(async (course) => {
           const tCourse = performance.now();
           try {
             const res = await fetch("/api/explain", {
@@ -191,6 +193,7 @@ export default function Home() {
     const excludeIds = results.map((r) => r.id);
     const lastScore = pagination.lastScore;
     const lastId = pagination.lastId;
+    const mobileView = typeof window !== "undefined" && window.innerWidth <= 768;
 
     setResults([]);
     setExplanations({});
@@ -206,7 +209,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           query: query.trim(),
-          limit: isMobile ? 2 : 4,
+          limit: mobileView ? 2 : 4,
           lastScore,
           lastId,
           excludeIds,
@@ -468,8 +471,11 @@ export default function Home() {
           }
           .search-box-wrapper.has-results {
             aspect-ratio: auto !important;
-            min-height: 75dvh !important;
-            max-height: 85dvh !important;
+            width: 90% !important;
+            max-width: 480px !important;
+            height: 80vh !important; /* fallback */
+            height: 80svh !important;
+            margin: 0 auto !important;
           }
           .box-image {
             position: absolute;
@@ -587,7 +593,7 @@ export default function Home() {
             </div>
             <div style={styles.resultsBottomBar}>
               <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
-                ← new query
+                New query
               </button>
               <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
                 load more →
@@ -775,7 +781,7 @@ export default function Home() {
                 </div>
                 <div style={styles.resultsBottomBar}>
                   <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
-                    ← new query
+                    New query
                   </button>
                   {pagination.hasMore && (
                     <button
@@ -787,7 +793,7 @@ export default function Home() {
                       onClick={loadMore}
                       disabled={loadingMore}
                     >
-                      {loadingMore ? "loading…" : "load more →"}
+                      {loadingMore ? "Loading…" : "Load more"}
                     </button>
                   )}
                 </div>
