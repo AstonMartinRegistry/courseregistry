@@ -458,7 +458,10 @@ export default function Home() {
             bottom: 20px !important;
           }
           .search-box-wrapper {
-            position: relative;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 90%;
             max-width: 480px;
             aspect-ratio: 4 / 5;
@@ -468,14 +471,18 @@ export default function Home() {
             flex-direction: column;
             align-items: center;
             overflow: visible;
+            z-index: 2;
           }
           .search-box-wrapper.has-results {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
             aspect-ratio: auto !important;
             width: 90% !important;
             max-width: 480px !important;
             height: 80vh !important; /* fallback */
             height: 80svh !important;
-            margin: 0 auto !important;
           }
           .box-image {
             position: absolute;
