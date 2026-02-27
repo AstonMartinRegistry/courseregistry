@@ -545,7 +545,7 @@ export default function Home() {
         }}
       >
       <div
-        className={`search-box-wrapper ${leaderboardOpen ? "" : hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage) ? "has-results" : ""}`}
+        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "has-results" : ""}`}
         style={
           leaderboardOpen || showSecretPage
             ? undefined
@@ -561,51 +561,89 @@ export default function Home() {
           <LeaderboardPanel onClose={() => setLeaderboardOpen(false)} />
         ) : showSecretPage ? (
           <div style={styles.resultsBox}>
-            <div style={styles.resultsList} className="results-list">
-              <div style={styles.resultsPage} className="results-page">
-                <div style={styles.secretPageContent}>
-                  <p style={styles.secretPageText}>
-                    Yippee, welcome to this cozy corner of the registry. Sorry no classes womp womp. But consider yourself a lucky one, this page has a 1/72 chance of appearing.
-                  </p>
-                  <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
-                  <p style={styles.secretPageText}>What&apos;s up with the salads???</p>
-                </div>
-              </div>
-              <div style={styles.resultsPageDivider} className="results-page-divider" />
-              <div style={styles.resultsPage} className="results-page">
-                <div style={styles.secretPageContent}>
-                  <p style={styles.secretPageText}>
-                    This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook. Perhaps some more pickles or even some pomegranates?
-                  </p>
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <img src="/dithered-image-6.jpeg" alt="" style={{ maxWidth: "75%", imageRendering: "pixelated" }} />
+            {isMobile ? (
+              <>
+                <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
+                  <div style={styles.secretPageContent}>
+                    <p style={styles.secretPageText}>
+                      This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook.
+                    </p>
+                    <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
+                    <p style={styles.secretPageText}>
+                      You also get an invitation to join the salad bar!!
+                    </p>
+                    <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
+                      <input
+                        type="email"
+                        placeholder="Drop your email for a surprise"
+                        value={saladEmail}
+                        onChange={(e) => setSaladEmail(e.target.value)}
+                        style={styles.saladEmailInput}
+                      />
+                      <button type="submit" style={styles.saladEmailButton}>
+                        →
+                      </button>
+                    </form>
                   </div>
-                  <p style={styles.secretPageText}>
-                    You also get an invitation to join the salad bar!!
-                  </p>
-                  <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
-                    <input
-                      type="email"
-                      placeholder="Drop your email for a surprise"
-                      value={saladEmail}
-                      onChange={(e) => setSaladEmail(e.target.value)}
-                      style={styles.saladEmailInput}
-                    />
-                    <button type="submit" style={styles.saladEmailButton}>
-                      →
-                    </button>
-                  </form>
                 </div>
-              </div>
-            </div>
-            <div style={styles.resultsBottomBar}>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
-                New query
-              </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
-                load more →
-              </button>
-            </div>
+                <div style={styles.resultsBottomBar}>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                    New query
+                  </button>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                    Load more
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={styles.resultsList} className="results-list">
+                  <div style={styles.resultsPage} className="results-page">
+                    <div style={styles.secretPageContent}>
+                      <p style={styles.secretPageText}>
+                        Yippee, welcome to this cozy corner of the registry. Sorry no classes womp womp. But consider yourself a lucky one, this page has a 1/72 chance of appearing.
+                      </p>
+                      <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
+                      <p style={styles.secretPageText}>What&apos;s up with the salads???</p>
+                    </div>
+                  </div>
+                  <div style={styles.resultsPageDivider} className="results-page-divider" />
+                  <div style={styles.resultsPage} className="results-page">
+                    <div style={styles.secretPageContent}>
+                      <p style={styles.secretPageText}>
+                        This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook. Perhaps some more pickles or even some pomegranates?
+                      </p>
+                      <div style={{ display: "flex", justifyContent: "center" }}>
+                        <img src="/dithered-image-6.jpeg" alt="" style={{ maxWidth: "75%", imageRendering: "pixelated" }} />
+                      </div>
+                      <p style={styles.secretPageText}>
+                        You also get an invitation to join the salad bar!!
+                      </p>
+                      <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
+                        <input
+                          type="email"
+                          placeholder="Drop your email for a surprise"
+                          value={saladEmail}
+                          onChange={(e) => setSaladEmail(e.target.value)}
+                          style={styles.saladEmailInput}
+                        />
+                        <button type="submit" style={styles.saladEmailButton}>
+                          →
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div style={styles.resultsBottomBar}>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                    New query
+                  </button>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                    Load more
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ) : !hasSearched ? (
           <>
