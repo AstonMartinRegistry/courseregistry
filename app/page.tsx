@@ -430,7 +430,7 @@ export default function Home() {
             position: relative;
           }
           .mobile-title {
-            font-size: 1.8em !important;
+            font-size: 2.1em !important;
           }
           .mobile-search-container {
             width: 95% !important;
