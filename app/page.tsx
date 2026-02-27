@@ -28,6 +28,7 @@ export default function Home() {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [showSecretPage, setShowSecretPage] = useState(false);
   const [saladEmail, setSaladEmail] = useState("");
+  const [saladEmailError, setSaladEmailError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function Home() {
       return;
     }
     window.scrollTo(0, 0);
-    if (Math.random() < 1 / 32) {
+    if (Math.random() < 1 / 2) {
       setLoading(false);
       setError(null);
       setResults([]);
@@ -189,6 +190,16 @@ export default function Home() {
     if (!query.trim() || loadingMore || !pagination.hasMore) {
       return;
     }
+    if (Math.random() < 1 / 2) {
+      setLoadingMore(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(true);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
 
     const excludeIds = results.map((r) => r.id);
     const lastScore = pagination.lastScore;
@@ -289,14 +300,18 @@ export default function Home() {
 
   const handleSaladEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (saladEmail.trim()) {
-      fetch("/api/salad-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: saladEmail.trim() }),
-      }).catch(() => {});
-      setSaladEmail("");
+    const email = saladEmail.trim().toLowerCase();
+    if (!email || !email.endsWith("@stanford.edu")) {
+      setSaladEmailError(true);
+      return;
     }
+    setSaladEmailError(false);
+    fetch("/api/salad-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }).catch(() => {});
+    setSaladEmail("");
   };
 
   return (
@@ -575,15 +590,16 @@ export default function Home() {
                     <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
                       <input
                         type="email"
-                        placeholder="Drop your email for a surprise"
+                        placeholder="your@stanford.edu"
                         value={saladEmail}
-                        onChange={(e) => setSaladEmail(e.target.value)}
+                        onChange={(e) => { setSaladEmail(e.target.value); setSaladEmailError(false); }}
                         style={styles.saladEmailInput}
                       />
                       <button type="submit" style={styles.saladEmailButton}>
                         →
                       </button>
                     </form>
+                    {saladEmailError && <p style={{ fontFamily: '"Roboto Mono", monospace', fontSize: "9px", color: "#8e0202", margin: "0.25rem 0 0" }}>Stanford emails only</p>}
                   </div>
                 </div>
                 <div style={styles.resultsBottomBar}>
@@ -622,15 +638,16 @@ export default function Home() {
                       <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
                         <input
                           type="email"
-                          placeholder="Drop your email for a surprise"
+                          placeholder="your@stanford.edu"
                           value={saladEmail}
-                          onChange={(e) => setSaladEmail(e.target.value)}
+                          onChange={(e) => { setSaladEmail(e.target.value); setSaladEmailError(false); }}
                           style={styles.saladEmailInput}
                         />
                         <button type="submit" style={styles.saladEmailButton}>
                           →
                         </button>
                       </form>
+                      {saladEmailError && <p style={{ fontFamily: '"Roboto Mono", monospace', fontSize: "9px", color: "#8e0202", margin: "0.25rem 0 0" }}>Stanford emails only</p>}
                     </div>
                   </div>
                 </div>
