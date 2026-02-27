@@ -1,17 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-interface CourseResult {
-  id: number;
-  course_codes: string;
-  course_title: string | null;
-  course_descr: string | null;
-  similarity: number;
-  explanation?: string | null;
-}
+import type { CourseResult } from "./lib/types";
+import { STANFORD_NAVIGATOR_URL } from "./lib/constants";
+import { LeaderboardPanel } from "./components/LeaderboardPanel";
 
 export default function Home() {
+  // Search state
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CourseResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -27,21 +22,83 @@ export default function Home() {
     lastScore: null,
     lastId: null,
   });
+  const [explanations, setExplanations] = useState<Record<number, string>>({});
+  const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
+  const [wrapperSize, setWrapperSize] = useState<{ width: number; height: number } | null>(null);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [showSecretPage, setShowSecretPage] = useState(false);
+  const [saladEmail, setSaladEmail] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(typeof window !== "undefined" && window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Scale wrapper to fit viewport
+  useEffect(() => {
+    if (!imageSize) return;
+    const updateSize = () => {
+      const maxW = typeof window !== "undefined" ? Math.min(480, window.innerWidth - 48) : 480;
+      const maxH = typeof window !== "undefined" ? Math.min(600, window.innerHeight - 48) : 600;
+      const scale = Math.min(1, maxW / imageSize.width, maxH / imageSize.height);
+      setWrapperSize({
+        width: Math.round(imageSize.width * scale),
+        height: Math.round(imageSize.height * scale),
+      });
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, [imageSize]);
+
+  // Lock scroll when on home view
+  useEffect(() => {
+    if (!hasSearched) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100vh";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    }
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    };
+  }, [hasSearched]);
 
   const runSearch = async () => {
     if (!query.trim()) {
       return;
     }
-
-    console.log("🔍 Starting search with query:", query.trim());
+    window.scrollTo(0, 0);
+    if (Math.random() < 1 / 72) {
+      setLoading(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(true);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
+    const t0 = performance.now();
+    console.log("🔍 [TIMING] Search started at", new Date().toISOString());
     setLoading(true);
     setError(null);
-    setResults([]);
+      setResults([]);
+    setExplanations({});
     setHasSearched(true);
+    setShowSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
-      const requestBody = { query: query.trim(), limit: 3 };
+      const requestBody = { query: query.trim(), limit: isMobile ? 2 : 4 };
       console.log("📤 Sending request:", requestBody);
       
       const response = await fetch("/api/search", {
@@ -52,19 +109,72 @@ export default function Home() {
         body: JSON.stringify(requestBody),
       });
 
-      console.log("📥 Response status:", response.status, response.statusText);
+      const t1 = performance.now();
+      console.log("📥 [TIMING] Search API response:", ((t1 - t0) / 1000).toFixed(2), "s");
       const data = await response.json();
-      console.log("📦 Response data:", data);
 
       if (!response.ok) {
         console.error("❌ Response not OK:", data.error);
         throw new Error(data.error || "Search failed");
       }
 
-      console.log("✅ Results received:", data.results?.length || 0, "courses");
-      console.log("📊 Full results:", data.results);
-      setResults(data.results || []);
+      console.log("✅ [TIMING] Results received:", data.results?.length || 0, "courses");
+      const courses = data.results || [];
+      setResults(courses);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
+      setLoading(false);
+
+      const t2 = performance.now();
+      console.log("⏱️ [TIMING] Starting explain streams (courses visible at", ((t2 - t0) / 1000).toFixed(2), "s)");
+
+      // Wait for phase 2 skeleton to paint and stay visible briefly
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise((r) => setTimeout(r, 400));
+
+      // Stream explanations for each course in parallel
+      await Promise.all(
+        courses.map(async (course) => {
+          const tCourse = performance.now();
+          try {
+            const res = await fetch("/api/explain", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                query: query.trim(),
+                courseTitle: course.course_title ?? null,
+                courseDescr: course.course_descr ?? null,
+              }),
+            });
+            if (!res.ok) throw new Error("Explain failed");
+            const tFirstByte = performance.now();
+            console.log("📡 [TIMING] Explain started for", course.course_codes, "at", ((tFirstByte - t0) / 1000).toFixed(2), "s");
+            const reader = res.body?.getReader();
+            if (!reader) return;
+            const decoder = new TextDecoder();
+            let text = "";
+            const MIN_CHARS_BEFORE_SHOW = 80;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              text += decoder.decode(value, { stream: true });
+              if (text.length >= MIN_CHARS_BEFORE_SHOW || done) {
+                setExplanations((prev) => ({ ...prev, [course.id]: text }));
+              }
+            }
+            if (text.length > 0) {
+              setExplanations((prev) => ({ ...prev, [course.id]: text }));
+            }
+            const tCourseDone = performance.now();
+            console.log("✅ [TIMING] Explain done for", course.course_codes, "in", ((tCourseDone - tCourse) / 1000).toFixed(2), "s");
+          } catch (err) {
+            console.warn("Explain failed for course", course.id, err);
+            setExplanations((prev) => ({ ...prev, [course.id]: course.course_descr || "" }));
+          }
+        })
+      );
+
+      const t3 = performance.now();
+      console.log("⏱️ [TIMING] Total search + explain:", ((t3 - t0) / 1000).toFixed(2), "s");
     } catch (err) {
       console.error("💥 Search error:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -77,12 +187,28 @@ export default function Home() {
     if (!query.trim() || loadingMore || !pagination.hasMore) {
       return;
     }
+    if (true) {
+      setLoadingMore(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(true);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
 
+    const excludeIds = results.map((r) => r.id);
+    const lastScore = pagination.lastScore;
+    const lastId = pagination.lastId;
+
+    setResults([]);
+    setExplanations({});
     setLoadingMore(true);
     setError(null);
+    setShowSecretPage(false);
 
     try {
-      const excludeIds = results.map((r) => r.id);
       const response = await fetch("/api/search", {
         method: "POST",
         headers: {
@@ -90,9 +216,9 @@ export default function Home() {
         },
         body: JSON.stringify({
           query: query.trim(),
-          limit: 3,
-          lastScore: pagination.lastScore,
-          lastId: pagination.lastId,
+          limit: isMobile ? 2 : 4,
+          lastScore,
+          lastId,
           excludeIds,
         }),
       });
@@ -103,11 +229,53 @@ export default function Home() {
         throw new Error(data.error || "Load more failed");
       }
 
-      setResults((prev) => [...prev, ...(data.results || [])]);
+      const newCourses = data.results || [];
+      setResults(newCourses);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
+      setLoadingMore(false);
+
+      // Wait for phase 2 skeleton to paint and stay visible briefly
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise((r) => setTimeout(r, 400));
+
+      // Stream explanations for new courses in parallel (cards already visible with names)
+      await Promise.all(
+        newCourses.map(async (course: CourseResult) => {
+          try {
+            const res = await fetch("/api/explain", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                query: query.trim(),
+                courseTitle: course.course_title ?? null,
+                courseDescr: course.course_descr ?? null,
+              }),
+            });
+            if (!res.ok) throw new Error("Explain failed");
+            const reader = res.body?.getReader();
+            if (!reader) return;
+            const decoder = new TextDecoder();
+            let text = "";
+            const MIN_CHARS_BEFORE_SHOW = 80;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              text += decoder.decode(value, { stream: true });
+              if (text.length >= MIN_CHARS_BEFORE_SHOW || done) {
+                setExplanations((prev) => ({ ...prev, [course.id]: text }));
+              }
+            }
+            if (text.length > 0) {
+              setExplanations((prev) => ({ ...prev, [course.id]: text }));
+            }
+          } catch (err) {
+            console.warn("Explain failed for course", course.id, err);
+            setExplanations((prev) => ({ ...prev, [course.id]: course.course_descr || "" }));
+          }
+        })
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
       setLoadingMore(false);
     }
   };
@@ -122,11 +290,49 @@ export default function Home() {
     setResults([]);
     setError(null);
     setHasSearched(false);
+    setShowSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
+  };
+
+  const handleSaladEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (saladEmail.trim()) {
+      fetch("/api/salad-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: saladEmail.trim() }),
+      }).catch(() => {});
+      setSaladEmail("");
+    }
   };
 
   return (
     <>
+      <div
+        style={{
+          position: "fixed",
+          top: "16px",
+          right: "20px",
+          zIndex: 100,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setLeaderboardOpen(true)}
+          style={{
+            fontFamily: '"Roboto Mono", monospace',
+            fontSize: "10px",
+            padding: "0.35rem 0.6rem",
+            background: "#1a1a1a",
+            color: "#f0f0f0",
+            border: "none",
+            cursor: "pointer",
+            borderRadius: 0,
+          }}
+        >
+          Most searched
+        </button>
+      </div>
       <style>{`
         @keyframes shimmer {
           0% {
@@ -134,6 +340,88 @@ export default function Home() {
           }
           100% {
             background-position: -200% 0;
+          }
+        }
+
+        @keyframes skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        .mobile-fixed {
+          height: 100vh;
+          overflow: hidden;
+        }
+
+        @media (min-width: 769px) {
+          .results-list {
+            flex-direction: row !important;
+          }
+          .results-page {
+            flex: 1 !important;
+            min-width: 0 !important;
+          }
+          .results-page-divider {
+            width: 1px !important;
+            height: auto !important;
+            min-height: 100% !important;
+            margin: 0 1rem !important;
+          }
+          .search-box-wrapper.has-results {
+            width: 900px !important;
+            height: 600px !important;
+          }
+          .search-box-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 480px;
+            aspect-ratio: 4 / 5;
+            padding: 0;
+            text-align: center;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: visible;
+          }
+          .box-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+          }
+          .box-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            image-rendering: pixelated;
+          }
+          .box-overlay-1,
+          .box-overlay-2 {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1rem 1.5rem;
+          }
+          .box-overlay-1 {
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+          }
+          .box-overlay-2 {
+            margin-top: auto;
+            margin-bottom: 2.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 0;
           }
         }
 
@@ -166,7 +454,7 @@ export default function Home() {
             max-width: none !important;
           }
           .mobile-container {
-            padding-top: 10px !important;
+            padding-top: 24px !important;
             padding-right: 10px !important;
             padding-bottom: 60px !important;
             padding-left: 10px !important;
@@ -175,215 +463,443 @@ export default function Home() {
             position: fixed !important;
             bottom: 20px !important;
           }
+          .search-box-wrapper {
+            position: relative;
+            width: 90%;
+            max-width: 480px;
+            aspect-ratio: 4 / 5;
+            padding: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: visible;
+          }
+          .box-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+          }
+          .box-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            image-rendering: pixelated;
+          }
+          .box-overlay-1,
+          .box-overlay-2 {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1rem 1.5rem;
+          }
+          .box-overlay-1 {
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+          }
+          .box-overlay-2 {
+            margin-top: auto;
+            margin-bottom: 1rem;
+            padding-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 0;
+          }
+          .results-list-mobile {
+            flex-direction: column !important;
+            width: 100% !important;
+          }
+          .results-list-mobile .results-page-divider {
+            display: none !important;
+          }
         }
       `}</style>
       <div 
-        className={`${!hasSearched ? "mobile-fixed" : "mobile-scrollable"} mobile-container`}
+        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container`}
         style={{
           ...styles.container,
           ...((loading || hasSearched) ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
-       {!hasSearched && (
-         <div style={styles.topNote}>
-           A continuation of
-           <br />
-           <a
-             href="https://stanfordbikeregistry.com"
-             target="_blank"
-             rel="noopener noreferrer"
-             style={{ textDecoration: "underline", color: "inherit" }}
-           >
-             stanfordbikeregistry.com
-           </a>{" "}
-           &{" "}
-           <a
-             href="https://stanfordlabregistry.com"
-             target="_blank"
-             rel="noopener noreferrer"
-             style={{ textDecoration: "underline", color: "inherit" }}
-           >
-             stanfordlabregistry.com
-           </a>
-         </div>
-       )}
-       <div style={styles.watercolorWrapper}>
-        <div style={styles.watercolorBlock}></div>
-        <div style={styles.grainOverlay}></div>
-        <div style={styles.glassSquares}></div>
-      </div>
-      {!hasSearched && (
-        <div className="mobile-content" style={styles.contentWrapper}>
-          <h1 className="mobile-title" style={styles.title}>Stanford Course<br />Registry</h1>
-          <div style={styles.subtitle}>Winter 26 Edition</div>
-          <form onSubmit={handleSearch} className="mobile-search-container" style={styles.searchContainer}>
-            <textarea
-              placeholder="Describe your dream course"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey && !loading) {
-                  e.preventDefault();
-                  runSearch();
+      <div
+        className={`search-box-wrapper ${leaderboardOpen ? "" : hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage) ? "has-results" : ""}`}
+        style={
+          leaderboardOpen || showSecretPage
+            ? undefined
+            : wrapperSize && hasSearched && !loading && !loadingMore && results.length === 0
+              ? {
+                  width: wrapperSize.width,
+                  height: wrapperSize.height,
                 }
-              }}
-              style={styles.searchInput}
-              disabled={loading}
-              rows={4}
-            />
-            <button
-              type="submit"
-              style={styles.searchButton}
-              disabled={loading}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = "#000000";
-                  e.currentTarget.style.color = "#FFFFFF";
-                  e.currentTarget.style.boxShadow = "none";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = "#8e0202";
-                  e.currentTarget.style.color = "#FFFFFF";
-                  e.currentTarget.style.boxShadow =
-                    "-3px 3px 0px rgba(0, 0, 0, 0.75)";
-                }
-              }}
-            >
-              {loading ? (
-                "..."
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                </svg>
-              )}
-            </button>
-          </form>
-        </div>
-      )}
-
-      {loading && (
-        <div className="mobile-results-container" style={styles.resultsContainer}>
-          {[1, 2, 3].map((i) => (
-            <div key={i} style={styles.resultCard}>
-              <div style={styles.skeleton}>
-                <div style={styles.skeletonHeader}>
-                  <div style={styles.skeletonContent}>
-                    <div style={styles.skeletonTitle}></div>
-                    <div style={{ ...styles.skeletonTitle, width: "70%" }}></div>
-                  </div>
-                  <div style={styles.skeletonScore}></div>
+              : undefined
+        }
+      >
+        {leaderboardOpen ? (
+          <LeaderboardPanel onClose={() => setLeaderboardOpen(false)} />
+        ) : showSecretPage ? (
+          <div style={styles.resultsBox}>
+            <div style={styles.resultsList} className="results-list">
+              <div style={styles.resultsPage} className="results-page">
+                <div style={styles.secretPageContent}>
+                  <p style={styles.secretPageText}>
+                    Yippee, welcome to this cozy corner of the registry. Sorry no classes womp womp. But consider yourself a lucky one, this page has a 1/72 chance of appearing.
+                  </p>
+                  <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
+                  <p style={styles.secretPageText}>What&apos;s up with the salads???</p>
                 </div>
-                <div style={styles.skeletonContent}>
-                  <div style={styles.skeletonLine}></div>
-                  <div style={styles.skeletonLine}></div>
-                  <div style={{ ...styles.skeletonLine, width: "70%" }}></div>
+              </div>
+              <div style={styles.resultsPageDivider} className="results-page-divider" />
+              <div style={styles.resultsPage} className="results-page">
+                <div style={styles.secretPageContent}>
+                  <p style={styles.secretPageText}>
+                    This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad maker will use the ingredients at their disposal is another question. However, a well stocked pantry with a complete list should be made available for the salad makers so they may cook. Perhaps some more pickles or even some pomegranates?
+                  </p>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <img src="/dithered-image-6.jpeg" alt="" style={{ maxWidth: "75%", imageRendering: "pixelated" }} />
+                  </div>
+                  <p style={styles.secretPageText}>
+                    You also get an invitation to join the salad bar!!
+                  </p>
+                  <form onSubmit={handleSaladEmailSubmit} style={styles.saladEmailForm}>
+                    <input
+                      type="email"
+                      placeholder="Drop your email for a surprise"
+                      value={saladEmail}
+                      onChange={(e) => setSaladEmail(e.target.value)}
+                      style={styles.saladEmailInput}
+                    />
+                    <button type="submit" style={styles.saladEmailButton}>
+                      →
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {error && <div style={styles.error}>{error}</div>}
-
-      {!loading && results.length > 0 && (
-        <div className="mobile-results-container" style={styles.resultsContainer}>
-          {results.map((course, index) => (
-            <CourseResultCard
-              key={course.id}
-              course={course}
-              index={index}
-            />
-          ))}
-          {loadingMore && (
-            <>
-              {[1, 2, 3].map((i) => (
-                <div key={`skeleton-${i}`} style={styles.resultCard}>
-                  <div style={styles.skeleton}>
-                    <div style={styles.skeletonHeader}>
-                      <div style={styles.skeletonContent}>
-                        <div style={styles.skeletonTitle}></div>
-                        <div style={{ ...styles.skeletonTitle, width: "70%" }}></div>
-                      </div>
-                      <div style={styles.skeletonScore}></div>
-                    </div>
-                    <div style={styles.skeletonContent}>
-                      <div style={styles.skeletonLine}></div>
-                      <div style={styles.skeletonLine}></div>
-                      <div style={{ ...styles.skeletonLine, width: "70%" }}></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-          {!loadingMore && (
-            <div style={styles.buttonContainer}>
-              {pagination.hasMore && (
-                <button
-                  onClick={loadMore}
-                  style={styles.actionButton}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "-2px 2px 0px rgba(0, 0, 0, 0.5)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "-4px 4px 0px rgba(0, 0, 0, 0.65)";
-                  }}
-                >
-                  Load More
-                </button>
-              )}
-              <button
-                onClick={handleNewSearch}
-                style={styles.actionButton}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = "-2px 2px 0px rgba(0, 0, 0, 0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "-4px 4px 0px rgba(0, 0, 0, 0.65)";
-                }}
-              >
-                New Search
+            <div style={styles.resultsBottomBar}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                ← new query
+              </button>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                load more →
               </button>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        ) : !hasSearched ? (
+          <>
+            <div style={styles.creatorByBox}>
+              {isMobile ? (
+                <>
+                  Campus Curiosities Vol 4 |{" "}
+                  <a
+                    href="https://stanfordlabregistry.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "underline", color: "inherit" }}
+                  >
+                    stanfordlabregistry.com
+                  </a>
+                </>
+              ) : (
+                <>
+                  Campus Curiosities Vol 4 /{" "}
+                  <a
+                    href="https://stanfordlabregistry.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "underline", color: "inherit" }}
+                  >
+                    stanfordlabregistry.com
+                  </a>
+                  {" / "}
+                  <a
+                    href="https://stanfordbikeregistry.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: "underline", color: "inherit" }}
+                  >
+                    stanfordbikeregistry.com
+                  </a>
+                </>
+              )}
+            </div>
+            <div className="box-image">
+              <img
+                src="/dithered-background.jpeg"
+                alt=""
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
+                }}
+              />
+            </div>
+            <div className="box-overlay-1">
+              <h1 className="mobile-title" style={styles.title}>Stanford Course<br />Registry</h1>
+            </div>
+            <div style={styles.spring26Badge}>Spring 26 Edition</div>
+            <div className="box-overlay-2">
+              <form onSubmit={handleSearch} className="mobile-search-container" style={styles.searchContainer}>
+                <textarea
+                  placeholder="Describe your dream course..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && !loading) {
+                      e.preventDefault();
+                      runSearch();
+                    }
+                  }}
+                  style={styles.searchInput}
+                  disabled={loading}
+                  rows={4}
+                />
+                <button
+                  type="submit"
+                  style={styles.searchButton}
+                  disabled={loading}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.background = "#333333";
+                      e.currentTarget.style.color = "#FFFFFF";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.background = "#000000";
+                      e.currentTarget.style.color = "#FFFFFF";
+                    }
+                  }}
+                >
+                  {loading ? (
+                    "..."
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                    </svg>
+                  )}
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div style={styles.resultsBox}>
+            {(loading || loadingMore) ? (
+              <div style={styles.resultsList} className={`results-list ${isMobile ? "results-list-mobile" : ""}`}>
+                <div style={styles.resultsPage} className="results-page">
+                  {(isMobile ? [0, 1] : [0, 1]).map((i) => (
+                    <div key={i} style={styles.resultItemWrapper}>
+                      <div style={styles.loadingSkeletonCard}>
+                        <div style={styles.loadingSkeletonHeader} />
+                        <div style={styles.skeletonDescr}>
+                          <div style={styles.skeletonDescrLine} />
+                          <div style={{ ...styles.skeletonDescrLine, width: "85%" }} />
+                          <div style={{ ...styles.skeletonDescrLine, width: "70%" }} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {!isMobile && (
+                  <>
+                    <div style={styles.resultsPageDivider} className="results-page-divider" />
+                    <div style={styles.resultsPage} className="results-page">
+                      {[2, 3].map((i) => (
+                        <div key={i} style={styles.resultItemWrapper}>
+                          <div style={styles.loadingSkeletonCard}>
+                            <div style={styles.loadingSkeletonHeader} />
+                            <div style={styles.skeletonDescr}>
+                              <div style={styles.skeletonDescrLine} />
+                              <div style={{ ...styles.skeletonDescrLine, width: "85%" }} />
+                              <div style={{ ...styles.skeletonDescrLine, width: "70%" }} />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : error ? (
+              <div style={styles.loadingText}>{error}</div>
+            ) : results.length === 0 ? (
+              <div style={styles.loadingText}>No results found.</div>
+            ) : (
+              <>
+                <div style={styles.resultsList} className={`results-list ${isMobile ? "results-list-mobile" : ""}`}>
+                  <div style={styles.resultsPage} className="results-page">
+                    {(isMobile ? results.slice(0, 2) : results.filter((_, i) => Math.floor(i / 2) % 2 === 0)).map((course) => (
+                      <div key={course.id} style={styles.resultItemWrapper}>
+                        <SimpleCourseCard
+                          course={course}
+                          explanation={explanations[course.id]}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {!isMobile && results.length > 2 && (
+                    <>
+                      <div style={styles.resultsPageDivider} className="results-page-divider" />
+                      <div style={styles.resultsPage} className="results-page">
+                        {results.filter((_, i) => Math.floor(i / 2) % 2 === 1).map((course) => (
+                          <div key={course.id} style={styles.resultItemWrapper}>
+                            <SimpleCourseCard
+                              course={course}
+                              explanation={explanations[course.id]}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div style={styles.resultsBottomBar}>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                    ← new query
+                  </button>
+                  {!isMobile && pagination.hasMore && (
+                    <button
+                      type="button"
+                      style={{
+                        ...styles.resultsBottomBarBtn,
+                        ...(loadingMore ? { opacity: 0.7, cursor: "wait" } : {}),
+                      }}
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                    >
+                      {loadingMore ? "loading…" : "load more →"}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
-      {!loading && hasSearched && results.length === 0 && !error && (
-        <div style={styles.error}>No results found. Try a different search.</div>
-      )}
-
-      {!hasSearched && (
-        <div className="mobile-footer" style={styles.footerText}>
-          Ver Natus
-        </div>
-      )}
+      <div className="mobile-footer" style={styles.footerText}>
+        Ver Natus
+      </div>
       </div>
     </>
+  );
+}
+
+function SimpleCourseCard({
+  course,
+  explanation,
+}: {
+  course: CourseResult;
+  explanation?: string;
+}) {
+  const [hoveredCodeIndex, setHoveredCodeIndex] = useState<number | null>(null);
+  const codes = (course.course_codes || "").split("/").map((c) => c.trim()).filter(Boolean);
+  const text = (explanation && explanation.trim().length > 0
+    ? explanation
+    : (course.explanation && course.explanation.trim().length > 0 ? course.explanation : course.course_descr)) || "";
+  const clean = (s: string) =>
+    s.replace(/<[^>]+>/g, "").replace(/_([^_]*)_/g, "$1").trim();
+  const prereqIdx = text.toLowerCase().indexOf("prerequisites:");
+  const mainText = prereqIdx >= 0 ? text.slice(0, prereqIdx).trim() : text;
+  const rawPrereq = prereqIdx >= 0 ? text.slice(prereqIdx).trim() : "";
+  const prereqContent = clean(rawPrereq).replace(/^prerequisites:?\s*/i, "").trim();
+  const prereqDisplay = prereqContent ? clean(rawPrereq) : "Prerequisites: None mentioned";
+  const hasCompleteExplanation =
+    typeof explanation === "string" &&
+    (explanation.toLowerCase().includes("prereq") || explanation.length >= 80);
+  const isLoading = explanation === undefined || !hasCompleteExplanation;
+
+  return (
+    <div style={styles.simpleCard}>
+      <div style={styles.simpleCardHeader}>
+        <div style={styles.simpleCardHeaderLeft}>
+          <div style={styles.courseCodesContainer}>
+            {codes.map((code, codeIndex) => {
+              const navigatorUrl = STANFORD_NAVIGATOR_URL(code);
+              const isHovered = hoveredCodeIndex === codeIndex;
+              return (
+                <span key={codeIndex}>
+                  <a
+                    href={navigatorUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      ...styles.courseCodes,
+                      ...styles.simpleCardCodes,
+                      ...(isHovered ? styles.courseCodesHovered : {}),
+                    }}
+                    onMouseEnter={() => setHoveredCodeIndex(codeIndex)}
+                    onMouseLeave={() => setHoveredCodeIndex(null)}
+                  >
+                    {code}
+                    <span style={styles.courseArrow}>↗</span>
+                  </a>
+                  {codeIndex < codes.length - 1 && (
+                    <span style={styles.courseCodeSeparator}> / </span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+          <span style={styles.simpleCardTitle}>{course.course_title || "N/A"}</span>
+          <span style={styles.simpleCardProfs}>{course.instructors || "N/A"}</span>
+        </div>
+        {typeof course.similarity === "number" && (
+          <span style={styles.simpleCardSimilarity}>
+            {(course.similarity * 100).toFixed(1)}%
+          </span>
+        )}
+      </div>
+      {isLoading ? (
+        <div style={styles.skeletonDescr}>
+          <div style={styles.skeletonDescrLine} />
+          <div style={styles.skeletonDescrLine} />
+          <div style={{ ...styles.skeletonDescrLine, width: "95%" }} />
+          <div style={{ ...styles.skeletonDescrLine, width: "90%" }} />
+          <div style={{ ...styles.skeletonDescrLine, width: "75%" }} />
+        </div>
+      ) : (clean(mainText) || prereqDisplay) ? (
+        <div style={styles.simpleCardDescr}>
+          {clean(mainText) && <span>{clean(mainText)}</span>}
+          {clean(mainText) && (
+            <>
+              <br />
+              <br />
+            </>
+          )}
+          <span>{prereqDisplay}</span>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 function CourseResultCard({
   course,
   index,
+  compact = false,
 }: {
   course: CourseResult;
   index: number;
+  compact?: boolean;
 }) {
   const [wordsVisible, setWordsVisible] = useState(false);
   const [hoveredCodeIndex, setHoveredCodeIndex] = useState<number | null>(null);
@@ -493,14 +1009,12 @@ function CourseResultCard({
   const textParts = parseTextWithUnderline(baseText);
 
   return (
-    <div style={styles.resultCard}>
+    <div style={compact ? { ...styles.resultCard, ...styles.compactCard } : styles.resultCard}>
       <div style={styles.resultHeader}>
         <div>
           <div style={styles.courseCodesContainer}>
             {courseCodes.map((code, codeIndex) => {
-              const navigatorUrl = `https://navigator.stanford.edu/classes?classes%5BrefinementList%5D%5BtermOffered%5D%5B0%5D=Winter%202026&classes%5Bquery%5D=${encodeURIComponent(
-                code,
-              )}`;
+              const navigatorUrl = STANFORD_NAVIGATOR_URL(code);
               const isHovered = hoveredCodeIndex === codeIndex;
               
               return (
@@ -526,9 +1040,8 @@ function CourseResultCard({
               );
             })}
           </div>
-          {course.course_title && (
-            <div style={styles.courseTitle}>{course.course_title}</div>
-          )}
+          <div style={styles.courseTitle}>{course.course_title || "N/A"}</div>
+          <div style={styles.instructors}>{course.instructors || "N/A"}</div>
         </div>
         <div style={styles.similarity}>
           {(course.similarity * 100).toFixed(1)}% match
@@ -572,10 +1085,24 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: "20px",
     paddingLeft: "20px",
     boxSizing: "border-box",
-    fontFamily: "'JetBrains Mono', monospace",
-    backgroundColor: "#FFFFFF",
+    fontFamily: '"Jersey 15", sans-serif',
+    backgroundColor: "#f5f5f5",
     color: "#000000",
     position: "relative",
+  },
+  creatorByBox: {
+    position: "absolute",
+    bottom: "100%",
+    left: 0,
+    right: 0,
+    fontSize: "9px",
+    color: "#1a1a1a",
+    fontFamily: '"Roboto Mono", monospace',
+    textAlign: "center",
+    padding: "0.5rem 1rem",
+    background: "#ffffff",
+    whiteSpace: "nowrap",
+    zIndex: 10,
   },
   topNote: {
     position: "absolute",
@@ -584,7 +1111,7 @@ const styles: Record<string, React.CSSProperties> = {
     transform: "translateX(-50%)",
     width: "100%",
     maxWidth: "700px",
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#1a1a1a",
     zIndex: 10,
     textAlign: "center",
@@ -597,50 +1124,23 @@ const styles: Record<string, React.CSSProperties> = {
     position: "relative",
     zIndex: 1,
   },
-  watercolorWrapper: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    zIndex: 0,
-    overflow: "hidden",
-    pointerEvents: "none",
+  titleSubtext: {
+    fontSize: "0.85em",
+    color: "#555",
+    fontFamily: '"Roboto Mono", monospace',
+    marginTop: "0.25rem",
+    marginBottom: 0,
   },
-  watercolorBlock: {
-    position: "absolute",
-    width: "110%",
-    height: "70%",
-    bottom: "-10%",
-    left: "-5%",
-    background:
-      "linear-gradient(to top, rgba(80, 5, 15, 1), rgba(100, 10, 20, 0.85), rgba(120, 15, 25, 0.65), transparent)",
-    filter: "blur(60px) contrast(1.5) saturate(1.8)",
-  },
-  grainOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='8' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.8'/%3E%3C/svg%3E")`,
-    backgroundSize: "80px 80px",
-    opacity: 0.7,
-    pointerEvents: "none",
-  },
-  glassSquares: {
-    position: "absolute",
-    top: "35%",
-    left: 0,
-    width: "100%",
-    height: "65%",
-    backgroundImage: `url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='glassPattern' width='300' height='300' patternUnits='userSpaceOnUse'%3E%3Crect width='300' height='300' fill='rgba(255,255,255,0.03)'/%3E%3Cg fill='url(%23glassGradient)'%3E%3Crect x='0' y='0' width='140' height='140'/%3E%3Crect x='80' y='40' width='140' height='140'/%3E%3Crect x='160' y='100' width='140' height='140'/%3E%3Crect x='40' y='120' width='140' height='140'/%3E%3Crect x='200' y='20' width='140' height='140'/%3E%3Crect x='20' y='200' width='140' height='140'/%3E%3Crect x='120' y='210' width='140' height='140'/%3E%3Crect x='220' y='180' width='140' height='140'/%3E%3C/g%3E%3C/pattern%3E%3ClinearGradient id='glassGradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='rgba(255,255,255,0.45)'/%3E%3Cstop offset='40%25' stop-color='rgba(255,255,255,0.12)'/%3E%3Cstop offset='100%25' stop-color='rgba(220,220,220,0.15)'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23glassPattern)'/%3E%3C/svg%3E")`,
-    opacity: 0.8,
-    pointerEvents: "none",
-    mixBlendMode: "overlay",
+  leaderboardLink: {
+    fontSize: "0.8em",
+    color: "#1a1a1a",
+    fontFamily: '"Roboto Mono", monospace',
+    marginTop: "1rem",
+    marginBottom: 0,
+    padding: 0,
   },
   title: {
-    fontSize: "2.5em",
+    fontSize: "2.8em",
     marginBottom: "0.5rem",
     marginTop: "0",
     letterSpacing: "0.1em",
@@ -649,59 +1149,61 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center",
     color: "#1a1a1a",
     fontWeight: "normal",
-    textShadow:
-      "0 0 1px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,0.6), -1px -1px 0 rgba(255,255,255,0.4), 1px -1px 0 rgba(255,255,255,0.4), -1px 1px 0 rgba(255,255,255,0.4), 1px 1px 0 rgba(255,255,255,0.4)",
   },
-  subtitle: {
-    fontSize: "12px",
-    color: "#666666",
-    marginBottom: "3.5rem",
-    textAlign: "center",
+  spring26Badge: {
+    position: "absolute",
+    top: "1px",
+    right: 0,
+    background: "#000000",
+    color: "#f0f0f0",
+    fontSize: "9px",
+    padding: "0.4rem 0.5rem",
+    writingMode: "vertical-rl",
+    textOrientation: "mixed",
+    whiteSpace: "nowrap",
+    zIndex: 10,
+    fontFamily: '"Roboto Mono", monospace',
   },
   searchContainer: {
-    width: "90%",
-    maxWidth: "700px",
+    width: "85%",
+    maxWidth: "384px",
     position: "relative",
     paddingBottom: "10px",
   },
   searchInput: {
     width: "100%",
-    padding: "0.8rem",
-    paddingRight: "100px",
-    minHeight: "100px",
-    border: "1px solid rgba(240, 240, 240, 0.7)",
-    background:
-      "linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(250, 250, 250, 0.25), rgba(245, 245, 245, 0.2))",
+    padding: "0.5rem",
+    paddingRight: "72px",
+    minHeight: "72px",
+    border: "none",
+    background: "#f0f0f0",
     color: "rgb(23, 23, 23)",
-    borderRadius: "6px",
-    fontSize: "12px",
+    borderRadius: 0,
+    fontSize: "10px",
+    fontFamily: '"Roboto Mono", monospace',
     outline: "none",
     boxSizing: "border-box",
     resize: "none",
-    backdropFilter: "blur(14px) saturate(1.1)",
-    boxShadow: "-4px 4px 0px rgba(0, 0, 0, 0.65)",
     lineHeight: "1.3",
   },
   searchButton: {
     position: "absolute",
-    right: "12px",
-    bottom: "25px",
+    right: "8px",
+    bottom: "20px",
     padding: 0,
-    height: "36px",
-    width: "36px",
-    border: "1px solid #f0f0f0",
-    background: "#8e0202",
+    height: "28px",
+    width: "28px",
+    border: "none",
+    background: "#000000",
     color: "#FFFFFF",
-    borderRadius: "5px",
+    borderRadius: 0,
     fontSize: "12px",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "background-color 0.2s, color 0.2s, box-shadow 0.1s",
-    backdropFilter: "blur(10px)",
+    transition: "background 0.2s, color 0.2s",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "-3px 3px 0px rgba(0, 0, 0, 0.75)",
   },
   error: {
     marginTop: "20px",
@@ -717,16 +1219,371 @@ const styles: Record<string, React.CSSProperties> = {
     width: "80%",
     fontSize: "12px",
   },
+  resultsBox: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "#ffffff",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: "1.5rem",
+    boxSizing: "border-box",
+    overflow: "auto",
+  },
+  secretPageContent: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    padding: "0.5rem 0",
+    width: "100%",
+    textAlign: "left",
+  },
+  secretPageText: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "11px",
+    color: "#333",
+    lineHeight: 1.5,
+    margin: 0,
+    textAlign: "left",
+  },
+  saladPlaceholder: {
+    width: "100%",
+    height: 120,
+    background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+    border: "1px dashed #81c784",
+  },
+  saladEmailForm: {
+    display: "flex",
+    gap: "0.5rem",
+    marginTop: "0.5rem",
+  },
+  saladEmailInput: {
+    flex: 1,
+    padding: "0.4rem 0",
+    fontSize: "11px",
+    fontFamily: '"Roboto Mono", monospace',
+    border: "none",
+    borderBottom: "1px solid #333",
+    borderRadius: 0,
+    background: "transparent",
+    outline: "none",
+  },
+  saladEmailButton: {
+    padding: "0.4rem 0.6rem",
+    fontSize: "11px",
+    fontFamily: '"Roboto Mono", monospace',
+    background: "#1a1a1a",
+    color: "#f0f0f0",
+    border: "none",
+    cursor: "pointer",
+  },
+  resultsTitle: {
+    fontFamily: '"Jersey 15", sans-serif',
+    fontSize: "2em",
+    margin: "0 0 0.5rem 0",
+    textAlign: "left",
+    color: "#1a1a1a",
+    alignSelf: "flex-start",
+  },
+  loadingText: {
+    fontFamily: '"Roboto Mono", monospace',
+    textAlign: "left",
+    padding: "2rem",
+    alignSelf: "flex-start",
+  },
+  resultsBottomBar: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    flexShrink: 0,
+  },
+  resultsBottomBarBtn: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "9px",
+    color: "#f0f0f0",
+    background: "#000000",
+    border: "none",
+    cursor: "pointer",
+    padding: "0.4rem 0.5rem",
+  },
+  resultsList: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    overflow: "hidden",
+    width: "100%",
+    alignItems: "stretch",
+  },
+  resultsPage: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    minWidth: 0,
+    overflow: "hidden",
+  },
+  resultsPageDivider: {
+    width: "100%",
+    height: 1,
+    background: "#1a1a1a",
+    flexShrink: 0,
+  },
+  resultItemWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    width: "100%",
+    flex: 1,
+    minHeight: 0,
+    overflow: "hidden",
+    paddingTop: "0.75rem",
+    paddingBottom: "0.75rem",
+  },
+  resultDivider: {
+    width: "100%",
+    height: 1,
+    background: "#1a1a1a",
+    flexShrink: 0,
+  },
+  simpleCard: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "0.5rem",
+    textAlign: "left",
+    maxWidth: "100%",
+    width: "100%",
+    minWidth: 0,
+  },
+  simpleCardHeader: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: "0.5rem",
+    width: "100%",
+  },
+  simpleCardHeaderLeft: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "0.25rem",
+  },
+  simpleCardSimilarity: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "10px",
+    color: "#f0f0f0",
+    background: "#000000",
+    padding: "0.2em 0.5em",
+    flexShrink: 0,
+  },
+  simpleCardCodes: {
+    fontFamily: '"Jersey 15", sans-serif',
+    fontSize: "1.2em",
+    color: "#1a1a1a",
+  },
+  simpleCardTitle: {
+    fontFamily: '"Jersey 15", sans-serif',
+    fontSize: "1em",
+    color: "#1a1a1a",
+  },
+  simpleCardProfs: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "11px",
+    color: "#666",
+  },
+  simpleCardDescr: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "11px",
+    color: "#333",
+    lineHeight: 1.2,
+    textAlign: "left",
+    height: "160px",
+    minHeight: "160px",
+    flexShrink: 0,
+    overflow: "hidden",
+    width: "100%",
+  },
+  spottedSection: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.5rem",
+    marginTop: "0.5rem",
+    flexWrap: "wrap",
+  },
+  spottedBy: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "9px",
+    color: "#666",
+  },
+  spotButton: {
+    fontFamily: '"Roboto Mono", monospace',
+    fontSize: "9px",
+    padding: "0.25rem 0.5rem",
+    background: "#f0f0f0",
+    color: "#1a1a1a",
+    border: "1px solid #ccc",
+    cursor: "pointer",
+  },
+  spotButtonActive: {
+    background: "#1a1a1a",
+    color: "#f0f0f0",
+    borderColor: "#1a1a1a",
+  },
+  loadingSkeletonCard: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    gap: "0.5rem",
+  },
+  loadingSkeletonHeader: {
+    height: "14px",
+    width: "60%",
+    background: "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
+    backgroundSize: "200% 100%",
+    animation: "skeleton-shimmer 1.5s ease-in-out infinite",
+    borderRadius: "2px",
+  },
+  skeletonDescr: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    marginTop: "4px",
+    height: "160px",
+    minHeight: "160px",
+    flexShrink: 0,
+    width: "100%",
+    minWidth: "100%",
+  },
+  skeletonDescrLine: {
+    height: "12px",
+    width: "100%",
+    background: "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
+    backgroundSize: "200% 100%",
+    animation: "skeleton-shimmer 1.5s ease-in-out infinite",
+    borderRadius: "2px",
+  },
+  bookScene: {
+    perspective: 2000,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginTop: "20px",
+  },
+  bookCover: {
+    flexShrink: 0,
+    position: "relative",
+    overflow: "visible",
+    backgroundColor: "#fff",
+    boxShadow: "2px 2px 10px rgba(0,0,0,0.2)",
+  },
+  coverFront: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+  },
+  coverBack: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "#ffffff",
+  },
+  pageCover: {
+    backgroundColor: "#fff",
+  },
+  pageCoverBack: {
+    backgroundColor: "#ffffff",
+  },
+  pageContent: {
+    border: "1px solid #ddd",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    padding: "1rem",
+    boxSizing: "border-box",
+    backgroundColor: "#ffffff",
+  },
+  bookCoverImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+  },
+  bookContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 0,
+    marginTop: "20px",
+    flexWrap: "wrap",
+    width: "100%",
+  },
+  bookPage: {
+    border: "1px solid #ddd",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    padding: "1rem",
+    boxSizing: "border-box",
+  },
+  bookPageWhite: {
+    background: "#ffffff",
+  },
+  bookPages: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  bookButtonContainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: "1rem",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "20px",
+    width: "100%",
+  },
+  loadingMoreOverlay: {
+    position: "fixed",
+    top: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "0.5rem 1rem",
+    background: "rgba(0,0,0,0.8)",
+    color: "#fff",
+    borderRadius: "4px",
+    fontSize: "12px",
+    zIndex: 100,
+  },
   resultsContainer: {
     marginTop: "20px",
     width: "44%",
     maxWidth: "800px",
     fontSize: "12px",
   },
-  resultsTitle: {
-    fontSize: "1rem",
-    fontWeight: "bold",
-    marginBottom: "20px",
+  compactCard: {
+    padding: "0.75rem",
+    marginBottom: "0.5rem",
+    fontSize: "10px",
+    flex: 1,
+    minHeight: 0,
+    overflow: "auto",
   },
   resultCard: {
     padding: "1.5rem",
@@ -771,10 +1628,10 @@ const styles: Record<string, React.CSSProperties> = {
     margin: "0 0.2rem",
   },
   courseArrow: {
-    marginLeft: "0.4rem",
-    fontSize: "1.2em",
+    marginLeft: "0.25rem",
+    fontSize: "0.75em",
     color: "inherit",
-    fontWeight: "100",
+    fontWeight: "700",
     fontFamily: "inherit",
     lineHeight: "1",
   },
@@ -782,6 +1639,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "0.9rem",
     color: "rgb(23, 23, 23)",
     marginBottom: "8px",
+  },
+  instructors: {
+    fontSize: "0.8rem",
+    color: "#555",
+    marginBottom: "4px",
   },
   similarity: {
     marginLeft: "auto",
@@ -853,13 +1715,14 @@ const styles: Record<string, React.CSSProperties> = {
     animation: "shimmer 1.5s ease-in-out infinite",
   },
   footerText: {
-    position: "absolute",
+    position: "fixed",
     bottom: "20px",
     left: "50%",
     transform: "translateX(-50%)",
-    fontSize: "12px",
+    fontSize: "11px",
     color: "#1a1a1a",
     zIndex: 10,
+    fontFamily: '"Roboto Mono", monospace',
   },
   buttonContainer: {
     display: "flex",
@@ -883,7 +1746,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "background-color 0.2s, box-shadow 0.1s",
     backdropFilter: "blur(14px) saturate(1.1)",
     boxShadow: "-4px 4px 0px rgba(0, 0, 0, 0.65)",
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: '"Jersey 15", sans-serif',
     outline: "none",
   },
 };

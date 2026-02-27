@@ -24,6 +24,12 @@
 .DS_Store
 *.pem
 
+# scripts
+/scripts
+
+# supabase migrations
+/supabase/migrations
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -40,11 +46,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# data files
+# data files (allow data/ folder for course JSONs)
 *.json
 !package.json
 !package-lock.json
 !tsconfig.json
-
-# scripts
-/scripts/
+!data/**/*.json

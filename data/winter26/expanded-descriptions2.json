@@ -1,0 +1,650 @@
+[
+  {
+    "id": 1078,
+    "course_codes": "MS&E 121",
+    "course_title": "Introduction to Stochastic Modeling",
+    "original_descr": "Stochastic processes and models in operations research. Discrete and continuous time parameter Markov chains. Queuing theory, inventory theory, simulation. Prerequisite: 120 or equivalent.",
+    "original_word_count": 23,
+    "expanded_descr": "Introduction to Stochastic Modeling explores operations research through stochastic processes and models. Students learn discrete and continuous time parameter Markov chains, queuing theory, and inventory theory. Simulation techniques are also covered. With a prerequisite of 120 or equivalent, students apply mathematical concepts to real-world problems. This course provides a solid foundation in stochastic modeling, enabling students to analyze and optimize complex systems. Through lectures, discussions, and assignments, students develop problem-solving skills and apply theoretical knowledge to practical scenarios, preparing them for advanced studies and professional applications in operations research and related fields effectively and efficiently every day.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1092,
+    "course_codes": "INTNLREL 200C",
+    "course_title": "IR Honors Thesis Writing",
+    "original_descr": "Mandatory seminar for International Relations Honors Students who are writing their Honors Thesis. INTNLREL 200A and 200B are prerequisites.",
+    "original_word_count": 19,
+    "expanded_descr": "In IR Honors Thesis Writing, students craft a comprehensive thesis under faculty guidance. Prerequisites INTNLREL 200A and 200B provide a foundation. Through seminars and workshops, students refine research, analysis, and writing skills, producing a polished thesis. They engage with peers, receive feedback, and develop expertise in international relations, culminating in a robust and well-supported argument. This mandatory course fosters academic growth, independence, and preparation for advanced study or professional careers, empowering students to contribute meaningfully to the field of international relations with a sophisticated and original research project, demonstrating mastery of complex topics and methodologies effectively.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1108,
+    "course_codes": "HISTORY 299H",
+    "course_title": "Junior Honors Colloquium",
+    "original_descr": "Required of junior History majors planning to write a History honors thesis during senior year. Meets four times during the quarter.",
+    "original_word_count": 21,
+    "expanded_descr": "In the Junior Honors Colloquium, History majors prepare for their senior thesis. Meeting four times a quarter, students engage in discussions and workshops, refining research skills and exploring thesis topics. Faculty guidance helps students develop a thesis proposal, conduct preliminary research, and create a timeline. Through peer feedback and mentorship, students refine their ideas and build a strong foundation for their senior project, setting themselves up for success in writing a comprehensive and well-researched History honors thesis, ultimately enhancing their academic and professional pursuits with a rigorous and rewarding research experience and final product. Expectations are clearly outlined.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1116,
+    "course_codes": "ECON 345",
+    "course_title": "Labor Economics Seminar",
+    "original_descr": "Labor Seminar for Economics.",
+    "original_word_count": 4,
+    "expanded_descr": "In the Labor Economics Seminar, students delve into the economics of labor markets, exploring theoretical and empirical aspects. This course examines labor supply and demand, wage determination, and labor market institutions. Through discussions, case studies, and research, students analyze labor market outcomes and policies. They develop critical thinking and problem-solving skills, applying economic principles to real-world labor issues. By the end of the seminar, students will have a deeper understanding of labor economics and its applications, preparing them for careers in economics, policy, and research, with a strong foundation in labor market analysis and decision-making techniques always.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1182,
+    "course_codes": "ECON 310",
+    "course_title": "Macroeconomic Seminar",
+    "original_descr": "Macroeconomic Seminar. Prerequisites: Econ 210, Econ 211 and Econ 212. To obtain credit, enrolled students need to satisfy the macro field presentation requirements.",
+    "original_word_count": 23,
+    "expanded_descr": "In the Macroeconomic Seminar, students build on foundational knowledge from Econ 210, 211, and 212. This advanced course delves into complex macroeconomic topics, fostering in-depth discussions and analysis. To earn credit, students must meet macro field presentation requirements, showcasing their understanding of key concepts. Through engaging seminars, students develop critical thinking and presentation skills, exploring real-world applications of macroeconomic theories. By satisfying the presentation requirements, students demonstrate mastery of macroeconomic principles, preparing them for future academic and professional pursuits in economics and related fields, with a deep understanding of global economic systems and trends always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1145,
+    "course_codes": "CBIO 245",
+    "course_title": "Lecture Seminar Series in Cancer Biology Program",
+    "original_descr": "Invited speakers share insights about state-of-the-art trends. Presents new concepts in the field of cancer biology. Science talks presented by students.",
+    "original_word_count": 21,
+    "expanded_descr": "The Lecture Seminar Series in Cancer Biology Program features esteemed invited speakers sharing cutting-edge insights on state-of-the-art trends. Students engage with new concepts and advancements in cancer biology, exploring innovative research and therapies. The series also showcases science talks presented by students, fostering a collaborative learning environment. Through discussions and lectures, students gain in-depth knowledge of cancer biology, staying updated on the latest developments and discoveries in the field, while developing critical thinking and presentation skills, preparing them for careers in cancer research and related fields with a comprehensive understanding of the subject matter and its applications always.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1168,
+    "course_codes": "STATS 319",
+    "course_title": "Literature of Statistics",
+    "original_descr": "Literature study of topics in statistics and probability culminating in oral and written reports. May be repeated for credit.",
+    "original_word_count": 19,
+    "expanded_descr": "In the Literature of Statistics course, students delve into in-depth studies of statistical and probabilistic topics, fostering critical thinking and analytical skills. Through comprehensive reviews of academic literature, participants develop expertise in research methods and data analysis. The course culminates in oral and written reports, allowing students to showcase their knowledge and communication skills. Repeating the course for credit enables students to explore diverse topics, refining their understanding of statistical concepts and applications, and preparing them for advanced research and professional pursuits in statistics and related fields with enhanced expertise and confidence. New insights emerge regularly.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1185,
+    "course_codes": "HISTORY 298 / HISTORY 398",
+    "course_title": "Major Topics in Modern Chinese History: Science and Technology in East Asia",
+    "original_descr": "History of science and technology in East Asia.",
+    "original_word_count": 8,
+    "expanded_descr": "In \"Major Topics in Modern Chinese History: Science and Technology in East Asia,\" students explore the dynamic history of science and technology in East Asia. This course delves into the region's significant contributions to global advancements, from ancient innovations to modern breakthroughs. Through lectures, discussions, and primary sources, students analyze the complex interplay between scientific discovery, cultural context, and historical events, gaining a deeper understanding of East Asia's role in shaping the modern world and its continued impact on contemporary science and technology, fostering a nuanced appreciation for the region's rich intellectual and technological heritage always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1261,
+    "course_codes": "ECON 391",
+    "course_title": "Microeconomic Theory Seminar",
+    "original_descr": "Microeconomic Theory Seminar (Only available for enrollment by ECON PhDs)",
+    "original_word_count": 10,
+    "expanded_descr": "In the Microeconomic Theory Seminar, ECON PhD students delve into advanced microeconomic concepts, exploring theoretical foundations and cutting-edge research. Through rigorous discussions and presentations, students analyze complex economic models, critically evaluating assumptions and implications. Participants engage with seminal papers and recent publications, developing expertise in microeconomic theory and its applications. This seminar fosters a collaborative environment, encouraging students to share research and receive feedback, ultimately enhancing their understanding of microeconomic principles and preparing them for original contributions to the field, with a focus on academic and professional growth, under faculty guidance and peer interaction always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1273,
+    "course_codes": "MLA 398",
+    "course_title": "MLA Thesis in Progress",
+    "original_descr": "Group meetings provide peer critiques, motivations, and advice under the direction of the Associate Dean.",
+    "original_word_count": 15,
+    "expanded_descr": "In MLA Thesis in Progress, group meetings foster a collaborative environment where students receive peer critiques, motivations, and expert advice under the Associate Dean's guidance. Participants engage in constructive feedback sessions, refining their thesis projects and addressing challenges. Through regular discussions and progress updates, students stay motivated and inspired, developing essential skills in research, writing, and project management. This supportive community helps students overcome obstacles, ensuring successful thesis completion and preparation for future academic and professional pursuits, all within a stimulating and productive learning environment that encourages growth and excellence in every aspect of their thesis work always.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1304,
+    "course_codes": "MUSIC 41",
+    "course_title": "Music History 1600-1830",
+    "original_descr": "Prerequisites: Music 22 or equivalent.",
+    "original_word_count": 5,
+    "expanded_descr": "In Music History 1600-1830, students explore the evolution of Western classical music from the Baroque to the Classical periods. Prerequisites include Music 22 or equivalent. Through lectures, discussions, and analysis of iconic compositions, students delve into the lives and works of renowned composers, such as Bach, Handel, and Mozart. They examine historical context, stylistic developments, and cultural influences, gaining a deeper understanding of music's role in society. By the end, students possess a rich knowledge of music history, critically analyzing and appreciating the masterworks of this pivotal era, with enhanced musical awareness and insight always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1351,
+    "course_codes": "APPPHYS 483",
+    "course_title": "Optics and Electronics Seminar",
+    "original_descr": "Current research topics in lasers, quantum electronics, optics, and photonics by faculty, students, and invited outside speakers. May be repeated for credit.",
+    "original_word_count": 22,
+    "expanded_descr": "In the Optics and Electronics Seminar, faculty, students, and guest speakers explore cutting-edge research in lasers, quantum electronics, optics, and photonics. Students engage with current topics, discussing applications and advancements. Repeated for credit, this seminar fosters academic growth, networking, and collaboration. Participants develop critical thinking, presentation, and discussion skills, enhancing their understanding of emerging technologies and innovative research methods. This dynamic forum encourages interdisciplinary exchange, preparing students for careers in optics, electronics, and related fields, while promoting a deeper understanding of the latest scientific discoveries and breakthroughs in these exciting areas of study always.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1356,
+    "course_codes": "CHEM 329",
+    "course_title": "Organic Chemistry Seminar",
+    "original_descr": "(Formerly 229) Required of graduate students majoring in organic chemistry. Students giving seminars register for CHEM 231.",
+    "original_word_count": 17,
+    "expanded_descr": "In the Organic Chemistry Seminar, graduate students majoring in organic chemistry engage in in-depth discussions and presentations. Students registered for CHEM 231 deliver seminars, fostering critical thinking and communication skills. This course provides a platform for exploring advanced topics, analyzing recent research, and exchanging ideas with peers. Through active participation, students develop expertise in organic chemistry, refine their presentation skills, and gain insight into cutting-edge research, preparing them for academic and professional success in the field of organic chemistry, under the guidance of experienced faculty and industry experts, every semester, with rigorous evaluation and feedback mechanisms.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1517,
+    "course_codes": "COMM 318",
+    "course_title": "Quantitative Social Science Research Methods",
+    "original_descr": "An introduction to a broad range of social science research methods that are widely used in PhD work. Prerequisite: consent of instructor.",
+    "original_word_count": 22,
+    "expanded_descr": "In Quantitative Social Science Research Methods, students explore a wide range of methodologies used in PhD research. With instructor consent, participants delve into statistical analysis, data visualization, and research design. Through case studies and hands-on exercises, students develop skills in data collection, modeling, and interpretation. This course provides a comprehensive foundation for social science research, enabling students to critically evaluate and conduct quantitative studies. By the end, students will be equipped to design and implement their own research projects, preparing them for advanced academic and professional pursuits in social sciences, with a strong emphasis on practical application and critical thinking.",
+    "expanded_word_count": 100
+  },
+  {
+    "id": 1367,
+    "course_codes": "ARTSTUDI 145",
+    "course_title": "Painting I",
+    "original_descr": "Introduction to techniques, materials, and vocabulary in oil painting. Still life, landscape, and figure used as subject matter. Emphasis is on painting and drawing from life. (lower level)",
+    "original_word_count": 28,
+    "expanded_descr": "In Painting I, students discover oil painting techniques, materials, and vocabulary. Exploring still life, landscape, and figure subjects, they learn to paint and draw from life, developing observation and rendering skills. Through hands-on exercises and projects, students understand color theory, composition, and brushwork. Emphasizing direct observation, this foundational course fosters artistic growth and confidence. Students gain a solid understanding of painting principles, preparing them for further artistic exploration and creative expression, with guidance from experienced instructors in a supportive and inspiring studio environment, tailored for lower-level students new to oil painting techniques and practices always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1398,
+    "course_codes": "PHIL 186 / PHIL 286",
+    "course_title": "Philosophy of Mind",
+    "original_descr": "(Graduate students register for 286.) This is an advanced introduction to core topics in the philosophy of mind. Prerequisite: PHIL 80",
+    "original_word_count": 21,
+    "expanded_descr": "In Philosophy of Mind, graduate students delve into core topics, exploring the nature of consciousness, mental states, and the mind-body problem. Prerequisite PHIL 80 provides foundational knowledge. Through advanced discussions and analyses, students examine theories of mind, free will, and personal identity, engaging with historical and contemporary perspectives. This course fosters critical thinking, nuanced understanding, and informed debate, preparing students for specialized study in philosophy of mind, cognitive science, and related fields, with opportunities for original research and intellectual growth, under the guidance of experienced faculty, in a supportive and stimulating academic environment, every semester.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1400,
+    "course_codes": "PHIL 165 / PHIL 265",
+    "course_title": "Philosophy of Physics: Philosophical Issues in Quantum Mechanics",
+    "original_descr": "Graduate students register for 265. The topic for 25-26 is Philosophical Issues in Quantum Mechanics.",
+    "original_word_count": 15,
+    "expanded_descr": "In Philosophy of Physics: Philosophical Issues in Quantum Mechanics, graduate students delve into fundamental questions surrounding quantum theory. Exploring the intersection of physics and philosophy, students analyze key concepts, such as wave-particle duality and uncertainty principle. Through lectures and discussions, students examine the implications of quantum mechanics on our understanding of reality, space, and time. By registering for course 265, students engage with cutting-edge research and debates, developing critical thinking and problem-solving skills to tackle complex philosophical issues in quantum mechanics, enhancing their understanding of this fascinating and complex field of study and research methodologies.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1404,
+    "course_codes": "LINGUIST 210L",
+    "course_title": "Phonology Research Lab",
+    "original_descr": "Current topics in phonological theory and analysis. Meetings consist of presentations of ongoing research, collaborative work, and discussions of theoretical and methodological advances in the field.",
+    "original_word_count": 26,
+    "expanded_descr": "In the Phonology Research Lab, students explore current topics in phonological theory and analysis through presentations, collaborative work, and discussions. Participants engage with ongoing research, examining theoretical and methodological advances in the field. This interactive environment fosters critical thinking, research skills, and effective communication. Students analyze and apply phonological concepts, developing a deeper understanding of language sound systems. The lab provides a unique opportunity for students to contribute to and learn from cutting-edge research, preparing them for advanced studies or careers in linguistics, language teaching, or speech pathology, with hands-on experience and expert guidance always available nearby.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1407,
+    "course_codes": "CHEM 379",
+    "course_title": "Physical Chemistry Seminar",
+    "original_descr": "(Formerly 279) Required of graduate students majoring in physical chemistry. May be repeated for credit.",
+    "original_word_count": 15,
+    "expanded_descr": "The Physical Chemistry Seminar is a required course for graduate students majoring in physical chemistry, offering in-depth exploration of advanced topics. Students engage with leading researchers, discussing recent developments and breakthroughs. Through presentations and discussions, participants develop critical thinking and communication skills. Repeated for credit, this seminar fosters a community of scholars, promoting collaboration and networking. Students refine their expertise, staying current with cutting-edge research and methodologies, and preparing for careers in academia, industry, or research institutions, with a deep understanding of physical chemistry principles and applications, and enhanced professional skills and knowledge in the field always.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1412,
+    "course_codes": "APPPHYS 285",
+    "course_title": "Physics of Disordered Systems",
+    "original_descr": "Topics include types of disorder, percolation, localization, glasses and spin glasses, fractals, self-organized criticality, aggregation, gelation, and other random processes leading to disordered media.",
+    "original_word_count": 24,
+    "expanded_descr": "In Physics of Disordered Systems, students explore complex phenomena arising from randomness and disorder. Topics include percolation, localization, and glasses, as well as fractals and self-organized criticality. The course delves into aggregation, gelation, and other random processes, examining their roles in forming disordered media. Through lectures and discussions, students develop a deep understanding of these concepts, analyzing theoretical models and experimental techniques. Real-world applications and current research are emphasized, providing a comprehensive introduction to this fascinating field and its relevance to materials science, biology, and engineering, with opportunities for hands-on exploration and critical thinking exercises always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1424,
+    "course_codes": "AA 296 / ME 350",
+    "course_title": "Plasma Science and Technology Seminar",
+    "original_descr": "Guest speakers present research related to plasma science and engineering, ranging from fundamental plasma physics to industrial applications of plasma.",
+    "original_word_count": 20,
+    "expanded_descr": "In the Plasma Science and Technology Seminar, renowned guest speakers present cutting-edge research in plasma physics and engineering. Topics range from fundamental plasma behavior to industrial applications, including materials processing and energy production. Students engage with experts, exploring advancements and challenges in the field. Through discussions and presentations, participants gain insight into the latest developments, fostering a deeper understanding of plasma science and its technological applications, and inspiring innovation and collaboration among attendees, preparing them for careers in this dynamic and interdisciplinary field of study and research. This seminar is a unique learning opportunity.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1433,
+    "course_codes": "POLECON 661",
+    "course_title": "Political Economy Research Workshop",
+    "original_descr": "Workshop for in-progress work by doctoral students in the PE program. Students present work and get feedback from other students and the faculty instructor.",
+    "original_word_count": 24,
+    "expanded_descr": "In the Political Economy Research Workshop, doctoral students present and refine their in-progress research under faculty guidance. Peers and instructors provide constructive feedback, fostering a collaborative environment for growth. Students engage with diverse methodologies and theoretical approaches, enhancing their critical thinking and research skills. Through regular presentations and discussions, participants develop effective communication and defense of their work, preparing them for academic and professional milestones, such as dissertation proposals and job market papers, while building a supportive community of scholars with shared interests in political economy research and academic development, leading to improved research quality.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1452,
+    "course_codes": "EDUC 343B",
+    "course_title": "Practicum for fellows in the Stanford Preparing Future Professors Program",
+    "original_descr": "Nine weekly one-hour and fifty-minute sessions consisting of discussions of: (1) the previous week's mentoring institutions' shadowing experiences and (2) readings related to session themes.",
+    "original_word_count": 25,
+    "expanded_descr": "In the Practicum for Stanford Preparing Future Professors Program fellows, nine weekly sessions facilitate in-depth discussions of mentoring institution shadowing experiences and relevant readings. Fellows share insights from their observations, analysing academic cultures and practices. Through readings and reflections, they explore key themes, developing a deeper understanding of higher education and their future roles as professors. This collaborative and interactive environment fosters professional growth, networking, and community-building among aspiring academics, preparing them for successful careers in academia and leadership positions, with a focus on teaching, research, and service, in a supportive and dynamic setting always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1487,
+    "course_codes": "EDUC 393",
+    "course_title": "Proseminar: Education, Business, Politics",
+    "original_descr": "Overview of the field of education for joint degree (M.B.A./M.A.) students.",
+    "original_word_count": 11,
+    "expanded_descr": "In the Proseminar: Education, Business, Politics, joint degree students explore the intersection of education, business, and politics. This overview course examines key issues, trends, and research in education, focusing on organizational management, policy, and leadership. Students analyze case studies, discuss current events, and develop critical thinking skills. Through lectures, discussions, and group work, students gain a deeper understanding of the complex relationships between education, business, and politics, preparing them for careers at the forefront of educational innovation and policy development, equipped with a unique blend of business acumen and educational expertise to drive meaningful change effectively.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1497,
+    "course_codes": "MUSIC 251",
+    "course_title": "Psychophysics and Music Cognition",
+    "original_descr": "Lecture, lab and experiment-based course in perception, psychoacoustics, cognition, and neuroscience of music. (WIM at 4 or 5 units only.)",
+    "original_word_count": 20,
+    "expanded_descr": "In Psychophysics and Music Cognition, students explore perception, psychoacoustics, cognition, and neuroscience of music through lectures, labs, and experiments. Delving into sound processing, auditory perception, and music cognition, students analyze the psychological and neural basis of music experience. With hands-on experiments and discussions, students investigate music's emotional and cognitive impact. By integrating theory and practice, students gain a deeper understanding of music's complex effects on the human mind, culminating in a comprehensive grasp of music's multifaceted relationship with human perception and cognition, meeting WIM requirements at 4 or 5 units, fostering academic and professional growth always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1504,
+    "course_codes": "PUBLPOL 311",
+    "course_title": "Public Policy Colloquium",
+    "original_descr": "Weekly colloquia speaker series required for M.P.P. and M.A. in Public Policy students. Open only to Public Policy graduate students; permission number required to enroll.",
+    "original_word_count": 25,
+    "expanded_descr": "In the Public Policy Colloquium, M.P.P. and M.A. students engage with renowned experts through a weekly speaker series. This required course fosters discussion and debate on pressing policy issues, enhancing analytical and critical thinking skills. Students gain insights into real-world policy challenges and solutions, exploring topics like governance, social justice, and economic development. With permission, graduate students delve into current research and best practices, developing professional networks and perspectives that inform their academic and career pursuits in public policy, ultimately preparing them for leadership roles in the field with a deeper understanding of policy complexities.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1519,
+    "course_codes": "PHYSICS 331",
+    "course_title": "Quantum Field Theory II",
+    "original_descr": "Functional integral methods. Local gauge invariance and Yang-Mills fields. Asymptotic freedom. Spontaneous symmetry breaking and the Higgs mechanism. Unified models of weak and electromagnetic interactions. Prerequisite: PHYSICS 330.",
+    "original_word_count": 28,
+    "expanded_descr": "In Quantum Field Theory II, students explore advanced topics, including functional integral methods and local gauge invariance. Yang-Mills fields, asymptotic freedom, and spontaneous symmetry breaking are examined, with a focus on the Higgs mechanism. Unified models of weak and electromagnetic interactions are also discussed. Building on PHYSICS 330, this course delves into the mathematical framework and physical implications of quantum field theory, preparing students for research and applications in particle physics. Through lectures and problem-solving, students develop a deep understanding of these fundamental concepts and their role in modern physics, enhancing their analytical and critical thinking skills greatly.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1533,
+    "course_codes": "ENGLISH 92",
+    "course_title": "Reading and Writing Poetry",
+    "original_descr": "Issues of poetic craft. How elements of form, music, structure, and content work together to create meaning and experience in a poem.",
+    "original_word_count": 22,
+    "expanded_descr": "In Reading and Writing Poetry, students explore poetic craft, analyzing how form, music, structure, and content converge to create meaningful experiences. Through close readings and writing workshops, participants delve into techniques such as imagery, metaphor, and syntax, developing their own poetic voices. Discussions and exercises focus on understanding and applying poetic devices, enabling students to craft original poems and critically evaluate existing works, fostering a deeper appreciation for the art of poetry and its ability to evoke emotion, convey ideas, and capture the human experience, ultimately refining their writing and analytical skills in a supportive and creative environment always.",
+    "expanded_word_count": 99
+  },
+  {
+    "id": 1565,
+    "course_codes": "SOC 385B",
+    "course_title": "Research Practicum II",
+    "original_descr": "Workshop on research methods and writing research papers for second year Sociology doctoral students. Ongoing student research, methodological problems, writing challenges, and possible solutions. Required for second year paper.",
+    "original_word_count": 29,
+    "expanded_descr": "In Research Practicum II, second-year Sociology doctoral students refine research methods and writing skills through a workshop-style course. Students receive guidance on ongoing research projects, addressing methodological problems and writing challenges. Discussions focus on crafting compelling research papers, overcoming obstacles, and exploring solutions. This required course supports the development of the second-year paper, fostering critical thinking, analytical skills, and effective communication. Through peer feedback and instructor mentorship, students enhance their research and writing abilities, preparing for successful academic careers and producing high-quality scholarly work, essential for advancing in the Sociology doctoral program with confidence and expertise gradually.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1568,
+    "course_codes": "MUSIC 310",
+    "course_title": "Research Seminar in Musicology",
+    "original_descr": "For graduate students. Topics vary each quarter. May be repeated for credit a total of 8 times.",
+    "original_word_count": 17,
+    "expanded_descr": "In the Research Seminar in Musicology, graduate students delve into specialized topics, exploring diverse methodologies and theoretical frameworks. Each quarter, a new theme emerges, allowing for in-depth examination of musicological issues. Through readings, discussions, and presentations, students develop critical thinking, research, and analytical skills. With the option to repeat the course up to 8 times, students can pursue a broad range of interests, cultivating expertise and refining their research agendas in a supportive, intellectually stimulating environment, preparing them for academic and professional success in musicology, fostering a community of scholars and promoting innovative research and scholarship always.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1640,
+    "course_codes": "ESS 322B",
+    "course_title": "Seminar in Hydrology",
+    "original_descr": "Current topics. May be repeated for credit. Prerequisite: consent of instructor.",
+    "original_word_count": 11,
+    "expanded_descr": "In the Seminar in Hydrology, students explore current topics and research in hydrology, delving into water's role in the environment. With instructor consent, students may repeat the course for credit, examining new subjects each semester. Through lectures, discussions, and guest speakers, participants gain insight into hydrologic principles, methodologies, and applications. This seminar fosters critical thinking, problem-solving, and collaboration, preparing students for careers in hydrology, environmental science, and related fields, with a deep understanding of water's impact on ecosystems and human societies, and the skills to address complex hydrologic challenges effectively every day always.",
+    "expanded_word_count": 93
+  },
+  {
+    "id": 1577,
+    "course_codes": "EDUC 489",
+    "course_title": "RILE Colloquium on Race, Inequality, and Language in Education",
+    "original_descr": "This course is a workshop for PhD students focusing on interdisciplinary empirical work related to Race, Inequality, and Language in Education.",
+    "original_word_count": 21,
+    "expanded_descr": "The RILE Colloquium on Race, Inequality, and Language in Education is a workshop for PhD students exploring interdisciplinary empirical research. Students examine the intersections of race, inequality, and language in educational settings, analyzing how these factors impact student outcomes. Through discussions, presentations, and peer feedback, students develop critical thinking and research skills, applying theoretical frameworks to real-world issues. This colloquium fosters a collaborative environment, equipping students to design and conduct innovative studies addressing pressing concerns in education, promoting equity and social justice, and advancing knowledge in the field, with expert guidance and support always available.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1600,
+    "course_codes": "FILMPROD 110",
+    "course_title": "Screen Writing III: Advanced Screenwriting",
+    "original_descr": "Advanced writing workshop in which students develop and complete a feature-length screenplay. Prerequisites: FP101 Screenwriting and approval of the instructor. Enrollment is limited.",
+    "original_word_count": 23,
+    "expanded_descr": "In Screen Writing III: Advanced Screenwriting, students hone their craft, developing and completing a feature-length screenplay. Building on foundational skills, participants refine character development, plot structure, and dialogue. With instructor guidance, students workshop their scripts, receiving constructive feedback and industry insights. Prerequisites include FP101 Screenwriting and instructor approval. Limited enrollment ensures personalized attention, allowing students to polish their work and prepare for professional opportunities. This advanced workshop is ideal for dedicated writers seeking to elevate their screenwriting skills and produce a high-quality, feature-length screenplay, ready for industry submission and potential production. Students gain valuable experience.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1603,
+    "course_codes": "ARABLANG 22",
+    "course_title": "Second-Year Arabic, Second Quarter",
+    "original_descr": "Continuation of ARABLANG 21. One-year sequence designed to develop intermediate proficiency, with additional emphasis on functional applications and reading and writing standard Arabic.",
+    "original_word_count": 23,
+    "expanded_descr": "In Second-Year Arabic, Second Quarter, students build upon foundational knowledge, refining intermediate proficiency in reading, writing, and conversing in standard Arabic. This course emphasizes functional applications, enhancing vocabulary and grammatical skills through interactive lessons and immersive activities. Students engage with authentic texts, explore cultural nuances, and develop critical thinking through discussions and writing exercises, preparing them for advanced Arabic studies and real-world communication, with a focus on precision, clarity, and effective expression, ultimately strengthening their language skills and cultural competence in a supportive and interactive learning environment, with regular feedback and assessment, every day.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1604,
+    "course_codes": "CHINLANG 22B",
+    "course_title": "Second-Year Chinese for Bilingual Students, Second Quarter",
+    "original_descr": "Continuation of CHINLANG 21B. For students with advanced comprehension and speaking skills, but lacking equivalent knowledge of grammar, reading, and writing Chinese characters. Prerequisite: Placement Test, CHINLANG 21B .",
+    "original_word_count": 29,
+    "expanded_descr": "In Second-Year Chinese for Bilingual Students, Second Quarter, students build on CHINLANG 21B, refining advanced comprehension and speaking skills. Emphasis is placed on grammar, reading, and writing Chinese characters. Through interactive lessons and cultural immersion, students enhance vocabulary and literacy. Prerequisite: Placement Test or CHINLANG 21B. This course accelerates language proficiency, fostering confident communication in personal and professional settings. Students engage in discussions, writing exercises, and presentations, solidifying their foundation in Chinese language and culture, preparing them for advanced studies and real-world applications with precision and fluency, achieving linguistic and cultural competence effectively always.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1641,
+    "course_codes": "IMMUNOL 311",
+    "course_title": "Seminar in Immunology",
+    "original_descr": "Enrollment limited to Ph.D., M.D./Ph.D., and medical students whose scholarly concentrations are in Immunology. Current research topics.",
+    "original_word_count": 17,
+    "expanded_descr": "In the Seminar in Immunology, Ph.D., M.D./Ph.D., and medical students with Immunology concentrations explore current research topics. Students engage with faculty and peers, discussing recent findings and advancements. The course delves into immune system function, regulation, and dysfunction, covering topics like immunotherapy and vaccine development. Through presentations and discussions, students analyze and interpret data, developing critical thinking and communication skills. This interactive seminar fosters a deeper understanding of immunological principles and their applications, preparing students for careers in research and medicine, with a focus on cutting-edge discoveries and innovative approaches in the field of immunology research.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1615,
+    "course_codes": "CHINLANG 22",
+    "course_title": "Second-Year Modern Chinese, Second Quarter",
+    "original_descr": "Continuation of CHINLANG 21. Listening, speaking, reading, writing. Daily sections may be set at the beginning of the quarter to suit schedule requirements. Prerequisite: Placement Test, CHINLANG 21.",
+    "original_word_count": 28,
+    "expanded_descr": "In Second-Year Modern Chinese, Second Quarter, students build on foundational skills, refining listening, speaking, reading, and writing abilities. Daily sections accommodate varying schedules. Through interactive lessons and immersive activities, learners engage with authentic materials, enhancing vocabulary and grammar. Prerequisite: Placement Test or CHINLANG 21. Students develop nuanced understanding of Chinese culture and language, preparing for advanced studies. With emphasis on real-world applications, this course fosters confident communication and sets the stage for continued language growth, exploring complex topics and sophisticated expressions in a supportive and dynamic learning environment, tailored to individual needs and progress. Regular assessments track.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1617,
+    "course_codes": "NVJOLANG 22",
+    "course_title": "Second-Year Navajo, Second Quarter",
+    "original_descr": "Continuation of NVJOLANG 21.",
+    "original_word_count": 4,
+    "expanded_descr": "In Second-Year Navajo, Second Quarter, students build upon foundational knowledge gained in NVJOLANG 21. This course delves deeper into the Navajo language, exploring complex grammar, vocabulary, and conversational skills. Through interactive lessons and immersive activities, students enhance their reading, writing, and speaking abilities. Cultural insights and traditional practices are integrated to foster a richer understanding of the Navajo community. By the end of the quarter, students will demonstrate improved proficiency and a deeper appreciation for the language and its cultural significance, preparing them for advanced study and real-world application of their Navajo language skills effectively always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1642,
+    "course_codes": "JAPAN 396",
+    "course_title": "Seminar in Modern Japanese Literature",
+    "original_descr": "Works and topics vary each year. May be repeated for credit. Prerequisite: fourth-year Japanese or consent of instructor.",
+    "original_word_count": 18,
+    "expanded_descr": "In the Seminar in Modern Japanese Literature, students delve into diverse works and topics that vary annually. With a prerequisite of fourth-year Japanese or instructor consent, participants engage in in-depth analyses and discussions. Through readings, lectures, and debates, students explore Japan's literary landscape, examining themes, styles, and cultural contexts. Repeated enrollments are allowed for credit, enabling students to broaden their knowledge and appreciation of modern Japanese literature, fostering a deeper understanding of the country's rich literary heritage and its ongoing evolution, and developing critical thinking and language skills in a dynamic and immersive academic environment annually available.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1643,
+    "course_codes": "EDUC 456 / SOC 210",
+    "course_title": "Seminar in Organizations and Institutions",
+    "original_descr": "This seminar considers ongoing work in organization studies through a speaker series featuring Stanford faculty, visiting scholars, and guests from academic institutions throughout North America and elsewhere.",
+    "original_word_count": 27,
+    "expanded_descr": "In the Seminar in Organizations and Institutions, students engage with cutting-edge research through a speaker series featuring Stanford faculty, visiting scholars, and esteemed guests. Exploring ongoing work in organization studies, participants delve into diverse topics and methodologies. This dynamic forum fosters intellectual exchange, critique, and debate, providing students with a deeper understanding of organizational dynamics and institutional complexities. Through discussions and presentations, students develop critical thinking and analytical skills, gaining valuable insights into the latest developments in the field of organization studies and its applications in various contexts and industries globally and locally always.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1629,
+    "course_codes": "TURKLANG 22",
+    "course_title": "Second-Year Turkish, Second Quarter",
+    "original_descr": "Continuation of TURKLANG 21. The main focus is on class discussions and essay-writing practices about daily life in Turkey. Prerequisite: TURKLANG 21.",
+    "original_word_count": 22,
+    "expanded_descr": "In Second-Year Turkish, Second Quarter, students build on TURKLANG 21, refining language skills through class discussions and essay-writing practices. Exploring daily life in Turkey, learners engage with authentic materials and conversations, enhancing vocabulary and grammar. Prerequisite TURKLANG 21, this course fosters cultural understanding and linguistic proficiency, preparing students for real-world interactions. Through interactive lessons and writing exercises, students develop critical thinking and effective communication skills, deepening their connection to Turkish language and culture, and advancing their proficiency in a supportive and immersive learning environment with experienced instructors and peers, promoting academic and personal growth always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1631,
+    "course_codes": "YDDSHLNG 22",
+    "course_title": "Second-Year Yiddish, Second Quarter",
+    "original_descr": "Continuation of YDDSHLNG 21. Prerequisite: YDDSHLNG 21.",
+    "original_word_count": 7,
+    "expanded_descr": "In Second-Year Yiddish, Second Quarter, students build on foundational knowledge from YDDSHLNG 21. This course delves deeper into Yiddish language and culture, exploring complex grammar and vocabulary. Through interactive lessons and immersive activities, students enhance reading, writing, and conversational skills. Engaging with Yiddish literature, music, and film, students gain a nuanced understanding of the language's history and significance. Prerequisite: YDDSHLNG 21. By quarter's end, students will demonstrate improved proficiency and a deeper appreciation for Yiddish heritage, preparing them for advanced studies and cultural engagement, with a strong foundation for lifelong learning and exploration always.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1647,
+    "course_codes": "ME 395",
+    "course_title": "Seminar in Solid Mechanics",
+    "original_descr": "Required of Ph.D. candidates in solid mechanics. Guest speakers present research topics related to mechanics theory, computational methods, and applications in science and engineering. May be repeated for credit.",
+    "original_word_count": 29,
+    "expanded_descr": "In the Seminar in Solid Mechanics, Ph.D. candidates engage with expert guest speakers presenting cutting-edge research in mechanics theory, computational methods, and interdisciplinary applications. Students delve into innovative topics, exploring the intersection of science and engineering. Through discussions and debates, participants broaden their knowledge, critically evaluate research, and develop professional networks. Repeated enrollments allow for ongoing exposure to emerging trends and ideas, fostering a deeper understanding of the field and preparing students for their own research contributions, with the option to repeat for credit and continue their academic and professional growth in solid mechanics. New insights emerge regularly.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1650,
+    "course_codes": "EDUC 375A / MS&E 389 / SOC 363A",
+    "course_title": "Seminar on Organizational Theory",
+    "original_descr": "The social science literature on organizations assessed through consideration of the major theoretical traditions and lines of research predominant in the field. For PhD students only.",
+    "original_word_count": 26,
+    "expanded_descr": "In the Seminar on Organizational Theory, PhD students delve into the social science literature on organizations, exploring major theoretical traditions and research lines. Through in-depth analysis and discussions, students assess classical and contemporary perspectives, examining their implications for organizational behavior and management. This advanced seminar fosters critical thinking, intellectual debate, and scholarly research, equipping students with a nuanced understanding of organizational theory and its applications, preparing them for original research contributions in the field, and enhancing their academic and professional expertise in organizational studies and related disciplines effectively and comprehensively within a scholarly community context always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1653,
+    "course_codes": "ANTHRO 199 / ANTHRO 299",
+    "course_title": "Senior and Master's Paper Writing Workshop",
+    "original_descr": "Techniques of interpreting data, organizing bibliographic materials, writing, editing and revising. Preparation of papers for conferences and publications in anthropology. Seniors register for 199; master's students register for 299.",
+    "original_word_count": 29,
+    "expanded_descr": "In the Senior and Master's Paper Writing Workshop, students develop essential skills in data interpretation, bibliographic organization, and writing. Through guided exercises, seniors and master's students learn to craft compelling papers for conferences and publications in anthropology. Techniques in editing and revising are emphasized, ensuring polished final products. Students register as seniors for 199 or master's students for 299, receiving tailored feedback and support to produce high-quality research papers, preparing them for academic and professional success in the field of anthropology, with a focus on clarity, coherence, and effective communication of research findings and ideas clearly.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1656,
+    "course_codes": "EALC 198",
+    "course_title": "Senior Colloquium",
+    "original_descr": "Students research, write, and present a capstone essay or honors thesis. All EALC undergraduate majors must take this course, be it for the senior capstone essay or honors thesis.",
+    "original_word_count": 29,
+    "expanded_descr": "In the Senior Colloquium, students culminate their undergraduate studies by researching, writing, and presenting a capstone essay or honors thesis. This required course for EALC majors fosters advanced critical thinking, writing, and presentation skills. Through individualized guidance, students develop a sophisticated research project, exploring topics in depth. The colloquium provides a supportive environment for students to refine their ideas, receive feedback, and showcase their academic accomplishments, preparing them for future academic and professional pursuits with confidence and expertise, and a deeper understanding of their field of study and its applications. Students produce a polished final product.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1665,
+    "course_codes": "EDUC 98SI",
+    "course_title": "Service Learning Practicum",
+    "original_descr": "For Alternative Spring Break program leaders. The skills and philosophical framework to develop and lead an ASB experience. May be repeat for credit",
+    "original_word_count": 23,
+    "expanded_descr": "In the Service Learning Practicum, Alternative Spring Break program leaders develop essential skills and a philosophical framework to design and lead impactful experiences. Through interactive discussions and hands-on activities, students explore community engagement, social justice, and leadership principles. By examining case studies and sharing best practices, participants gain confidence to create and facilitate transformative ASB experiences. This repeatable course offers ongoing growth and development, equipping leaders to make a meaningful difference in their communities, fostering personal and professional growth, and enhancing their leadership capabilities in a supportive and collaborative environment, with flexible credit options available.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1692,
+    "course_codes": "CS 194W",
+    "course_title": "Software Project (WIM)",
+    "original_descr": "Restricted to Computer Science and Electrical Engineering undergraduates. Writing-intensive version of CS194. Preference given to seniors. Prerequisites: CS109 and CS161.",
+    "original_word_count": 20,
+    "expanded_descr": "In the Software Project course, Computer Science and Electrical Engineering undergraduates develop comprehensive software solutions. Restricted to juniors and seniors, with preference given to seniors, this writing-intensive version of CS194 enhances technical skills. Prerequisites CS109 and CS161 provide a foundation. Students design, implement, and test software projects, focusing on collaboration, documentation, and communication. Through hands-on experience, they apply theoretical concepts to real-world problems, producing a polished project and technical report, preparing them for industry and research applications with a strong portfolio of work, ultimately refining their programming and writing abilities in a practical setting effectively always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1702,
+    "course_codes": "PSYCH 183",
+    "course_title": "SPARQ Lab",
+    "original_descr": "Join SPARQ (Social Psychological Answers to Real-world Questions) as a research assistant and help with projects addressing real-world issues.",
+    "original_word_count": 19,
+    "expanded_descr": "In the SPARQ Lab, students join a dynamic research team addressing real-world issues through social psychology. As research assistants, they contribute to projects investigating topics like social inequality and behavioral change. Through hands-on experience, students develop research skills, collaborate with peers, and apply theoretical concepts to practical problems. They gain insight into the research process, from design to dissemination, and explore innovative solutions to pressing social issues, preparing them for careers in research, policy, and social impact. Students develop valuable skills, build their network, and drive positive change through rigorous and applied social psychological research and collaboration always.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 1756,
+    "course_codes": "CEE 283",
+    "course_title": "Structural Dynamics",
+    "original_descr": "Vibrations and dynamic response of simple structures under time dependent loads; dynamic analysis of single and multiple degrees of freedom systems; support motion; response spectra.",
+    "original_word_count": 25,
+    "expanded_descr": "In Structural Dynamics, students explore vibrations and dynamic responses of simple structures under time-dependent loads. Dynamic analysis of single and multiple degrees of freedom systems is covered, including support motion and response spectra. Through lectures and case studies, students learn to analyze and predict structural behavior, developing skills to design and optimize structures for dynamic loads. Key concepts and techniques are applied to real-world problems, preparing students for careers in civil, mechanical, and aerospace engineering, and enabling them to create resilient and efficient structures that withstand dynamic forces and loads, ensuring public safety and infrastructure reliability always.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1757,
+    "course_codes": "CEE 298",
+    "course_title": "Structural Engineering and Mechanics Seminar",
+    "original_descr": "Recommended for all graduate students. Lectures on topics of current interest in professional practice and research.",
+    "original_word_count": 16,
+    "expanded_descr": "The Structural Engineering and Mechanics Seminar is a dynamic forum for graduate students to explore cutting-edge topics in professional practice and research. Through lectures and discussions, students engage with industry experts and faculty on current issues and advancements. This seminar fosters critical thinking, collaboration, and networking, preparing students for careers in structural engineering and mechanics. Students gain insights into innovative designs, materials, and methods, enhancing their knowledge and skills in a rapidly evolving field, and developing expertise to tackle complex engineering challenges and contribute to the profession's ongoing advancements and innovations effectively every semester.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 1770,
+    "course_codes": "EPS 304",
+    "course_title": "Survey of research in the Earth & Planetary Sciences",
+    "original_descr": "Introduction to the faculty and research in the Department of Earth & Planetary Sciences. Class meets for one hour 12-1pm. EPS First-Year Graduate Core Series Requirement.",
+    "original_word_count": 26,
+    "expanded_descr": "In the Survey of Research in Earth & Planetary Sciences, students explore faculty-led research initiatives, gaining insight into departmental expertise. Meeting weekly from 12-1pm, this core series requirement introduces first-year graduate students to EPS faculty and their research focus areas. Through lectures and discussions, students discover the breadth of earth and planetary sciences research, fostering connections and informing their own research pursuits. This foundational course sets the stage for academic success, providing a comprehensive understanding of the department's research landscape and opportunities for collaboration and growth within the EPS community and beyond academic boundaries naturally.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1773,
+    "course_codes": "TAPS 136E",
+    "course_title": "Sustainability in Entertainment Design",
+    "original_descr": "Sustainability in Entertainment Design",
+    "original_word_count": 4,
+    "expanded_descr": "Sustainability in Entertainment Design explores eco-friendly practices in the entertainment industry. Students learn to create sustainable sets, lighting, and special effects, reducing environmental impact. Through case studies and hands-on projects, they develop strategies for minimizing waste, conserving energy, and promoting eco-awareness. Industry experts share best practices, and students collaborate on sustainable design projects, applying theoretical knowledge to real-world scenarios, preparing them for a career in environmentally responsible entertainment design, and making a positive impact on the industry's ecological footprint, while maintaining creative and artistic integrity in their work and designs every day always.",
+    "expanded_word_count": 93
+  },
+  {
+    "id": 1791,
+    "course_codes": "LAW 1029",
+    "course_title": "Taxation I",
+    "original_descr": "This course provides an overview of the federal income tax. Elements used in grading: Class participation and final exam.",
+    "original_word_count": 19,
+    "expanded_descr": "In Taxation I, students explore the fundamentals of federal income tax, gaining a comprehensive understanding of tax principles and concepts. Through lectures and discussions, students analyze tax laws and regulations, learning to apply them to real-world scenarios. Class participation and a final exam assess student knowledge, encouraging engagement and critical thinking. By course completion, students will be able to navigate tax complexities, making informed decisions in personal and professional contexts, and laying the groundwork for advanced tax studies and professional certification, with a strong foundation in tax theory and practical application, and effective tax planning strategies always.",
+    "expanded_word_count": 97
+  },
+  {
+    "id": 1794,
+    "course_codes": "CHEM 299",
+    "course_title": "Teaching of Chemistry",
+    "original_descr": "Required of all teaching assistants in Chemistry. Techniques of teaching chemistry by means of lectures and labs.",
+    "original_word_count": 17,
+    "expanded_descr": "In the Teaching of Chemistry course, teaching assistants develop essential skills for effective chemistry instruction. Through lectures and labs, students learn techniques for presenting complex concepts, designing engaging lesson plans, and facilitating hands-on learning experiences. Emphasis is placed on creating inclusive and supportive learning environments, assessing student understanding, and using technology to enhance instruction. By exploring best practices and pedagogies, teaching assistants gain confidence and competence in teaching chemistry, preparing them to inspire and educate future generations of chemistry students, and make a positive impact on their academic and professional development, every day, in every way.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1836,
+    "course_codes": "ECON 28N",
+    "course_title": "The Future of America's Healthcare Policies",
+    "original_descr": "TBD",
+    "original_word_count": 1,
+    "expanded_descr": "In The Future of America's Healthcare Policies, students explore the evolving healthcare landscape, examining current challenges and potential solutions. Through discussions, debates, and case studies, learners analyze policy frameworks, economic factors, and social determinants shaping the US healthcare system. Expert guest speakers and interactive simulations enhance understanding of policy development, implementation, and evaluation. By graduation, students will be equipped to critically assess and propose innovative healthcare policy solutions, preparing them for careers in healthcare administration, policy, and advocacy, with a deep understanding of the complex issues influencing America's healthcare future and its global implications always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1891,
+    "course_codes": "GEOPHYS 385D",
+    "course_title": "Theoretical Geophysics",
+    "original_descr": "Research on physics and mechanics of earthquakes, volcanoes, ice sheets, and glaciers. Emphasis is on developing theoretical understanding of processes governing natural phenomena.",
+    "original_word_count": 23,
+    "expanded_descr": "In Theoretical Geophysics, students explore the physics and mechanics underlying earthquakes, volcanoes, ice sheets, and glaciers. Through research and analysis, they develop a theoretical understanding of the complex processes governing these natural phenomena. Emphasis is placed on mathematical modeling, computational simulations, and data analysis to investigate the dynamics of geological systems. Students gain a deep understanding of the Earth's internal and external processes, preparing them for careers in geophysics, research, and environmental science, with applications in hazard mitigation, climate modeling, and natural resource management, fostering a comprehensive understanding of our dynamic planet and its systems always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1904,
+    "course_codes": "KORLANG 102",
+    "course_title": "Third-Year Korean, Second Quarter",
+    "original_descr": "Continuation of KORLANG 101. Materials about Korean culture and society. Proficiency in interpersonal, interpretive, and presentational communication. Vocabulary, reading, and aural/oral skills. Prerequisite: Placement Test or KORLANG 101.",
+    "original_word_count": 28,
+    "expanded_descr": "In Third-Year Korean, Second Quarter, students build upon foundational skills, exploring Korean culture and society through authentic materials. Emphasis is placed on interpersonal, interpretive, and presentational communication, enhancing vocabulary, reading, and aural/oral skills. Through interactive lessons and discussions, students develop proficiency in expressing complex ideas and nuances. Prerequisite: Placement Test or KORLANG 101. This course fosters a deeper understanding of Korean language and culture, preparing students for advanced studies and real-world applications, with engaging activities and assessments to track progress and achievement, ultimately refining their language abilities and cultural competence effectively every day.",
+    "expanded_word_count": 93
+  },
+  {
+    "id": 1905,
+    "course_codes": "CHINLANG 102B",
+    "course_title": "Third-Year Modern Chinese for Bilingual Students, Second Quarter",
+    "original_descr": "Continuation of CHINLANG 101B. Equivalent to CHINLANG 102. For students with advanced listening and speaking abilities, but lacking equivalent knowledge in reading and writing. Prerequisite: Placement Test, CHINLANG 101B.",
+    "original_word_count": 29,
+    "expanded_descr": "In Third-Year Modern Chinese for Bilingual Students, Second Quarter, students build on advanced listening and speaking skills, developing reading and writing proficiency. Equivalent to CHINLANG 102, this course enhances linguistic abilities through interactive lessons and immersive activities. Prerequisites include a Placement Test and CHINLANG 101B. Students refine vocabulary, grammar, and character recognition, exploring complex texts and discussions. Engaging materials and collaborative exercises foster improved comprehension, expression, and cultural understanding, preparing bilingual students for academic and professional success in Chinese language contexts, with a focus on nuanced communication and effective expression of ideas in written and spoken Chinese formats always.",
+    "expanded_word_count": 99
+  },
+  {
+    "id": 1908,
+    "course_codes": "PERSLANG 102",
+    "course_title": "Third-Year Persian, Second Quarter",
+    "original_descr": "Continuation of PERSLANG 101. Prerequisite: Placement Test, PERSLANG 101.",
+    "original_word_count": 9,
+    "expanded_descr": "In Third-Year Persian, Second Quarter, students build upon foundational language skills acquired in PERSLANG 101. Through immersive instruction, learners refine grammar, vocabulary, and pronunciation. Engaging texts, discussions, and interactive exercises foster cultural understanding and linguistic proficiency. Prerequisites include a placement test and PERSLANG 101. As students progress, they develop advanced reading, writing, and conversation abilities, preparing them for real-world applications and further academic pursuits in Persian language and literature, with a deeper appreciation for the culture and history of Persian-speaking countries and communities, and enhanced career opportunities in international relations and global communication fields effectively.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1909,
+    "course_codes": "POLSHLNG 102",
+    "course_title": "Third-Year Polish, Second Quarter",
+    "original_descr": "Continuation of POLSHLNG 101. Prerequisite: POLSHLNG 101.",
+    "original_word_count": 7,
+    "expanded_descr": "In Third-Year Polish, Second Quarter, students build on foundational knowledge from POLSHLNG 101, refining language skills and exploring complex grammar and vocabulary. Through interactive discussions, readings, and writing assignments, learners deepen their understanding of Polish culture and literature. Prerequisite POLSHLNG 101 ensures a solid foundation. Engaging activities and authentic materials foster improved pronunciation, comprehension, and communication. Students develop advanced language proficiency, preparing them for real-world applications and further academic pursuits in Polish language and culture, with a focus on nuanced expression and contextual understanding, ultimately enhancing their overall language competence and cultural awareness effectively always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 1910,
+    "course_codes": "RUSSLANG 102",
+    "course_title": "Third-Year Russian, Second Quarter",
+    "original_descr": "Continuation of RUSSLANG 101. A snapshot of Russian life. Reading comprehension, conversational competence, grammatical accuracy, and cultural sophistication. Prerequisite: Placement Test or RUSSLANG 101.",
+    "original_word_count": 24,
+    "expanded_descr": "In Third-Year Russian, Second Quarter, students delve deeper into Russian culture and language, building on skills from RUSSLANG 101. Through engaging readings, conversations, and grammar exercises, learners enhance comprehension, conversational competence, and accuracy. Exploring aspects of Russian life, students develop cultural sophistication and nuanced understanding. With a prerequisite of RUSSLANG 101 or placement test, this course fosters immersive learning, preparing students for advanced studies and real-world interactions. Interactive classes and authentic materials facilitate language mastery, empowering students to communicate effectively in Russian and navigate its rich cultural landscape with confidence and precision always. New skills emerge.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 1948,
+    "course_codes": "COMPMED 198",
+    "course_title": "Undergraduate Directed Reading in Comparative Medicine",
+    "original_descr": "May be taken as a prelude to research and may also involve participation in a lab or research group seminar and/or library research.",
+    "original_word_count": 23,
+    "expanded_descr": "In Undergraduate Directed Reading in Comparative Medicine, students engage in self-directed learning and research under faculty guidance. This course serves as a precursor to research, fostering critical thinking and analytical skills. Students participate in lab or research group seminars, library research, and independent study, exploring comparative medicine topics in-depth. Through readings, discussions, and hands-on experiences, students develop a nuanced understanding of comparative medicine principles and applications, preparing them for future research endeavors and careers in the field, with personalized mentorship and support from experienced faculty members, culminating in a comprehensive understanding of the subject matter and its relevance.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 2001,
+    "course_codes": "ANTHRO 314 / FEMGEN 314A",
+    "course_title": "Women of Color Feminisms",
+    "original_descr": "Women of Color Feminisms",
+    "original_word_count": 4,
+    "expanded_descr": "In Women of Color Feminisms, students explore the diverse perspectives and experiences of women of color, delving into intersectional feminist theories and activism. Through readings, discussions, and multimedia, learners analyze the historical and contemporary struggles of women of color, including racism, sexism, and social justice. This course examines the contributions of women like Sojourner Truth, Audre Lorde, and Angela Davis, fostering critical thinking, empathy, and social awareness. By engaging with these feminisms, students develop a nuanced understanding of the complex intersections of identity, power, and social change, preparing them for informed activism and community engagement always.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 2004,
+    "course_codes": "POLISCI 422",
+    "course_title": "Workshop in American Politics",
+    "original_descr": "Research seminar. Frontiers in mass political behavior. Course may be repeated for credit.",
+    "original_word_count": 13,
+    "expanded_descr": "In the Workshop in American Politics, students engage in a research seminar exploring frontiers in mass political behavior. Through in-depth analysis and discussion, participants examine the complexities of American politics, delving into topics such as voter turnout, public opinion, and political polarization. With the opportunity to repeat the course for credit, students can further specialize their knowledge and skills, developing a nuanced understanding of the American political landscape and cultivating expertise in research design and methodology, preparing them for advanced study or careers in politics and public policy, with a deep understanding of the field's latest developments always.",
+    "expanded_word_count": 98
+  },
+  {
+    "id": 2006,
+    "course_codes": "POLISCI 440D",
+    "course_title": "Workshop in Comparative Politics",
+    "original_descr": "Faculty, guest speakers, and graduate students conducting research in comparative politics present work-in-progress. May be repeated for credit.",
+    "original_word_count": 18,
+    "expanded_descr": "In the Workshop in Comparative Politics, faculty, guest speakers, and graduate students share cutting-edge research in progress. Through interactive presentations and discussions, students engage with emerging trends and debates in comparative politics. This dynamic forum fosters critical thinking, analysis, and debate, allowing students to deepen their understanding of comparative politics. Repeated enrollment is permitted, enabling students to explore diverse topics and methodologies, and develop their own research interests and skills in a supportive and interdisciplinary environment, enhancing their academic and professional growth in the field of comparative politics and international studies effectively every semester.",
+    "expanded_word_count": 94
+  },
+  {
+    "id": 2008,
+    "course_codes": "POLISCI 411B",
+    "course_title": "Workshop in International Relations",
+    "original_descr": "For graduate students. Contemporary work. Organized around presentation of research by students and outside scholars. May be repeated for credit.",
+    "original_word_count": 20,
+    "expanded_descr": "In the Workshop in International Relations, graduate students engage with contemporary research in a dynamic setting. The course is organized around presentations of ongoing research by students and esteemed outside scholars. Through discussions and debates, students refine their analytical skills and broaden their understanding of global issues. Repeated for credit, this workshop fosters a community of scholars, providing a platform for students to share their work, receive feedback, and explore cutting-edge topics in international relations, enhancing their research and academic pursuits in a collaborative and intellectually stimulating environment with diverse perspectives and expertise, every semester.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 2009,
+    "course_codes": "POLISCI 353B",
+    "course_title": "Workshop in Political Methodology",
+    "original_descr": "Continuation of POLISCI 353A. Mathematical and statistical models and applications to political science. Guest speakers, faculty, and students present research papers. May be repeated for credit.",
+    "original_word_count": 26,
+    "expanded_descr": "In the Workshop in Political Methodology, students build on POLISCI 353A, exploring advanced mathematical and statistical models in political science. Through presentations by guest speakers, faculty, and peers, students engage with cutting-edge research and applications. Participants develop critical thinking and analytical skills, evaluating research papers and methodologies. Repeated enrollments allow for continued growth, as students refine their expertise and stay updated on emerging trends and techniques in the field, fostering a community of scholars and preparing them for innovative research and professional pursuits in political science. Students gain hands-on experience and in-depth knowledge of research methods.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 2012,
+    "course_codes": "EDUC 387 / SOC 311A",
+    "course_title": "Workshop: Comparative Sociology",
+    "original_descr": "Analysis of quantitative and longitudinal data on national educational systems and political structures. May be repeated for credit. Prerequisite: consent of instructor.",
+    "original_word_count": 22,
+    "expanded_descr": "In the Workshop: Comparative Sociology, students analyze quantitative and longitudinal data on national educational systems and political structures. Through in-depth examinations, participants explore societal trends and institutional variations. With instructor consent, students may repeat the course for credit, delving deeper into comparative methodologies. This workshop fosters critical thinking, data analysis, and research skills, preparing students for advanced sociological studies. By exploring complex relationships between education and politics, students gain a nuanced understanding of global societal dynamics, enhancing their research and analytical capabilities in a supportive and interactive learning environment with expert guidance and feedback always available.",
+    "expanded_word_count": 96
+  },
+  {
+    "id": 2018,
+    "course_codes": "SOC 380W",
+    "course_title": "Workshop: Qualitative and Fieldwork Methods",
+    "original_descr": "Presentations and discussion of ongoing ethnographic, interview-based, and other fieldwork research by faculty and students . May be repeated for credit. Prerequisite: Sociology doctoral student or consent of instructor.",
+    "original_word_count": 29,
+    "expanded_descr": "In the Workshop: Qualitative and Fieldwork Methods course, sociology doctoral students engage with faculty and peers in presentations and discussions of ongoing ethnographic, interview-based, and fieldwork research. Students explore qualitative methods, share their own research, and receive feedback. With instructor consent, students can repeat the course for credit, deepening their understanding of fieldwork techniques and methodologies. This interactive workshop fosters a collaborative environment, enhancing students' research skills and preparing them for advanced qualitative research projects, under the guidance of experienced faculty and supported by a community of scholars, with opportunities for growth and development in a dynamic setting always.",
+    "expanded_word_count": 99
+  },
+  {
+    "id": 2023,
+    "course_codes": "PWR 1ST",
+    "course_title": "Writing & Rhetoric 1:  The Rhetoric of Biomedical Ethics",
+    "original_descr": "Rhetorical and contextual analysis of readings; research; and argument. Focus is on development of a substantive research-based argument using multiple sources. Individual conferences with instructor. See http://www.stanford.edu/dept/undergrad/cgi-bin/drupal_ual/AP_univ_req_PWR_Courses.html.",
+    "original_word_count": 27,
+    "expanded_descr": "In Writing & Rhetoric 1: The Rhetoric of Biomedical Ethics, students analyze readings, conduct research, and craft arguments. Focus is on developing a research-based argument using multiple sources. Through individual conferences and interactive discussions, students refine their critical thinking and writing skills. Exploring biomedical ethics, students engage with complex issues and nuanced perspectives, producing well-supported arguments and polished writing. This course fosters academic writing, research, and critical thinking, preparing students for university-level scholarship and beyond, with guidance from instructor conferences and online resources, such as the Stanford University website for further support and information always.",
+    "expanded_word_count": 95
+  },
+  {
+    "id": 2056,
+    "course_codes": "ESOLLANG 698A",
+    "course_title": "Writing Academic English",
+    "original_descr": "Strategies and conventions for graduate writing. Emphasis is placed on fluency, organization, documentation, and appropriateness for writing tasks required in coursework. May be repeated once for credit.",
+    "original_word_count": 27,
+    "expanded_descr": "In Writing Academic English, graduate students develop essential strategies and conventions for effective writing. Emphasis is placed on achieving fluency, organization, and proper documentation. Students learn to tailor their writing for various coursework tasks, enhancing their ability to convey complex ideas clearly. Through interactive exercises and constructive feedback, students refine their writing skills, ensuring appropriateness and accuracy. This repeatable course provides a supportive environment for students to improve their academic writing, preparing them for success in their graduate programs and beyond, with a focus on producing polished, professional writing that meets academic standards and expectations always.",
+    "expanded_word_count": 96
+  }
+]

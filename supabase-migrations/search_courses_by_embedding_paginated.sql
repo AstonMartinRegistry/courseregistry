@@ -22,6 +22,7 @@ RETURNS TABLE (
     course_codes TEXT,
     course_title TEXT,
     course_descr TEXT,
+    instructors TEXT,
     similarity FLOAT
 ) 
 LANGUAGE plpgsql
@@ -33,6 +34,7 @@ BEGIN
     c.course_codes,
     c.course_title,
     c.course_descr,
+    c.instructors,
     1 - (c.embedding <=> query_embedding) AS similarity
   FROM courses c
   WHERE 

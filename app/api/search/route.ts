@@ -62,6 +62,12 @@ function normalizeVector(vector: number[]): number[] {
   return vector.map((val) => val / magnitude);
 }
 
+const SEARCH_TERM = process.env.NEXT_PUBLIC_SEARCH_TERM || "spring26";
+const SEARCH_RPC =
+  SEARCH_TERM === "spring26"
+    ? "search_courses_spring26_by_embedding_paginated"
+    : "search_courses_by_embedding_paginated";
+
 async function searchCourses(
   embedding: number[],
   limit: number = 3,
@@ -74,7 +80,7 @@ async function searchCourses(
   }
 
   const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/rpc/search_courses_by_embedding_paginated`,
+    `${SUPABASE_URL}/rest/v1/rpc/${SEARCH_RPC}`,
     {
       method: "POST",
       headers: {
@@ -116,36 +122,37 @@ async function generateCourseExplanation(params: {
 
   const systemPrompt = `You are an expert course selector and academic advisor helping a student choose courses.
 You receive the student's free-text query, plus the course title and official description.
-Your job is to write a structured explanation (exactly 100 words) with TWO distinct parts:
-1. FIRST HALF (~50 words): Connect the course to the student's query - analyze their query and explain why this course fits their interests
-2. SECOND HALF (~50 words): Describe the course content and details
+Your job is to write a structured explanation with TWO distinct parts:
+1. FIRST PART (~20 words): Connect the course to the student's query - briefly explain why this course fits their interests
+2. SECOND PART (~40 words): Describe the course content and details
 
 CRITICAL REQUIREMENTS:
 - Start with "This course is a good fit for your interests in [specific concepts from their query] because..."
-- FIRST HALF must focus on connecting their query "${query}" to the course - use their exact words/concepts
-- SECOND HALF should describe what the course covers and its key features
+- FIRST PART (~20 words) must focus on connecting their query "${query}" to the course - use their exact words/concepts
+- SECOND PART (~40 words) should describe what the course covers and its key features
 - ALWAYS extract and include prerequisites if mentioned in the course description - format them as underlined text using <u>prerequisite text</u>
 - Be professional, knowledgeable, and advisor-like in your tone
 - Never mention word counts or that you are an AI.`;
 
   const userMessage = `CRITICAL STRUCTURE REQUIREMENTS:
-Write an explanation in EXACTLY 100 words with this structure:
+Write an explanation with this structure (total ~60 words):
 
-FIRST HALF (~50 words): Connect to student query
+FIRST PART (~20 words): Connect to student query
 - Start with "This course is a good fit for your interests in [use specific words/concepts from: "${query}"] because..."
 - Focus ONLY on how the course relates to what the student is looking for in "${query}"
 - Use the student's exact query language and concepts
-- Explain why this course matches their interests/goals
+- Keep this part brief (~20 words)
 
-SECOND HALF (~50 words): Describe the course
+SECOND PART (~40 words): Describe the course
 - Describe what the course covers, its key topics, and what students will learn
 - Mention important course details, format, or structure
 
 PREREQUISITES:
 - Search the course description below for any mention of prerequisites, requirements, or recommended courses
-- If prerequisites exist, ALWAYS include them at the end and format them as: "Prerequisites: <u>MATH 19, 20, 21</u>"
+- If prerequisites exist, ALWAYS include them on a NEW LINE at the end, formatted as: "Prerequisites: <u>MATH 19, 20, 21</u>"
+- Put prerequisites on their own line, separate from the main description
 - Underline the prerequisite courses using <u> tags
-- Include prerequisites even if it means the explanation slightly exceeds 100 words
+- Include prerequisites even if it means the explanation slightly exceeds the word targets
 
 Student query: "${query}"
 
@@ -154,7 +161,7 @@ Course title: ${courseTitle || "N/A"}
 Course description:
 ${courseDescr || "N/A"}
 
-Write the explanation following the structure above. First half connects to "${query}", second half describes the course, and always include prerequisites if mentioned.`;
+Write the explanation following the structure above. First part (~20 words) connects to "${query}", second part (~40 words) describes the course, and always include prerequisites if mentioned.`;
 
   const maxRetries = 5;
   let lastError: Error | null = null;
@@ -243,17 +250,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate embedding for the query
-    console.log("📊 API: Generating embedding for query:", query.trim());
+    const tEmbedStart = Date.now();
+    console.log("📊 API: [TIMING] Generating embedding for query:", query.trim());
     const embedding = await generateEmbedding(query.trim());
-    console.log("✅ API: Embedding generated, length:", embedding.length);
+    console.log("✅ API: [TIMING] Embedding done in", ((Date.now() - tEmbedStart) / 1000).toFixed(2), "s, length:", embedding.length);
 
     // Normalize the embedding to ensure fair comparison
     const normalizedEmbedding = normalizeVector(embedding);
-    console.log("✅ API: Embedding normalized");
 
     // Search for similar courses with pagination
     const searchLimit = limit || 3;
-    console.log("🔎 API: Searching courses with limit:", searchLimit);
+    const tSearchStart = Date.now();
+    console.log("🔎 API: [TIMING] Searching courses with limit:", searchLimit);
     const results = await searchCourses(
       normalizedEmbedding,
       searchLimit,
@@ -261,50 +269,45 @@ export async function POST(request: NextRequest) {
       lastId || null,
       excludeIds || null,
     );
-    console.log("📦 API: Raw search results:", results.length, "courses");
+    console.log("✅ API: [TIMING] Search done in", ((Date.now() - tSearchStart) / 1000).toFixed(2), "s, results:", results.length);
     console.log("📋 API: Course titles:", results.map((r: any) => r.course_title));
 
-    // Enrich each result with a personalized explanation (best-effort, sequential to avoid rate limits)
-    const enrichedResults: any[] = [];
-    for (let i = 0; i < results.length; i++) {
-      const course: any = results[i];
-      console.log(`💭 API: Generating explanation for course ${i + 1}/${results.length}: ${course.course_title}`);
+    // Return results immediately without explanations (explanations streamed separately)
+    const sortedResults = [...results].sort((a, b) => (b.similarity ?? 0) - (a.similarity ?? 0));
 
-      const explanation = await generateCourseExplanation({
-        query: query.trim(),
-        courseTitle: course.course_title ?? null,
-        courseDescr: course.course_descr ?? null,
-      });
-
-      // Only include courses with successfully generated explanations
-      if (explanation && explanation.trim().length > 0) {
-        console.log(`✅ API: Explanation generated for: ${course.course_title}`);
-        enrichedResults.push({
-          ...course,
-          explanation,
+    // Increment popularity for each course that appeared in search results
+    if (sortedResults.length > 0 && SUPABASE_URL && SUPABASE_ANON_KEY) {
+      const courseIds = sortedResults.map((r: { id: number }) => r.id);
+      try {
+        const popRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_course_popularity`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ course_ids: courseIds }),
         });
-      } else {
-        console.warn(`⚠️ API: No explanation generated for: ${course.course_title}`);
-      }
-
-      // Small delay between calls to be kinder to Cerebras rate limits
-      // (Retry logic will handle failures, so we keep a minimal delay here)
-      if (i < results.length - 1) {
-        await sleep(300);
+        if (!popRes.ok) {
+          const errText = await popRes.text();
+          console.warn("Course popularity RPC failed:", popRes.status, errText);
+        }
+      } catch (e) {
+        console.warn("Failed to increment course popularity:", e);
       }
     }
 
     // Determine if there are more results
     const hasMore = results.length === searchLimit;
-    const lastResult = enrichedResults[enrichedResults.length - 1];
+    const lastResult = sortedResults[sortedResults.length - 1];
     const nextLastScore = lastResult?.similarity || null;
     const nextLastId = lastResult?.id || null;
 
-    console.log("📤 API: Returning response with", enrichedResults.length, "enriched results");
-    console.log("📊 API: Pagination:", { hasMore, nextLastScore, nextLastId });
+    const tTotal = Date.now() - tEmbedStart;
+    console.log("📤 API: [TIMING] Total search API:", (tTotal / 1000).toFixed(2), "s");
 
     return NextResponse.json({
-      results: enrichedResults,
+      results: sortedResults,
       pagination: {
         hasMore,
         lastScore: nextLastScore,
