@@ -475,6 +475,11 @@ export default function Home() {
             align-items: center;
             overflow: visible;
           }
+          .search-box-wrapper.has-results {
+            aspect-ratio: auto !important;
+            min-height: 75dvh !important;
+            max-height: 85dvh !important;
+          }
           .box-image {
             position: absolute;
             top: 0;
@@ -520,13 +525,19 @@ export default function Home() {
           .results-list-mobile .results-page-divider {
             display: none !important;
           }
+          .results-list-mobile .simple-card-descr {
+            min-height: 240px !important;
+            height: auto !important;
+            max-height: 280px !important;
+            overflow-y: auto !important;
+          }
         }
       `}</style>
       <div 
         className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container`}
         style={{
           ...styles.container,
-          ...((loading || hasSearched) ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
+          ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
       <div
@@ -775,7 +786,7 @@ export default function Home() {
                   <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
                     ← new query
                   </button>
-                  {!isMobile && pagination.hasMore && (
+                  {pagination.hasMore && (
                     <button
                       type="button"
                       style={{
@@ -821,7 +832,8 @@ function SimpleCourseCard({
   const mainText = prereqIdx >= 0 ? text.slice(0, prereqIdx).trim() : text;
   const rawPrereq = prereqIdx >= 0 ? text.slice(prereqIdx).trim() : "";
   const prereqContent = clean(rawPrereq).replace(/^prerequisites:?\s*/i, "").trim();
-  const prereqDisplay = prereqContent ? clean(rawPrereq) : "Prerequisites: None mentioned";
+  const prereqDisplayRaw = prereqContent ? clean(rawPrereq) : "Prerequisites: None mentioned";
+  const prereqDisplay = prereqDisplayRaw.replace(/^(Prerequisites:\s*)+/i, "Prerequisites: ");
   const hasCompleteExplanation =
     typeof explanation === "string" &&
     (explanation.toLowerCase().includes("prereq") || explanation.length >= 80);
@@ -869,7 +881,7 @@ function SimpleCourseCard({
         )}
       </div>
       {isLoading ? (
-        <div style={styles.skeletonDescr}>
+        <div className="simple-card-descr" style={styles.skeletonDescr}>
           <div style={styles.skeletonDescrLine} />
           <div style={styles.skeletonDescrLine} />
           <div style={{ ...styles.skeletonDescrLine, width: "95%" }} />
@@ -1340,8 +1352,8 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     minHeight: 0,
     overflow: "hidden",
-    paddingTop: "0.75rem",
-    paddingBottom: "0.75rem",
+    paddingTop: 0,
+    paddingBottom: "0.25rem",
   },
   resultDivider: {
     width: "100%",
@@ -1353,7 +1365,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: "0.5rem",
+    gap: "0.35rem",
     textAlign: "left",
     maxWidth: "100%",
     width: "100%",
@@ -1398,13 +1410,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   simpleCardDescr: {
     fontFamily: '"Roboto Mono", monospace',
-    fontSize: "11px",
+    fontSize: "10px",
     color: "#333",
     lineHeight: 1.2,
     textAlign: "left",
-    height: "160px",
     minHeight: "160px",
-    flexShrink: 0,
+    flex: 1,
     overflow: "hidden",
     width: "100%",
   },

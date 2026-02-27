@@ -18,7 +18,7 @@ CRITICAL REQUIREMENTS:
 - FIRST PART (~20 words) must focus on connecting their query to the course - use their exact words/concepts
 - SECOND PART (~40 words) should describe what the course covers and its key features
 - ALWAYS extract and include prerequisites if mentioned in the course description - format them as underlined text using <u>prerequisite text</u>
-- Put prerequisites on a NEW LINE at the end - add a blank line before prerequisites, then "Prerequisites: ..." on its own line
+- Put prerequisites on a NEW LINE at the end - add a blank line, then exactly one of: "Prerequisites: <u>course codes</u>" OR "Prerequisites: None mentioned". Never write "Prerequisites:" twice.
 - Be professional, knowledgeable, and advisor-like in your tone
 - Never mention word counts or that you are an AI.`;
 
@@ -28,7 +28,7 @@ FIRST PART (~20 words): Connect to student query - start with "This course is a 
 
 SECOND PART (~40 words): Describe the course content, key topics, and what students learn.
 
-PREREQUISITES: Always add a blank line, then put on the next line either "Prerequisites: <u>course codes</u>" if prerequisites exist, or "Prerequisites: None mentioned" if none are found
+PREREQUISITES: Add a blank line, then a single line: either "Prerequisites: <u>course codes</u>" if prerequisites exist, or "Prerequisites: None mentioned" if none. Output the line exactly once—do not repeat "Prerequisites:".
 
 Student query: "${query}"
 Course title: ${courseTitle || "N/A"}
