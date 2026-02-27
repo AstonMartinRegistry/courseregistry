@@ -187,16 +187,6 @@ export default function Home() {
     if (!query.trim() || loadingMore || !pagination.hasMore) {
       return;
     }
-    if (true) {
-      setLoadingMore(false);
-      setError(null);
-      setResults([]);
-      setExplanations({});
-      setHasSearched(true);
-      setShowSecretPage(true);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
-      return;
-    }
 
     const excludeIds = results.map((r) => r.id);
     const lastScore = pagination.lastScore;
@@ -427,15 +417,16 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .mobile-fixed {
-            /* Use dynamic viewport height on modern mobile browsers to resist URL bar show/hide */
-            height: 100dvh;
-            min-height: 100vh; /* Fallback for browsers without dvh support */
+            /* Use small viewport height - stable when URL bar shows/hides, prevents cover jump on refresh */
+            height: 100vh; /* Fallback for browsers without svh */
+            height: 100svh;
             overflow: hidden;
             position: relative;
           }
           .mobile-scrollable {
             overflow-y: auto;
-            min-height: 100vh;
+            min-height: 100vh; /* Fallback for browsers without svh */
+            min-height: 100svh;
             position: relative;
           }
           .mobile-title {
@@ -534,7 +525,7 @@ export default function Home() {
         }
       `}</style>
       <div 
-        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container`}
+        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage) ? " mobile-has-results" : ""}`}
         style={{
           ...styles.container,
           ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
@@ -904,187 +895,6 @@ function SimpleCourseCard({
   );
 }
 
-function CourseResultCard({
-  course,
-  index,
-  compact = false,
-}: {
-  course: CourseResult;
-  index: number;
-  compact?: boolean;
-}) {
-  const [wordsVisible, setWordsVisible] = useState(false);
-  const [hoveredCodeIndex, setHoveredCodeIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    // Start word-by-word animation after component mounts
-    setWordsVisible(true);
-  }, []);
-
-  // Parse course codes by "/"
-  const courseCodes = course.course_codes.split("/").map((code) => code.trim()).filter((code) => code.length > 0);
-
-  const baseText =
-    (course.explanation && course.explanation.trim().length > 0
-      ? course.explanation
-      : course.course_descr) || "";
-
-  // Parse text to handle <u> tags for underlined prerequisites and separate prerequisites line
-  const parseTextWithUnderline = (text: string) => {
-    // First, check if prerequisites exist and split the text
-    const prereqPattern = /\b(?:prerequisites?:|prerequisite|prereq)\s*[:.]?\s*/i;
-    const match = text.match(prereqPattern);
-    
-    let mainText = text;
-    let prerequisitesText = "";
-    
-    if (match) {
-      const index = match.index!;
-      mainText = text.substring(0, index).trim();
-      prerequisitesText = text.substring(index).trim();
-    }
-
-    const parts: Array<{ text: string; underlined: boolean; isNewLine: boolean }> = [];
-    
-    // Helper function to parse a section and handle underline tags
-    const parseSection = (sectionText: string) => {
-      let remaining = sectionText.trim();
-      
-      while (remaining.length > 0) {
-        const openTag = remaining.indexOf("<u>");
-        const closeTag = remaining.indexOf("</u>");
-
-        if (openTag === -1 && closeTag === -1) {
-          // No more tags, add remaining text
-          const words = remaining.split(/\s+/).filter((w) => w.length > 0);
-          words.forEach((word) => {
-            parts.push({ text: word, underlined: false, isNewLine: false });
-          });
-          break;
-        }
-
-        if (openTag !== -1 && (closeTag === -1 || openTag < closeTag)) {
-          // Add text before the open tag
-          const before = remaining.substring(0, openTag).trim();
-          const words = before.split(/\s+/).filter((w) => w.length > 0);
-          words.forEach((word) => {
-            parts.push({ text: word, underlined: false, isNewLine: false });
-          });
-
-          // Add underlined text
-          const afterOpen = remaining.substring(openTag + 3);
-          const closeIdx = afterOpen.indexOf("</u>");
-          if (closeIdx !== -1) {
-            const underlinedText = afterOpen.substring(0, closeIdx).trim();
-            const words = underlinedText.split(/\s+/).filter((w) => w.length > 0);
-            words.forEach((word) => {
-              parts.push({ text: word, underlined: true, isNewLine: false });
-            });
-            remaining = afterOpen.substring(closeIdx + 4).trim();
-          } else {
-            // Malformed, just add as normal text
-            const words = remaining.split(/\s+/).filter((w) => w.length > 0);
-            words.forEach((word) => {
-              parts.push({ text: word, underlined: false, isNewLine: false });
-            });
-            break;
-          }
-        } else {
-          // Close tag without open, skip it
-          remaining = remaining.substring(closeTag + 4);
-        }
-      }
-    };
-
-    // Helper function to parse prerequisites without underlining (strip all <u> tags)
-    const parsePrerequisites = (sectionText: string) => {
-      // Remove all underline tags from prerequisites
-      let cleanText = sectionText.replace(/<u>/g, "").replace(/<\/u>/g, "");
-      const words = cleanText.split(/\s+/).filter((w) => w.length > 0);
-      words.forEach((word) => {
-        parts.push({ text: word, underlined: false, isNewLine: false });
-      });
-    };
-
-    // Parse main text (with underlining allowed)
-    parseSection(mainText);
-    
-    // Add newline and parse prerequisites if they exist (without underlining)
-    if (prerequisitesText) {
-      parts.push({ text: "", underlined: false, isNewLine: true });
-      parsePrerequisites(prerequisitesText);
-    }
-
-    return parts;
-  };
-
-  const textParts = parseTextWithUnderline(baseText);
-
-  return (
-    <div style={compact ? { ...styles.resultCard, ...styles.compactCard } : styles.resultCard}>
-      <div style={styles.resultHeader}>
-        <div>
-          <div style={styles.courseCodesContainer}>
-            {courseCodes.map((code, codeIndex) => {
-              const navigatorUrl = STANFORD_NAVIGATOR_URL(code);
-              const isHovered = hoveredCodeIndex === codeIndex;
-              
-              return (
-                <span key={codeIndex}>
-                  <a
-                    href={navigatorUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      ...styles.courseCodes,
-                      ...(isHovered ? styles.courseCodesHovered : {}),
-                    }}
-                    onMouseEnter={() => setHoveredCodeIndex(codeIndex)}
-                    onMouseLeave={() => setHoveredCodeIndex(null)}
-                  >
-                    {code}
-                    <span style={styles.courseArrow}>↗</span>
-                  </a>
-                  {codeIndex < courseCodes.length - 1 && (
-                    <span style={styles.courseCodeSeparator}> / </span>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-          <div style={styles.courseTitle}>{course.course_title || "N/A"}</div>
-          <div style={styles.instructors}>{course.instructors || "N/A"}</div>
-        </div>
-        <div style={styles.similarity}>
-          {(course.similarity * 100).toFixed(1)}% match
-        </div>
-      </div>
-      {baseText && (
-        <div style={styles.courseDescr}>
-          {textParts.map((part, wordIndex) => {
-            if (part.isNewLine) {
-              return <div key={wordIndex} style={{ display: "block", marginTop: "12px", height: "1px" }}></div>;
-            }
-            return (
-              <span
-                key={wordIndex}
-                style={{
-                  ...styles.descriptionWord,
-                  ...(part.underlined ? { textDecoration: "underline" } : {}),
-                  opacity: wordsVisible ? 1 : 0,
-                  transition: `opacity 0.2s ease ${wordIndex * 0.01}s`,
-                }}
-              >
-                {part.text}{" "}
-              </span>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh",
@@ -1115,41 +925,6 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#ffffff",
     whiteSpace: "nowrap",
     zIndex: 10,
-  },
-  topNote: {
-    position: "absolute",
-    top: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "100%",
-    maxWidth: "700px",
-    fontSize: "14px",
-    color: "#1a1a1a",
-    zIndex: 10,
-    textAlign: "center",
-    padding: "0.25rem 0.5rem",
-  },
-  contentWrapper: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    position: "relative",
-    zIndex: 1,
-  },
-  titleSubtext: {
-    fontSize: "0.85em",
-    color: "#555",
-    fontFamily: '"Roboto Mono", monospace',
-    marginTop: "0.25rem",
-    marginBottom: 0,
-  },
-  leaderboardLink: {
-    fontSize: "0.8em",
-    color: "#1a1a1a",
-    fontFamily: '"Roboto Mono", monospace',
-    marginTop: "1rem",
-    marginBottom: 0,
-    padding: 0,
   },
   title: {
     fontSize: "2.8em",
@@ -1217,20 +992,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
   },
-  error: {
-    marginTop: "20px",
-    padding: "1.5rem",
-    border: "1px solid #f0f0f0",
-    background:
-      "linear-gradient(135deg, rgba(255, 254, 254, 0.8), rgba(255, 253, 253, 0.8), rgba(255, 252, 252, 0.8))",
-    color: "rgb(23, 23, 23)",
-    boxShadow: "-6.5px 6.5px 0px rgba(0, 0, 0, 0.75)",
-    backdropFilter: "blur(10px)",
-    borderRadius: "8px",
-    maxWidth: "700px",
-    width: "80%",
-    fontSize: "12px",
-  },
   resultsBox: {
     position: "absolute",
     top: 0,
@@ -1261,12 +1022,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     textAlign: "left",
   },
-  saladPlaceholder: {
-    width: "100%",
-    height: 120,
-    background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
-    border: "1px dashed #81c784",
-  },
   saladEmailForm: {
     display: "flex",
     gap: "0.5rem",
@@ -1291,14 +1046,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#f0f0f0",
     border: "none",
     cursor: "pointer",
-  },
-  resultsTitle: {
-    fontFamily: '"Jersey 15", sans-serif',
-    fontSize: "2em",
-    margin: "0 0 0.5rem 0",
-    textAlign: "left",
-    color: "#1a1a1a",
-    alignSelf: "flex-start",
   },
   loadingText: {
     fontFamily: '"Roboto Mono", monospace',
@@ -1354,12 +1101,6 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
     paddingTop: 0,
     paddingBottom: "0.25rem",
-  },
-  resultDivider: {
-    width: "100%",
-    height: 1,
-    background: "#1a1a1a",
-    flexShrink: 0,
   },
   simpleCard: {
     display: "flex",
@@ -1419,34 +1160,6 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
     width: "100%",
   },
-  spottedSection: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "0.5rem",
-    marginTop: "0.5rem",
-    flexWrap: "wrap",
-  },
-  spottedBy: {
-    fontFamily: '"Roboto Mono", monospace',
-    fontSize: "9px",
-    color: "#666",
-  },
-  spotButton: {
-    fontFamily: '"Roboto Mono", monospace',
-    fontSize: "9px",
-    padding: "0.25rem 0.5rem",
-    background: "#f0f0f0",
-    color: "#1a1a1a",
-    border: "1px solid #ccc",
-    cursor: "pointer",
-  },
-  spotButtonActive: {
-    background: "#1a1a1a",
-    color: "#f0f0f0",
-    borderColor: "#1a1a1a",
-  },
   loadingSkeletonCard: {
     display: "flex",
     flexDirection: "column",
@@ -1480,142 +1193,6 @@ const styles: Record<string, React.CSSProperties> = {
     animation: "skeleton-shimmer 1.5s ease-in-out infinite",
     borderRadius: "2px",
   },
-  bookScene: {
-    perspective: 2000,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    marginTop: "20px",
-  },
-  bookCover: {
-    flexShrink: 0,
-    position: "relative",
-    overflow: "visible",
-    backgroundColor: "#fff",
-    boxShadow: "2px 2px 10px rgba(0,0,0,0.2)",
-  },
-  coverFront: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: "100%",
-    height: "100%",
-  },
-  coverBack: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "#ffffff",
-  },
-  pageCover: {
-    backgroundColor: "#fff",
-  },
-  pageCoverBack: {
-    backgroundColor: "#ffffff",
-  },
-  pageContent: {
-    border: "1px solid #ddd",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-    padding: "1rem",
-    boxSizing: "border-box",
-    backgroundColor: "#ffffff",
-  },
-  bookCoverImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: "100%",
-    height: "100%",
-  },
-  bookContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 0,
-    marginTop: "20px",
-    flexWrap: "wrap",
-    width: "100%",
-  },
-  bookPage: {
-    border: "1px solid #ddd",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-    padding: "1rem",
-    boxSizing: "border-box",
-  },
-  bookPageWhite: {
-    background: "#ffffff",
-  },
-  bookPages: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  bookButtonContainer: {
-    display: "flex",
-    flexDirection: "row",
-    gap: "1rem",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "20px",
-    width: "100%",
-  },
-  loadingMoreOverlay: {
-    position: "fixed",
-    top: "20px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    padding: "0.5rem 1rem",
-    background: "rgba(0,0,0,0.8)",
-    color: "#fff",
-    borderRadius: "4px",
-    fontSize: "12px",
-    zIndex: 100,
-  },
-  resultsContainer: {
-    marginTop: "20px",
-    width: "44%",
-    maxWidth: "800px",
-    fontSize: "12px",
-  },
-  compactCard: {
-    padding: "0.75rem",
-    marginBottom: "0.5rem",
-    fontSize: "10px",
-    flex: 1,
-    minHeight: 0,
-    overflow: "auto",
-  },
-  resultCard: {
-    padding: "1.5rem",
-    border: "1px solid rgba(240, 240, 240, 0.7)",
-    boxShadow: "-6.5px 6.5px 0px rgba(0, 0, 0, 0.75)",
-    textAlign: "left",
-    marginBottom: "20px",
-    borderRadius: "8px",
-    background:
-      "linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(250, 250, 250, 0.25), rgba(245, 245, 245, 0.2))",
-    fontSize: "12px",
-    position: "relative",
-    backdropFilter: "blur(10px)",
-    color: "rgb(23, 23, 23)",
-  },
-  resultHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "0.6rem",
-    marginBottom: "12px",
-  },
   courseCodesContainer: {
     display: "inline-flex",
     alignItems: "center",
@@ -1646,85 +1223,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "inherit",
     lineHeight: "1",
   },
-  courseTitle: {
-    fontSize: "0.9rem",
-    color: "rgb(23, 23, 23)",
-    marginBottom: "8px",
-  },
-  instructors: {
-    fontSize: "0.8rem",
-    color: "#555",
-    marginBottom: "4px",
-  },
-  similarity: {
-    marginLeft: "auto",
-    fontSize: "0.85em",
-    fontWeight: "normal",
-    color: "#8e0202",
-    background: "rgba(142, 2, 2, 0.1)",
-    padding: "0.2em 0.8em",
-    borderRadius: "10px",
-    minWidth: "6em",
-    flexShrink: 0,
-    height: "1.5em",
-    lineHeight: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    whiteSpace: "nowrap",
-  },
-  courseDescr: {
-    fontSize: "12px",
-    color: "rgb(23, 23, 23)",
-    lineHeight: "1.3",
-    marginTop: "18px",
-    paddingTop: "1rem",
-    borderTop: "1px solid #ddd",
-  },
-  descriptionWord: {
-    display: "inline-block",
-    whiteSpace: "pre",
-  },
-  skeleton: {
-    position: "relative",
-    overflow: "hidden",
-  },
-  skeletonHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "0.6rem",
-    marginBottom: "12px",
-  },
-  skeletonContent: {
-    flex: 1,
-  },
-  skeletonTitle: {
-    width: "80%",
-    height: "20px",
-    background: "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
-    backgroundSize: "200% 100%",
-    borderRadius: "4px",
-    marginBottom: "0.5rem",
-    animation: "shimmer 1.5s ease-in-out infinite",
-  },
-  skeletonScore: {
-    width: "80px",
-    height: "24px",
-    background: "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
-    backgroundSize: "200% 100%",
-    borderRadius: "10px",
-    marginLeft: "auto",
-    animation: "shimmer 1.5s ease-in-out infinite",
-  },
-  skeletonLine: {
-    width: "100%",
-    height: "16px",
-    background: "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
-    backgroundSize: "200% 100%",
-    borderRadius: "4px",
-    marginBottom: "0.5rem",
-    animation: "shimmer 1.5s ease-in-out infinite",
-  },
   footerText: {
     position: "fixed",
     bottom: "20px",
@@ -1734,31 +1232,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#1a1a1a",
     zIndex: 10,
     fontFamily: '"Roboto Mono", monospace',
-  },
-  buttonContainer: {
-    display: "flex",
-    flexDirection: "row",
-    gap: "1rem",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "20px",
-    width: "100%",
-  },
-  actionButton: {
-    padding: "0.8rem 2rem",
-    border: "1px solid rgba(240, 240, 240, 0.7)",
-    background:
-      "linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(250, 250, 250, 0.25), rgba(245, 245, 245, 0.2))",
-    color: "rgb(23, 23, 23)",
-    borderRadius: "6px",
-    fontSize: "0.8rem",
-    fontWeight: "normal",
-    cursor: "pointer",
-    transition: "background-color 0.2s, box-shadow 0.1s",
-    backdropFilter: "blur(14px) saturate(1.1)",
-    boxShadow: "-4px 4px 0px rgba(0, 0, 0, 0.65)",
-    fontFamily: '"Jersey 15", sans-serif',
-    outline: "none",
   },
 };
 
