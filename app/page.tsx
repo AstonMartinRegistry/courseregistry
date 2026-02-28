@@ -28,6 +28,7 @@ export default function Home() {
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [showSecretPage, setShowSecretPage] = useState(false);
   const [showNewSecretPage, setShowNewSecretPage] = useState(false);
+  const [showCooksSecretPage, setShowCooksSecretPage] = useState(false);
   const [saladEmail, setSaladEmail] = useState("");
   const [saladEmailError, setSaladEmailError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -79,8 +80,9 @@ export default function Home() {
       return;
     }
     window.scrollTo(0, 0);
-    const saladWins = Math.random() < 1 / 4;
-    const newPageWins = Math.random() < 1 / 2;
+    const saladWins = Math.random() < 1 / 32;
+    const olivesWins = Math.random() < 1 / 16;
+    const cooksWins = Math.random() < 1 / 8;
     if (saladWins) {
       setLoading(false);
       setError(null);
@@ -89,10 +91,11 @@ export default function Home() {
       setHasSearched(true);
       setShowSecretPage(true);
       setShowNewSecretPage(false);
+      setShowCooksSecretPage(false);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
-    if (newPageWins) {
+    if (olivesWins) {
       setLoading(false);
       setError(null);
       setResults([]);
@@ -100,6 +103,19 @@ export default function Home() {
       setHasSearched(true);
       setShowSecretPage(false);
       setShowNewSecretPage(true);
+      setShowCooksSecretPage(false);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
+    if (cooksWins) {
+      setLoading(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(false);
+      setShowCooksSecretPage(true);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
@@ -112,6 +128,7 @@ export default function Home() {
     setHasSearched(true);
     setShowSecretPage(false);
     setShowNewSecretPage(false);
+    setShowCooksSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
@@ -206,8 +223,9 @@ export default function Home() {
     if (!query.trim() || loadingMore || !pagination.hasMore) {
       return;
     }
-    const saladWins = Math.random() < 1 / 4;
-    const newPageWins = Math.random() < 1 / 2;
+    const saladWins = Math.random() < 1 / 32;
+    const olivesWins = Math.random() < 1 / 16;
+    const cooksWins = Math.random() < 1 / 8;
     if (saladWins) {
       setLoadingMore(false);
       setError(null);
@@ -216,10 +234,11 @@ export default function Home() {
       setHasSearched(true);
       setShowSecretPage(true);
       setShowNewSecretPage(false);
+      setShowCooksSecretPage(false);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
-    if (newPageWins) {
+    if (olivesWins) {
       setLoadingMore(false);
       setError(null);
       setResults([]);
@@ -227,6 +246,19 @@ export default function Home() {
       setHasSearched(true);
       setShowSecretPage(false);
       setShowNewSecretPage(true);
+      setShowCooksSecretPage(false);
+      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      return;
+    }
+    if (cooksWins) {
+      setLoadingMore(false);
+      setError(null);
+      setResults([]);
+      setExplanations({});
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(false);
+      setShowCooksSecretPage(true);
       setPagination({ hasMore: false, lastScore: null, lastId: null });
       return;
     }
@@ -242,6 +274,7 @@ export default function Home() {
     setError(null);
     setShowSecretPage(false);
     setShowNewSecretPage(false);
+    setShowCooksSecretPage(false);
 
     try {
       const response = await fetch("/api/search", {
@@ -321,12 +354,14 @@ export default function Home() {
   };
 
   const handleNewSearch = () => {
+    setShowCooksSecretPage(false);
     setQuery("");
     setResults([]);
     setError(null);
     setHasSearched(false);
     setShowSecretPage(false);
     setShowNewSecretPage(false);
+    setShowCooksSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
   };
 
@@ -585,16 +620,16 @@ export default function Home() {
         }
       `}</style>
       <div 
-        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage) ? " mobile-has-results" : ""}`}
+        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage) ? " mobile-has-results" : ""}`}
         style={{
           ...styles.container,
           ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
       <div
-        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage)) ? "has-results" : ""}`}
+        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage)) ? "has-results" : ""}`}
         style={
-          leaderboardOpen || showSecretPage || showNewSecretPage
+          leaderboardOpen || showSecretPage || showNewSecretPage || showCooksSecretPage
             ? undefined
             : wrapperSize && hasSearched && !loading && !loadingMore && results.length === 0
               ? {
@@ -651,7 +686,7 @@ export default function Home() {
                   <div style={styles.resultsPage} className="results-page">
                     <div style={styles.secretPageContent}>
                       <p style={styles.secretPageText}>
-                        Yippee, welcome to this cozy corner of the registry. Sorry no classes womp womp. But consider yourself a lucky one, this page has a 1/72 chance of appearing.
+                        Yippee, welcome to this cozy corner of the registry. Sorry no classes womp womp. But consider yourself a lucky one, this page has a 1/32 chance of appearing.
                       </p>
                       <img src="/dithered-image-5.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
                       <p style={styles.secretPageText}>What&apos;s up with the salads???</p>
@@ -706,6 +741,24 @@ export default function Home() {
                 <img src="/dithered-image-7.jpeg" alt="" style={{ maxWidth: "100%", imageRendering: "pixelated" }} />
                 <p style={{ ...styles.secretPageText, marginTop: "2em" }}>
                   Right, you want classes, nevermind
+                </p>
+              </div>
+            </div>
+            <div style={styles.resultsBottomBar}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                New query
+              </button>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                Load more
+              </button>
+            </div>
+          </div>
+        ) : showCooksSecretPage ? (
+          <div style={styles.resultsBox}>
+            <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
+              <div style={styles.secretPageContent}>
+                <p style={styles.secretPageText}>
+                  All our cooks are busy and that&apos;s a difficult query, have you considered dropping out?
                 </p>
               </div>
             </div>

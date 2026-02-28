@@ -62,8 +62,8 @@ export function LeaderboardPanel({ onClose }: Props) {
             right: 0,
             bottom: 0,
             backgroundImage: "url(/dithered-image-5.jpeg)",
-            backgroundSize: "220%",
-            backgroundPosition: "-25% center",
+            backgroundSize: "170%",
+            backgroundPosition: "-50% 20%",
             opacity: 1,
           }}
         />
