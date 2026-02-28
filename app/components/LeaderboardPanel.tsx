@@ -102,6 +102,8 @@ export function LeaderboardPanel({ onClose }: Props) {
           flex: 1,
           overflowY: "auto",
           padding: "1rem 1.5rem",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {loading ? (
@@ -110,13 +112,16 @@ export function LeaderboardPanel({ onClose }: Props) {
               display: "flex",
               flexDirection: "column",
               gap: "10px",
+              flex: 1,
             }}
           >
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 30 }).map((_, i) => (
               <div
                 key={i}
                 style={{
                   height: "16px",
+                  flex: "1 1 16px",
+                  maxHeight: "16px",
                   width: `${70 + (i % 3) * 10}%`,
                   background:
                     "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",

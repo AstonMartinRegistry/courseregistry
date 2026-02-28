@@ -29,6 +29,7 @@ export default function Home() {
   const [showSecretPage, setShowSecretPage] = useState(false);
   const [showNewSecretPage, setShowNewSecretPage] = useState(false);
   const [showCooksSecretPage, setShowCooksSecretPage] = useState(false);
+  const [showDropoutSecretPage, setShowDropoutSecretPage] = useState(false);
   const [saladEmail, setSaladEmail] = useState("");
   const [saladEmailError, setSaladEmailError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -81,42 +82,47 @@ export default function Home() {
     }
     window.scrollTo(0, 0);
     const saladWins = Math.random() < 1 / 32;
-    const olivesWins = Math.random() < 1 / 16;
-    const cooksWins = Math.random() < 1 / 8;
+    const cooksWins = Math.random() < 1 / 28;
+    const olivesWins = Math.random() < 1 / 24;
+    const dropoutWins = Math.random() < 1 / 20;
     if (saladWins) {
       setLoading(false);
       setError(null);
-      setResults([]);
-      setExplanations({});
       setHasSearched(true);
       setShowSecretPage(true);
       setShowNewSecretPage(false);
       setShowCooksSecretPage(false);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
-      return;
-    }
-    if (olivesWins) {
-      setLoading(false);
-      setError(null);
-      setResults([]);
-      setExplanations({});
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(true);
-      setShowCooksSecretPage(false);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      setShowDropoutSecretPage(false);
       return;
     }
     if (cooksWins) {
       setLoading(false);
       setError(null);
-      setResults([]);
-      setExplanations({});
       setHasSearched(true);
       setShowSecretPage(false);
       setShowNewSecretPage(false);
       setShowCooksSecretPage(true);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      setShowDropoutSecretPage(false);
+      return;
+    }
+    if (olivesWins) {
+      setLoading(false);
+      setError(null);
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(true);
+      setShowCooksSecretPage(false);
+      setShowDropoutSecretPage(false);
+      return;
+    }
+    if (dropoutWins) {
+      setLoading(false);
+      setError(null);
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(false);
+      setShowCooksSecretPage(false);
+      setShowDropoutSecretPage(true);
       return;
     }
     const t0 = performance.now();
@@ -129,6 +135,7 @@ export default function Home() {
     setShowSecretPage(false);
     setShowNewSecretPage(false);
     setShowCooksSecretPage(false);
+    setShowDropoutSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
@@ -224,42 +231,47 @@ export default function Home() {
       return;
     }
     const saladWins = Math.random() < 1 / 32;
-    const olivesWins = Math.random() < 1 / 16;
-    const cooksWins = Math.random() < 1 / 8;
+    const cooksWins = Math.random() < 1 / 28;
+    const olivesWins = Math.random() < 1 / 24;
+    const dropoutWins = Math.random() < 1 / 20;
     if (saladWins) {
       setLoadingMore(false);
       setError(null);
-      setResults([]);
-      setExplanations({});
       setHasSearched(true);
       setShowSecretPage(true);
       setShowNewSecretPage(false);
       setShowCooksSecretPage(false);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
-      return;
-    }
-    if (olivesWins) {
-      setLoadingMore(false);
-      setError(null);
-      setResults([]);
-      setExplanations({});
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(true);
-      setShowCooksSecretPage(false);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      setShowDropoutSecretPage(false);
       return;
     }
     if (cooksWins) {
       setLoadingMore(false);
       setError(null);
-      setResults([]);
-      setExplanations({});
       setHasSearched(true);
       setShowSecretPage(false);
       setShowNewSecretPage(false);
       setShowCooksSecretPage(true);
-      setPagination({ hasMore: false, lastScore: null, lastId: null });
+      setShowDropoutSecretPage(false);
+      return;
+    }
+    if (olivesWins) {
+      setLoadingMore(false);
+      setError(null);
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(true);
+      setShowCooksSecretPage(false);
+      setShowDropoutSecretPage(false);
+      return;
+    }
+    if (dropoutWins) {
+      setLoadingMore(false);
+      setError(null);
+      setHasSearched(true);
+      setShowSecretPage(false);
+      setShowNewSecretPage(false);
+      setShowCooksSecretPage(false);
+      setShowDropoutSecretPage(true);
       return;
     }
 
@@ -275,6 +287,7 @@ export default function Home() {
     setShowSecretPage(false);
     setShowNewSecretPage(false);
     setShowCooksSecretPage(false);
+    setShowDropoutSecretPage(false);
 
     try {
       const response = await fetch("/api/search", {
@@ -362,7 +375,16 @@ export default function Home() {
     setShowSecretPage(false);
     setShowNewSecretPage(false);
     setShowCooksSecretPage(false);
+    setShowDropoutSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
+  };
+
+  const handleSecretLoadMore = () => {
+    if (pagination.hasMore) {
+      loadMore();
+    } else {
+      runSearch();
+    }
   };
 
   const handleSaladEmailSubmit = (e: React.FormEvent) => {
@@ -445,6 +467,11 @@ export default function Home() {
           .search-box-wrapper.has-results {
             width: 900px !important;
             height: 600px !important;
+          }
+          .search-box-wrapper.has-leaderboard {
+            width: 480px !important;
+            height: 600px !important;
+            aspect-ratio: auto !important;
           }
           .search-box-wrapper {
             position: fixed;
@@ -555,7 +582,8 @@ export default function Home() {
             overflow: visible;
             z-index: 2;
           }
-          .search-box-wrapper.has-results {
+          .search-box-wrapper.has-results,
+          .search-box-wrapper.has-leaderboard {
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
@@ -620,14 +648,14 @@ export default function Home() {
         }
       `}</style>
       <div 
-        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage) ? " mobile-has-results" : ""}`}
+        className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage || showDropoutSecretPage)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container${isMobile && hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage || showDropoutSecretPage) ? " mobile-has-results" : ""}`}
         style={{
           ...styles.container,
           ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
         }}
       >
       <div
-        className={`search-box-wrapper ${leaderboardOpen || (hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage)) ? "has-results" : ""}`}
+        className={`search-box-wrapper ${leaderboardOpen ? "has-leaderboard" : ""} ${(hasSearched && (loading || loadingMore || results.length > 0 || showSecretPage || showNewSecretPage || showCooksSecretPage || showDropoutSecretPage)) ? "has-results" : ""}`}
         style={
           leaderboardOpen || showSecretPage || showNewSecretPage || showCooksSecretPage
             ? undefined
@@ -648,7 +676,7 @@ export default function Home() {
                 <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
                   <div style={styles.secretPageContent}>
                     <p style={styles.secretPageText}>
-                      Welcome to the salad bar!! Consider yourself lucky, there was a 1/4 chance for this page to appear!
+                      Welcome to the salad bar!! Consider yourself lucky, there was a 1/32 chance for this page to appear!
                     </p>
                     <p style={styles.secretPageText}>
                       This registry&apos;s sole aim is to encourage salad makers to make good salads. One will not know that apples and olives work well in a salad until one has discovered their nature and embraced their union. Whether the salad makers will use the ingredients at their disposal is another question. However, a well stocked pantry and a complete list should be made available so they may cook.
@@ -675,7 +703,7 @@ export default function Home() {
                   <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
                     New query
                   </button>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
                     Load more
                   </button>
                 </div>
@@ -724,7 +752,7 @@ export default function Home() {
                   <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
                     New query
                   </button>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
                     Load more
                   </button>
                 </div>
@@ -748,7 +776,7 @@ export default function Home() {
               <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
                 New query
               </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
                 Load more
               </button>
             </div>
@@ -758,7 +786,29 @@ export default function Home() {
             <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
               <div style={styles.secretPageContent}>
                 <p style={styles.secretPageText}>
-                  All our cooks are busy and that&apos;s a difficult query, have you considered dropping out?
+                  <em>Recipe for a Salad</em> by Sydney Smith
+                </p>
+                <p style={{ ...styles.secretPageText, whiteSpace: "pre-line", marginTop: "1em" }}>
+                  {`To make this condiment your poet begs
+The pounded yellow of two hard-boil'd eggs;
+Two boiled potatoes, passed through kitchen sieve,
+Smoothness and softness to the salad give.
+Let onion atoms lurk within the bowl,
+And, half-suspected, animate the whole.
+Of mordant mustard add a single spoon,
+Distrust the condiment that bites so soon;
+But deem it not, thou man of herbs, a fault
+To add a double quantity of salt;
+Four times the spoon with oil of Lucca crown,
+And twice with vinegar procur'd from town;
+And lastly o'er the flavour'd compound toss
+A magic soupçon of anchovy sauce.
+Oh, green and glorious! Oh, herbaceous treat!
+Twould tempt the dying anchorite to eat;
+Back to the world he'd turn his fleeting soul,
+And plunge his fingers in the salad-bowl!
+Serenely full, the epicure would say,
+\`Fate cannot harm me, I have dined today.'`}
                 </p>
               </div>
             </div>
@@ -766,7 +816,25 @@ export default function Home() {
               <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
                 New query
               </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={() => runSearch()}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+                Load more
+              </button>
+            </div>
+          </div>
+        ) : showDropoutSecretPage ? (
+          <div style={styles.resultsBox}>
+            <div style={{ flex: 1, overflow: "auto", width: "100%" }}>
+              <div style={styles.secretPageContent}>
+                <p style={styles.secretPageText}>
+                  All our cooks are busy and that query was a difficult query, have you considered dropping out?
+                </p>
+              </div>
+            </div>
+            <div style={styles.resultsBottomBar}>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                New query
+              </button>
+              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
                 Load more
               </button>
             </div>
