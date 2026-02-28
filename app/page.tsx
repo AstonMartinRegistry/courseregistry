@@ -30,6 +30,16 @@ export default function Home() {
   const [showNewSecretPage, setShowNewSecretPage] = useState(false);
   const [showCooksSecretPage, setShowCooksSecretPage] = useState(false);
   const [showDropoutSecretPage, setShowDropoutSecretPage] = useState(false);
+  const [resultsHistory, setResultsHistory] = useState<Array<{
+    results: CourseResult[];
+    explanations: Record<number, string>;
+    pagination: { hasMore: boolean; lastScore: number | null; lastId: number | null };
+  }>>([]);
+  const [forwardHistory, setForwardHistory] = useState<Array<{
+    results: CourseResult[];
+    explanations: Record<number, string>;
+    pagination: { hasMore: boolean; lastScore: number | null; lastId: number | null };
+  }>>([]);
   const [saladEmail, setSaladEmail] = useState("");
   const [saladEmailError, setSaladEmailError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -131,6 +141,8 @@ export default function Home() {
     setError(null);
       setResults([]);
     setExplanations({});
+    setResultsHistory([]);
+    setForwardHistory([]);
     setHasSearched(true);
     setShowSecretPage(false);
     setShowNewSecretPage(false);
@@ -280,6 +292,10 @@ export default function Home() {
     const lastId = pagination.lastId;
     const mobileView = typeof window !== "undefined" && window.innerWidth <= 768;
 
+    if (results.length > 0) {
+      setResultsHistory((prev) => [...prev, { results, explanations, pagination }]);
+    }
+    setForwardHistory([]);
     setResults([]);
     setExplanations({});
     setLoadingMore(true);
@@ -367,9 +383,9 @@ export default function Home() {
   };
 
   const handleNewSearch = () => {
-    setShowCooksSecretPage(false);
     setQuery("");
     setResults([]);
+    setExplanations({});
     setError(null);
     setHasSearched(false);
     setShowSecretPage(false);
@@ -377,6 +393,32 @@ export default function Home() {
     setShowCooksSecretPage(false);
     setShowDropoutSecretPage(false);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
+    setResultsHistory([]);
+    setForwardHistory([]);
+  };
+
+  const goBack = () => {
+    if (resultsHistory.length === 0) return;
+    setForwardHistory((f) => [...f, { results, explanations, pagination }]);
+    const prev = resultsHistory[resultsHistory.length - 1];
+    setResultsHistory((h) => h.slice(0, -1));
+    setResults(prev.results);
+    setExplanations(prev.explanations);
+    setPagination(prev.pagination);
+    setShowSecretPage(false);
+    setShowNewSecretPage(false);
+    setShowCooksSecretPage(false);
+    setShowDropoutSecretPage(false);
+  };
+
+  const goForward = () => {
+    if (forwardHistory.length === 0) return;
+    setResultsHistory((h) => [...h, { results, explanations, pagination }]);
+    const next = forwardHistory[forwardHistory.length - 1];
+    setForwardHistory((f) => f.slice(0, -1));
+    setResults(next.results);
+    setExplanations(next.explanations);
+    setPagination(next.pagination);
   };
 
   const handleSecretLoadMore = () => {
@@ -403,6 +445,11 @@ export default function Home() {
     setSaladEmail("");
   };
 
+  const barBtnStyle = {
+    ...styles.resultsBottomBarBtn,
+    ...(isMobile ? { fontSize: "10px", padding: "0.45rem 0.55rem" } : {}),
+  };
+
   return (
     <>
       <div
@@ -418,8 +465,8 @@ export default function Home() {
           onClick={() => setLeaderboardOpen(true)}
           style={{
             fontFamily: '"Roboto Mono", monospace',
-            fontSize: "10px",
-            padding: "0.35rem 0.6rem",
+            fontSize: isMobile ? "11px" : "10px",
+            padding: isMobile ? "0.4rem 0.6rem" : "0.35rem 0.6rem",
             background: "#1a1a1a",
             color: "#f0f0f0",
             border: "none",
@@ -668,7 +715,7 @@ export default function Home() {
         }
       >
         {leaderboardOpen ? (
-          <LeaderboardPanel onClose={() => setLeaderboardOpen(false)} />
+          <LeaderboardPanel onClose={() => setLeaderboardOpen(false)} isMobile={isMobile} />
         ) : showSecretPage ? (
           <div style={styles.resultsBox}>
             {isMobile ? (
@@ -700,10 +747,10 @@ export default function Home() {
                   </div>
                 </div>
                 <div style={styles.resultsBottomBar}>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                  <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                     New query
                   </button>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+                  <button type="button" style={barBtnStyle} onClick={handleSecretLoadMore}>
                     Load more
                   </button>
                 </div>
@@ -749,10 +796,10 @@ export default function Home() {
                   </div>
                 </div>
                 <div style={styles.resultsBottomBar}>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                  <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                     New query
                   </button>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+                  <button type="button" style={barBtnStyle} onClick={handleSecretLoadMore}>
                     Load more
                   </button>
                 </div>
@@ -773,10 +820,10 @@ export default function Home() {
               </div>
             </div>
             <div style={styles.resultsBottomBar}>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+              <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                 New query
               </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+              <button type="button" style={barBtnStyle} onClick={handleSecretLoadMore}>
                 Load more
               </button>
             </div>
@@ -813,10 +860,10 @@ Serenely full, the epicure would say,
               </div>
             </div>
             <div style={styles.resultsBottomBar}>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+              <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                 New query
               </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+              <button type="button" style={barBtnStyle} onClick={handleSecretLoadMore}>
                 Load more
               </button>
             </div>
@@ -831,10 +878,10 @@ Serenely full, the epicure would say,
               </div>
             </div>
             <div style={styles.resultsBottomBar}>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+              <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                 New query
               </button>
-              <button type="button" style={styles.resultsBottomBarBtn} onClick={handleSecretLoadMore}>
+              <button type="button" style={barBtnStyle} onClick={handleSecretLoadMore}>
                 Load more
               </button>
             </div>
@@ -1019,22 +1066,33 @@ Serenely full, the epicure would say,
                   )}
                 </div>
                 <div style={styles.resultsBottomBar}>
-                  <button type="button" style={styles.resultsBottomBarBtn} onClick={handleNewSearch}>
+                  <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
                     New query
                   </button>
-                  {pagination.hasMore && (
-                    <button
-                      type="button"
-                      style={{
-                        ...styles.resultsBottomBarBtn,
-                        ...(loadingMore ? { opacity: 0.7, cursor: "wait" } : {}),
-                      }}
-                      onClick={loadMore}
-                      disabled={loadingMore}
-                    >
-                      {loadingMore ? "Loading…" : "Load more"}
-                    </button>
-                  )}
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {resultsHistory.length > 0 && (
+                      <button type="button" style={barBtnStyle} onClick={goBack}>
+                        Back
+                      </button>
+                    )}
+                    {forwardHistory.length > 0 ? (
+                      <button type="button" style={barBtnStyle} onClick={goForward}>
+                        Forward
+                      </button>
+                    ) : pagination.hasMore ? (
+                      <button
+                        type="button"
+                        style={{
+                          ...barBtnStyle,
+                          ...(loadingMore ? { opacity: 0.7, cursor: "wait" } : {}),
+                        }}
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                      >
+                        {loadingMore ? "Loading…" : "Load more"}
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </>
             )}
@@ -1162,7 +1220,7 @@ const styles: Record<string, React.CSSProperties> = {
     bottom: "100%",
     left: 0,
     right: 0,
-    fontSize: "9px",
+    fontSize: "10px",
     color: "#1a1a1a",
     fontFamily: '"Roboto Mono", monospace',
     textAlign: "center",
@@ -1211,7 +1269,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#f0f0f0",
     color: "rgb(23, 23, 23)",
     borderRadius: 0,
-    fontSize: "10px",
+    fontSize: "11px",
     fontFamily: '"Roboto Mono", monospace',
     outline: "none",
     boxSizing: "border-box",

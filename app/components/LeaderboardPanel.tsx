@@ -12,9 +12,10 @@ type LeaderboardEntry = {
 
 type Props = {
   onClose: () => void;
+  isMobile?: boolean;
 };
 
-export function LeaderboardPanel({ onClose }: Props) {
+export function LeaderboardPanel({ onClose, isMobile }: Props) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -69,7 +70,7 @@ export function LeaderboardPanel({ onClose }: Props) {
         />
         <h2
           style={{
-            fontSize: "1.4em",
+            fontSize: isMobile ? "1.5em" : "1.4em",
             margin: 0,
             fontFamily: '"Jersey 15", sans-serif',
             color: "#1a1a1a",
@@ -84,8 +85,8 @@ export function LeaderboardPanel({ onClose }: Props) {
           onClick={onClose}
           style={{
             fontFamily: '"Roboto Mono", monospace',
-            fontSize: "10px",
-            padding: "0.25rem 0.5rem",
+            fontSize: isMobile ? "11px" : "10px",
+            padding: isMobile ? "0.35rem 0.5rem" : "0.25rem 0.5rem",
             background: "#1a1a1a",
             color: "#f0f0f0",
             border: "none",
@@ -156,16 +157,17 @@ export function LeaderboardPanel({ onClose }: Props) {
             <div
               style={{
                 display: "flex",
-                gap: "1rem",
+                gap: "0.75rem",
                 paddingBottom: "0.5rem",
                 borderBottom: "1px solid #ddd",
                 marginBottom: "0.5rem",
               }}
             >
-              <span style={{ minWidth: "3em" }}># searches</span>
-              <span>class name</span>
+              <span style={{ minWidth: "2em", flexShrink: 0 }}>#</span>
+              <span style={{ flex: 1 }}>class name</span>
+              <span style={{ flexShrink: 0 }}>searches</span>
             </div>
-            {leaderboard.map((entry) => {
+            {leaderboard.map((entry, idx) => {
               const codes = (entry.course_codes || "")
                 .split("/")
                 .map((c) => c.trim())
@@ -175,14 +177,14 @@ export function LeaderboardPanel({ onClose }: Props) {
                 <div
                   style={{
                     display: "flex",
-                    gap: "1rem",
+                    gap: "0.75rem",
                     alignItems: "baseline",
                   }}
                 >
-                  <span style={{ minWidth: "3em", flexShrink: 0 }}>
-                    {entry.search_count}
+                  <span style={{ minWidth: "2em", flexShrink: 0 }}>
+                    {idx + 1}
                   </span>
-                  <span style={{ display: "inline" }}>
+                  <span style={{ flex: 1, display: "inline" }}>
                     {codes.map((code, i) => (
                       <span key={`${code}-${i}`}>
                         <a
@@ -200,6 +202,9 @@ export function LeaderboardPanel({ onClose }: Props) {
                       </span>
                     ))}
                     {entry.course_title ? ` — ${entry.course_title}` : ""}
+                  </span>
+                  <span style={{ flexShrink: 0 }}>
+                    {entry.search_count}
                   </span>
                 </div>
                 <div
