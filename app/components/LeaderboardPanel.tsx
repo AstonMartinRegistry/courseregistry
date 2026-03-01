@@ -112,25 +112,69 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "10px",
               flex: 1,
             }}
           >
-            {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                paddingBottom: "0.5rem",
+                borderBottom: "1px solid #eee",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <span style={{ minWidth: "2em", flexShrink: 0 }}>#</span>
+              <span style={{ flex: 1 }}>class name</span>
+              <span style={{ flexShrink: 0 }}>searches</span>
+            </div>
+            {Array.from({ length: 20 }).map((_, i) => (
               <div
                 key={i}
                 style={{
-                  height: "16px",
-                  flex: "1 1 16px",
-                  maxHeight: "16px",
-                  width: `${70 + (i % 3) * 10}%`,
-                  background:
-                    "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
-                  backgroundSize: "200% 100%",
-                  animation: "skeleton-shimmer 1.5s ease-in-out infinite",
-                  borderRadius: "2px",
+                  display: "flex",
+                  gap: "0.75rem",
+                  alignItems: "center",
+                  marginBottom: "0.75rem",
                 }}
-              />
+              >
+                <div
+                  style={{
+                    width: "1.5em",
+                    height: "12px",
+                    flexShrink: 0,
+                    background:
+                      "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
+                    backgroundSize: "200% 100%",
+                    animation: "skeleton-shimmer 1.5s ease-in-out infinite",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    flex: 1,
+                    height: "12px",
+                    maxWidth: `${55 + (i % 5) * 8}%`,
+                    background:
+                      "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
+                    backgroundSize: "200% 100%",
+                    animation: "skeleton-shimmer 1.5s ease-in-out infinite",
+                    borderRadius: "2px",
+                  }}
+                />
+                <div
+                  style={{
+                    width: "2.5em",
+                    height: "12px",
+                    flexShrink: 0,
+                    background:
+                      "linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%)",
+                    backgroundSize: "200% 100%",
+                    animation: "skeleton-shimmer 1.5s ease-in-out infinite",
+                    borderRadius: "2px",
+                  }}
+                />
+              </div>
             ))}
           </div>
         ) : leaderboard.length === 0 ? (

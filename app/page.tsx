@@ -889,40 +889,15 @@ Serenely full, the epicure would say,
         ) : !hasSearched ? (
           <>
             <div style={styles.creatorByBox}>
-              {isMobile ? (
-                <>
-                  Campus Curiosities Vol 4 |{" "}
-                  <a
-                    href="https://stanfordlabregistry.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "underline", color: "inherit" }}
-                  >
-                    stanfordlabregistry.com
-                  </a>
-                </>
-              ) : (
-                <>
-                  Campus Curiosities Vol 4 /{" "}
-                  <a
-                    href="https://stanfordlabregistry.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "underline", color: "inherit" }}
-                  >
-                    stanfordlabregistry.com
-                  </a>
-                  {" / "}
-                  <a
-                    href="https://stanfordbikeregistry.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "underline", color: "inherit" }}
-                  >
-                    stanfordbikeregistry.com
-                  </a>
-                </>
-              )}
+              Campus Curiosities Vol 4 |{" "}
+              <a
+                href="https://stanfordlabregistry.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "underline", color: "inherit" }}
+              >
+                stanfordlabregistry.com
+              </a>
             </div>
             <div className="box-image">
               <img
@@ -1101,7 +1076,14 @@ Serenely full, the epicure would say,
       </div>
 
       <div className="mobile-footer" style={styles.footerText}>
-        Ver Natus
+        <a
+          href="https://vernatus.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "inherit", textDecoration: "none" }}
+        >
+          Ver Natus
+        </a>
       </div>
       </div>
     </>
