@@ -17,13 +17,17 @@ type Props = {
 
 export function LeaderboardPanel({ onClose, isMobile }: Props) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     fetch("/api/leaderboard")
       .then((r) => r.json())
-      .then((d) => setLeaderboard(d.leaderboard ?? []))
+      .then((d) => {
+        setLeaderboard(d.leaderboard ?? []);
+        setTotalRows(d.totalRows ?? 0);
+      })
       .catch(() => setLeaderboard([]))
       .finally(() => setLoading(false));
   }, []);
@@ -201,6 +205,24 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
               textAlign: "left",
             }}
           >
+            {/* <div
+              style={{
+                paddingBottom: "0.5rem",
+                borderBottom: "1px solid #ddd",
+                marginBottom: "0.25rem",
+              }}
+            >
+              Total results generated: {leaderboard.reduce((sum, e) => sum + e.search_count, 0).toLocaleString()}
+            </div>
+            <div
+              style={{
+                paddingBottom: "0.5rem",
+                borderBottom: "1px solid #ddd",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Total courses discovered: {totalRows.toLocaleString()} / 1973 ({(totalRows / 1973 * 100).toFixed(1)}%)
+            </div> */}
             <div
               style={{
                 display: "flex",

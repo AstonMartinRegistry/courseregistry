@@ -28,7 +28,31 @@ export async function GET() {
     }
 
     const data = await response.json();
-    return NextResponse.json({ leaderboard: data ?? [] });
+
+    // Get total row count from course_popularity via RPC
+    let totalRows = 0;
+    try {
+      const countRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/get_popularity_count`,
+        {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        },
+      );
+      if (countRes.ok) {
+        const count = await countRes.json();
+        totalRows = typeof count === "number" ? count : 0;
+      }
+    } catch {
+      // ignore
+    }
+
+    return NextResponse.json({ leaderboard: data ?? [], totalRows });
   } catch (error) {
     console.error("Leaderboard error:", error);
     return NextResponse.json(
