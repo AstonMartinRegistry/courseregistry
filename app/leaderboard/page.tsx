@@ -65,7 +65,7 @@ export default function LeaderboardPage() {
               fontFamily: '"Jersey 15", sans-serif',
             }}
           >
-            Top 100 most searched
+            Top 200 most searched
           </h1>
           <Link
             href="/"

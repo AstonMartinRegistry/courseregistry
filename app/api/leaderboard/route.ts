@@ -18,7 +18,7 @@ export async function GET() {
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ limit_count: 100 }),
+        body: JSON.stringify({ limit_count: 200 }),
       },
     );
 

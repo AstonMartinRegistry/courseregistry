@@ -78,7 +78,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
             zIndex: 1,
           }}
         >
-          Top 100 most searched
+          Top 200 most searched
         </h2>
         <button
           type="button"
