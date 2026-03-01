@@ -92,9 +92,9 @@ export default function Home() {
     }
     window.scrollTo(0, 0);
     const saladWins = Math.random() < 1 / 32;
-    const cooksWins = Math.random() < 1 / 28;
-    const olivesWins = Math.random() < 1 / 24;
-    const dropoutWins = Math.random() < 1 / 20;
+    // const cooksWins = Math.random() < 1 / 28;
+    // const olivesWins = Math.random() < 1 / 24;
+    // const dropoutWins = Math.random() < 1 / 20;
     if (saladWins) {
       setLoading(false);
       setError(null);
@@ -105,36 +105,36 @@ export default function Home() {
       setShowDropoutSecretPage(false);
       return;
     }
-    if (cooksWins) {
-      setLoading(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(false);
-      setShowCooksSecretPage(true);
-      setShowDropoutSecretPage(false);
-      return;
-    }
-    if (olivesWins) {
-      setLoading(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(true);
-      setShowCooksSecretPage(false);
-      setShowDropoutSecretPage(false);
-      return;
-    }
-    if (dropoutWins) {
-      setLoading(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(false);
-      setShowCooksSecretPage(false);
-      setShowDropoutSecretPage(true);
-      return;
-    }
+    // if (cooksWins) {
+    //   setLoading(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(false);
+    //   setShowCooksSecretPage(true);
+    //   setShowDropoutSecretPage(false);
+    //   return;
+    // }
+    // if (olivesWins) {
+    //   setLoading(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(true);
+    //   setShowCooksSecretPage(false);
+    //   setShowDropoutSecretPage(false);
+    //   return;
+    // }
+    // if (dropoutWins) {
+    //   setLoading(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(false);
+    //   setShowCooksSecretPage(false);
+    //   setShowDropoutSecretPage(true);
+    //   return;
+    // }
     const t0 = performance.now();
     console.log("🔍 [TIMING] Search started at", new Date().toISOString());
     setLoading(true);
@@ -243,9 +243,9 @@ export default function Home() {
       return;
     }
     const saladWins = Math.random() < 1 / 32;
-    const cooksWins = Math.random() < 1 / 28;
-    const olivesWins = Math.random() < 1 / 24;
-    const dropoutWins = Math.random() < 1 / 20;
+    // const cooksWins = Math.random() < 1 / 28;
+    // const olivesWins = Math.random() < 1 / 24;
+    // const dropoutWins = Math.random() < 1 / 20;
     if (saladWins) {
       setLoadingMore(false);
       setError(null);
@@ -256,36 +256,36 @@ export default function Home() {
       setShowDropoutSecretPage(false);
       return;
     }
-    if (cooksWins) {
-      setLoadingMore(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(false);
-      setShowCooksSecretPage(true);
-      setShowDropoutSecretPage(false);
-      return;
-    }
-    if (olivesWins) {
-      setLoadingMore(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(true);
-      setShowCooksSecretPage(false);
-      setShowDropoutSecretPage(false);
-      return;
-    }
-    if (dropoutWins) {
-      setLoadingMore(false);
-      setError(null);
-      setHasSearched(true);
-      setShowSecretPage(false);
-      setShowNewSecretPage(false);
-      setShowCooksSecretPage(false);
-      setShowDropoutSecretPage(true);
-      return;
-    }
+    // if (cooksWins) {
+    //   setLoadingMore(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(false);
+    //   setShowCooksSecretPage(true);
+    //   setShowDropoutSecretPage(false);
+    //   return;
+    // }
+    // if (olivesWins) {
+    //   setLoadingMore(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(true);
+    //   setShowCooksSecretPage(false);
+    //   setShowDropoutSecretPage(false);
+    //   return;
+    // }
+    // if (dropoutWins) {
+    //   setLoadingMore(false);
+    //   setError(null);
+    //   setHasSearched(true);
+    //   setShowSecretPage(false);
+    //   setShowNewSecretPage(false);
+    //   setShowCooksSecretPage(false);
+    //   setShowDropoutSecretPage(true);
+    //   return;
+    // }
 
     const excludeIds = results.map((r) => r.id);
     const lastScore = pagination.lastScore;
