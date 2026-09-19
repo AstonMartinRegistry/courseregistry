@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { CourseResult } from "./lib/types";
 import { STANFORD_NAVIGATOR_URL } from "./lib/constants";
 import { explainCourses } from "./lib/explainCourse";
@@ -63,6 +63,7 @@ export default function AutumnRegistryPage() {
   const [pageTurnSnapshot, setPageTurnSnapshot] = useState<PageTurnSnapshot | null>(null);
   const [pageTurnDirection, setPageTurnDirection] = useState<PageTurnDirection>("forward");
   const [reversePageTurnTarget, setReversePageTurnTarget] = useState<PageTurnSnapshot | null>(null);
+  const mobileSwipeStart = useRef<{ x: number; y: number; startedAt: number } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(typeof window !== "undefined" && window.innerWidth <= 768);
@@ -438,7 +439,6 @@ export default function AutumnRegistryPage() {
       setPageTurnSnapshot(null);
       setReversePageTurnTarget(null);
       setPageTurnDirection("forward");
-      requestAnimationFrame(() => setMobilePage("left"));
     }, 800);
   };
 
@@ -475,6 +475,81 @@ export default function AutumnRegistryPage() {
     window.setTimeout(() => {
       setPageTurnSnapshot(null);
     }, 800);
+  };
+
+  const mobileNavigationIsBusy =
+    !isMobile ||
+    !hasSearched ||
+    bookPhase !== "open" ||
+    backPhase !== "idle" ||
+    openBackPhase !== "idle" ||
+    loading ||
+    loadingMore ||
+    loadingMobileRight ||
+    pageTurnSnapshot !== null;
+
+  const handleMobileSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (mobileNavigationIsBusy || event.touches.length !== 1) {
+      mobileSwipeStart.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    mobileSwipeStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startedAt: performance.now(),
+    };
+  };
+
+  const handleMobileSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = mobileSwipeStart.current;
+    mobileSwipeStart.current = null;
+    if (!start || mobileNavigationIsBusy || event.changedTouches.length !== 1) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    const distanceX = Math.abs(deltaX);
+    const distanceY = Math.abs(deltaY);
+    const elapsed = Math.max(performance.now() - start.startedAt, 1);
+    const velocityX = distanceX / elapsed;
+    const distanceThreshold = Math.min(64, window.innerWidth * 0.14);
+    const isDeliberateHorizontalSwipe =
+      distanceX > distanceY * 1.25 &&
+      (distanceX >= distanceThreshold || (distanceX >= 28 && velocityX >= 0.45));
+
+    if (!isDeliberateHorizontalSwipe) return;
+    event.preventDefault();
+
+    if (deltaX < 0) {
+      // Swipe left: reveal the right-hand page, then advance to the next spread.
+      if (mobilePage === "left") {
+        if (results.length > 2) {
+          setMobilePage("right");
+        } else if (pagination.hasMore) {
+          void loadMobileRightPage();
+        } else if (forwardHistory.length > 0) {
+          goForwardWithAnimation();
+        }
+      } else if (forwardHistory.length > 0) {
+        goForwardWithAnimation();
+      } else if (pagination.hasMore) {
+        void loadMore();
+      }
+      return;
+    }
+
+    // Swipe right: reveal the left-hand page, then return to the previous spread.
+    if (mobilePage === "right") {
+      setMobilePage("left");
+    } else if (resultsHistory.length > 0) {
+      goBackWithAnimation();
+    }
+  };
+
+  const cancelMobileSwipe = () => {
+    mobileSwipeStart.current = null;
   };
 
   const barBtnStyle = {
@@ -1548,11 +1623,21 @@ export default function AutumnRegistryPage() {
           .open-to-back-front {
             padding: 1.5rem;
           }
+          /* Mirror the real pages, including their 0.2rem top inset and half the 12px spine divider. */
           .page-turn-front {
-            padding: 1.5rem;
+            padding: 1.7rem 1.75rem 3.4rem calc(1.5rem + 6px);
           }
           .page-turn-back {
-            padding: 1.5rem;
+            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
+          }
+          .page-turn-static-left {
+            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
+          }
+          .page-turn-scene-backward .page-turn-front {
+            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
+          }
+          .page-turn-scene-backward .page-turn-back {
+            padding: 1.7rem 1.75rem 3.4rem calc(1.5rem + 6px);
           }
           .book-transition.shifting {
             animation-name: autumn-book-shift-mobile;
@@ -1738,6 +1823,10 @@ export default function AutumnRegistryPage() {
             flex-direction: row !important;
             width: 100% !important;
           }
+          .autumn-results-book {
+            touch-action: pan-y pinch-zoom;
+            overscroll-behavior-x: contain;
+          }
           .search-box-wrapper:not(.book-pages-hidden) > .autumn-results-book {
             animation: none;
           }
@@ -1915,7 +2004,13 @@ export default function AutumnRegistryPage() {
             </div>
           </>
         ) : (
-          <div className={`autumn-results-book ${pageTurnSnapshot ? "page-turning" : ""}`} style={styles.resultsBox}>
+          <div
+            className={`autumn-results-book ${pageTurnSnapshot ? "page-turning" : ""}`}
+            style={styles.resultsBox}
+            onTouchStart={handleMobileSwipeStart}
+            onTouchEnd={handleMobileSwipeEnd}
+            onTouchCancel={cancelMobileSwipe}
+          >
             <div className="results-page-surface results-page-surface-left" aria-hidden="true" />
             <div className="results-page-surface results-page-surface-right" aria-hidden="true" />
             {isMobile && openBackPhase === "closing" && openBackSnapshot && (
@@ -2949,5 +3044,3 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: '"Roboto Mono", monospace',
   },
 };
-
-
