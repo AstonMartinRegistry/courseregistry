@@ -13,6 +13,7 @@ type BookPhase =
   | "open"
   | "closing"
   | "recentering";
+type BookTransitionPhase = Exclude<BookPhase, "idle" | "open"> | "open-loading";
 type BackPhase = "idle" | "to-back" | "back" | "to-front";
 type OpenBackPhase = "idle" | "closing" | "centering";
 type MobilePage = "left" | "right";
@@ -21,6 +22,10 @@ type PageTurnSnapshot = {
   explanations: Record<number, string>;
 };
 type PageTurnDirection = "forward" | "backward";
+
+const PAGE_REVEAL_MS = 820;
+const DESKTOP_SEARCH_SHIFT_MS = 650;
+const MOBILE_PAGE_SLIDE_MS = 620;
 
 export default function AutumnRegistryPage() {
   // Search state
@@ -125,7 +130,7 @@ export default function AutumnRegistryPage() {
       if (bookPhase === "opening") setBookPhase("open");
       if (bookPhase === "closing") beginRecentering();
       if (bookPhase === "recentering") finishNewSearch();
-    }, bookPhase === "shifting" || bookPhase === "recentering" ? 650 : 1000);
+    }, bookPhase === "shifting" || bookPhase === "recentering" ? DESKTOP_SEARCH_SHIFT_MS : 1000);
     return () => window.clearTimeout(timeout);
   }, [bookPhase]);
 
@@ -213,6 +218,13 @@ export default function AutumnRegistryPage() {
 
       console.log("✅ [TIMING] Results received:", data.results?.length || 0, "courses");
       const courses = data.results || [];
+      const minimumRevealTime = mobileView
+        ? PAGE_REVEAL_MS
+        : DESKTOP_SEARCH_SHIFT_MS + PAGE_REVEAL_MS;
+      const remainingRevealTime = Math.max(0, minimumRevealTime - (performance.now() - t0));
+      if (remainingRevealTime > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, remainingRevealTime));
+      }
       setResults(courses);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
       setLoading(false);
@@ -292,7 +304,7 @@ export default function AutumnRegistryPage() {
       setResults(newCourses);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
 
-      const remainingTurnTime = Math.max(0, 820 - (performance.now() - turnStartedAt));
+      const remainingTurnTime = Math.max(0, PAGE_REVEAL_MS - (performance.now() - turnStartedAt));
       await new Promise((resolve) => window.setTimeout(resolve, remainingTurnTime));
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       setPageTurnSnapshot(null);
@@ -321,6 +333,7 @@ export default function AutumnRegistryPage() {
     setMobilePage("right");
     setLoadingMobileRight(true);
     setError(null);
+    const slideStartedAt = performance.now();
 
     try {
       const response = await fetch("/api/search", {
@@ -341,6 +354,13 @@ export default function AutumnRegistryPage() {
       }
 
       const rightCourses: CourseResult[] = data.results || [];
+      const remainingSlideTime = Math.max(
+        0,
+        MOBILE_PAGE_SLIDE_MS - (performance.now() - slideStartedAt),
+      );
+      if (remainingSlideTime > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, remainingSlideTime));
+      }
       setResults((current) => [...current.slice(0, 2), ...rightCourses]);
       setPagination(data.pagination || { hasMore: false, lastScore: null, lastId: null });
       setLoadingMobileRight(false);
@@ -1076,7 +1096,8 @@ export default function AutumnRegistryPage() {
         }
 
         .book-transition.opening,
-        .book-transition.closing {
+        .book-transition.closing,
+        .book-transition.open-loading {
           transform: translate(calc(-50% + 240px), -50%);
         }
 
@@ -1101,6 +1122,10 @@ export default function AutumnRegistryPage() {
 
         .book-transition.recentering .book-cover-rig {
           transform: rotateY(0deg);
+        }
+
+        .book-transition.open-loading .book-cover-rig {
+          transform: rotateY(-178deg);
         }
 
         .book-cover-face {
@@ -1134,6 +1159,19 @@ export default function AutumnRegistryPage() {
           box-shadow:
             inset -18px 0 28px rgba(85, 62, 40, 0.16),
             inset 2px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .book-cover-inside-loading {
+          box-sizing: border-box;
+          padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
+          background:
+            repeating-linear-gradient(0deg, rgba(102, 77, 48, 0.022) 0 1px, transparent 1px 5px),
+            linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+          box-shadow: inset -14px 0 22px rgba(91, 67, 39, 0.1);
+        }
+
+        .book-cover-inside-loading::after {
+          display: none;
         }
 
         .book-cover-inside::after {
@@ -1227,7 +1265,8 @@ export default function AutumnRegistryPage() {
           transition: none !important;
         }
 
-        .autumn-results-book {
+        .autumn-results-book,
+        .book-transition {
           --book-padding: 1.5rem;
           --page-block-padding: 0.2rem;
           --page-edge-padding: 0.25rem;
@@ -1684,6 +1723,10 @@ export default function AutumnRegistryPage() {
           .book-transition.opening {
             animation: autumn-mobile-camera-open 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
           }
+          .book-transition.open-loading {
+            animation: none;
+            transform: translate(calc(-50% + min(90vw, 480px)), -50%);
+          }
           .book-transition.closing {
             animation: autumn-mobile-camera-close 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
           }
@@ -1863,7 +1906,8 @@ export default function AutumnRegistryPage() {
             flex-direction: row !important;
             width: 100% !important;
           }
-          .autumn-results-book {
+          .autumn-results-book,
+          .book-transition {
             --page-divider-width: 12px;
             --page-divider-margin: 0;
             --page-divider-half: 6px;
@@ -1933,9 +1977,9 @@ export default function AutumnRegistryPage() {
           }
         }
       `}</style>
-      {bookPhase !== "idle" && bookPhase !== "open" && (
+      {bookPhase !== "idle" && (bookPhase !== "open" || loading) && (
         <BookTransition
-          phase={bookPhase}
+          phase={bookPhase === "open" ? "open-loading" : bookPhase}
           query={query}
           onShiftComplete={() => setBookPhase("opening")}
           onOpenComplete={() => setBookPhase("open")}
@@ -2082,7 +2126,7 @@ export default function AutumnRegistryPage() {
             {(loading || loadingMore) ? (
               <div style={styles.resultsList} className={`results-list ${isMobile ? "results-list-mobile" : ""}`}>
                 <div style={styles.resultsPage} className="results-page">
-                  {[0, 1].map((i) => (
+                  {(loading ? [] : [0, 1]).map((i) => (
                     <div key={i} style={styles.resultItemWrapper}>
                       <AutumnLoadingSkeletonCard />
                     </div>
@@ -2254,13 +2298,15 @@ function BookTransition({
   onCloseComplete,
   onRecenterComplete,
 }: {
-  phase: "shifting" | "opening" | "closing" | "recentering";
+  phase: BookTransitionPhase;
   query: string;
   onShiftComplete: () => void;
   onOpenComplete: () => void;
   onCloseComplete: () => void;
   onRecenterComplete: () => void;
 }) {
+  const showsLoadingPage = phase === "opening" || phase === "open-loading";
+
   return (
     <div
       className={`book-transition ${phase}`}
@@ -2338,7 +2384,19 @@ function BookTransition({
             </div>
           </div>
         </div>
-        <div className="book-cover-face book-cover-inside" />
+        <div
+          className={`book-cover-face book-cover-inside ${showsLoadingPage ? "book-cover-inside-loading" : ""}`}
+        >
+          {showsLoadingPage && (
+            <div className="page-turn-cards">
+              {[0, 1].map((index) => (
+                <div className="page-turn-card" style={styles.resultItemWrapper} key={index}>
+                  <AutumnLoadingSkeletonCard />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
