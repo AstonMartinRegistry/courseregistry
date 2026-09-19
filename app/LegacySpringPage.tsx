@@ -395,7 +395,7 @@ export default function Home() {
           borderRadius: 0,
         }}
       >
-        Back
+        Autumn 26
       </a>
       <div
         style={{
@@ -1471,5 +1471,4 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: '"Roboto Mono", monospace',
   },
 };
-
 

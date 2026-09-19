@@ -617,6 +617,40 @@ export default function AutumnRegistryPage() {
           100% { background-position: -200% 0; }
         }
 
+        @keyframes autumn-pill-wave {
+          0% {
+            transform: translate3d(-12%, -7%, 0) rotate(-8deg) scale(1);
+          }
+          35% {
+            transform: translate3d(9%, -13%, 0) rotate(6deg) scale(1.08);
+          }
+          68% {
+            transform: translate3d(-6%, 12%, 0) rotate(13deg) scale(0.96);
+          }
+          100% {
+            transform: translate3d(14%, 6%, 0) rotate(-5deg) scale(1.08);
+          }
+        }
+
+        @keyframes autumn-pill-gas-drift {
+          0% {
+            border-radius: 42% 58% 66% 34% / 56% 38% 62% 44%;
+            transform: translate3d(-24%, 12%, 0) rotate(0deg) scale(0.88);
+          }
+          28% {
+            border-radius: 63% 37% 35% 65% / 38% 62% 42% 58%;
+            transform: translate3d(5%, -18%, 0) rotate(48deg) scale(1.12);
+          }
+          62% {
+            border-radius: 36% 64% 58% 42% / 65% 35% 60% 40%;
+            transform: translate3d(25%, 11%, 0) rotate(96deg) scale(0.94);
+          }
+          100% {
+            border-radius: 57% 43% 32% 68% / 44% 60% 40% 56%;
+            transform: translate3d(-8%, 20%, 0) rotate(142deg) scale(1.16);
+          }
+        }
+
         .autumn-black-grain,
         .autumn-results-controls button,
         .autumn-meta-percentage,
@@ -670,6 +704,21 @@ export default function AutumnRegistryPage() {
           right: 20px;
         }
 
+        .autumn-corner-pill-left,
+        .autumn-corner-pill-right {
+          isolation: isolate;
+          overflow: hidden;
+          border-color: rgba(255, 255, 255, 0.38);
+          background: rgba(8, 8, 8, 0.48);
+          color: #fff !important;
+          -webkit-text-fill-color: #fff;
+          box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.2),
+            inset 0 3px 5px rgba(255, 255, 255, 0.42),
+            inset 0 -3px 6px rgba(0, 0, 0, 0.52),
+            inset 3px 0 5px rgba(255, 255, 255, 0.1);
+        }
+
         .autumn-corner-pill::before {
           content: "";
           position: absolute;
@@ -681,6 +730,62 @@ export default function AutumnRegistryPage() {
             inset 0 1px 1px #fff;
           transition: background 250ms ease;
           pointer-events: none;
+        }
+
+        .autumn-corner-pill-left::before,
+        .autumn-corner-pill-right::before {
+          display: block;
+          inset: -90%;
+          border-radius: 42%;
+          box-shadow: none;
+          filter: blur(4px);
+          opacity: 1;
+          mix-blend-mode: screen;
+          will-change: transform;
+        }
+
+        .autumn-corner-pill-left::before {
+          background:
+            radial-gradient(ellipse 34% 42% at 14% 28%, rgba(255, 255, 255, 0.5), transparent 68%),
+            radial-gradient(ellipse 38% 20% at 68% 22%, rgba(176, 205, 224, 0.34), transparent 67%),
+            radial-gradient(ellipse 22% 44% at 52% 78%, rgba(255, 255, 255, 0.3), transparent 70%);
+          animation: autumn-pill-wave 11.5s cubic-bezier(0.45, 0, 0.55, 1) -2.8s infinite alternate;
+        }
+
+        .autumn-corner-pill-right::before {
+          background:
+            radial-gradient(ellipse 18% 48% at 78% 18%, rgba(255, 255, 255, 0.46), transparent 68%),
+            radial-gradient(ellipse 46% 18% at 32% 48%, rgba(164, 194, 215, 0.38), transparent 66%),
+            radial-gradient(ellipse 28% 30% at 84% 76%, rgba(255, 255, 255, 0.28), transparent 70%),
+            radial-gradient(ellipse 20% 26% at 20% 82%, rgba(255, 255, 255, 0.22), transparent 68%);
+          animation: autumn-pill-wave 13.4s cubic-bezier(0.45, 0, 0.55, 1) -7.1s infinite alternate-reverse;
+        }
+
+        .autumn-corner-pill-left::after,
+        .autumn-corner-pill-right::after {
+          content: "";
+          position: absolute;
+          inset: -65%;
+          filter: blur(5px);
+          opacity: 0.94;
+          mix-blend-mode: screen;
+          pointer-events: none;
+          will-change: transform, border-radius;
+        }
+
+        .autumn-corner-pill-left::after {
+          background:
+            radial-gradient(ellipse 44% 24% at 24% 36%, rgba(255, 255, 255, 0.42), transparent 68%),
+            radial-gradient(ellipse 22% 46% at 72% 68%, rgba(146, 181, 205, 0.4), transparent 70%);
+          animation: autumn-pill-gas-drift 14.2s cubic-bezier(0.45, 0, 0.55, 1) -8.4s infinite alternate;
+        }
+
+        .autumn-corner-pill-right::after {
+          background:
+            radial-gradient(ellipse 30% 38% at 76% 30%, rgba(255, 255, 255, 0.44), transparent 69%),
+            radial-gradient(ellipse 42% 20% at 30% 72%, rgba(140, 177, 202, 0.38), transparent 68%),
+            radial-gradient(ellipse 18% 26% at 18% 24%, rgba(255, 255, 255, 0.28), transparent 66%);
+          animation: autumn-pill-gas-drift 16.8s cubic-bezier(0.45, 0, 0.55, 1) -3.6s infinite alternate-reverse;
         }
 
         .autumn-corner-pill span {
@@ -852,6 +957,12 @@ export default function AutumnRegistryPage() {
         }
 
         @media (prefers-reduced-motion: reduce) {
+          .autumn-corner-pill-left::before,
+          .autumn-corner-pill-right::before,
+          .autumn-corner-pill-left::after,
+          .autumn-corner-pill-right::after {
+            animation: none;
+          }
           .autumn-reveal-word {
             animation: none;
           }
@@ -1968,6 +2079,8 @@ export default function AutumnRegistryPage() {
           }
           .mobile-page-bar-right {
             padding-left: 1.5rem;
+            justify-content: flex-end;
+            gap: 0.5rem;
           }
           .results-list-mobile .simple-card-descr {
             min-height: 240px !important;
