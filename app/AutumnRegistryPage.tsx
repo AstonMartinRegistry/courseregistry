@@ -27,6 +27,7 @@ type SwipeStart = { x: number; y: number; startedAt: number };
 const PAGE_REVEAL_MS = 820;
 const DESKTOP_SEARCH_SHIFT_MS = 650;
 const MOBILE_PAGE_SLIDE_MS = 620;
+const AUTUMN_VOLUME_LABEL = "Campus Curiosities Vol 6";
 
 function getHorizontalSwipeDirection(
   start: SwipeStart,
@@ -2194,7 +2195,7 @@ export default function AutumnRegistryPage() {
         {!hasSearched ? (
           <>
             <div className="autumn-black-grain" style={styles.creatorByBox}>
-              Campus Curiosities Vol 5 |{" "}
+              {AUTUMN_VOLUME_LABEL} |{" "}
               <a
                 href="https://stanfordlabregistry.com"
                 target="_blank"
@@ -2511,7 +2512,7 @@ function BookTransition({
       >
         <div className="book-cover-face book-cover-front">
           <div className="autumn-black-grain" style={styles.creatorByBox}>
-            Campus Curiosities Vol 5 | stanfordlabregistry.com
+            {AUTUMN_VOLUME_LABEL} | stanfordlabregistry.com
           </div>
           <div className="box-overlay-1">
             <h2 className="mobile-title" style={styles.title}>
@@ -2692,7 +2693,7 @@ function BackCoverTransition({
       >
         <div className="back-book-face back-book-front" aria-hidden={phase === "back"}>
           <div className="autumn-black-grain" style={styles.creatorByBox}>
-            Campus Curiosities Vol 5 | stanfordlabregistry.com
+            {AUTUMN_VOLUME_LABEL} | stanfordlabregistry.com
           </div>
           <div className="box-overlay-1">
             <h2 className="mobile-title" style={styles.title}>

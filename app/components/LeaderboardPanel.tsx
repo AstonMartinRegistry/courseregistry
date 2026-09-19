@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CourseTerm, STANFORD_NAVIGATOR_URL } from "../lib/constants";
 
 type LeaderboardEntry = {
@@ -49,6 +49,7 @@ type Props = {
 };
 
 export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props) {
+  const swipeStart = useRef<{ x: number; y: number; startedAt: number } | null>(null);
   const cached = leaderboardCache.get(term);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(cached?.leaderboard ?? []);
   const [totalRows, setTotalRows] = useState(cached?.totalRows ?? 0);
@@ -87,9 +88,50 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
     };
   }, [term]);
 
+  const handleSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile || event.touches.length !== 1) {
+      swipeStart.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    swipeStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startedAt: performance.now(),
+    };
+  };
+
+  const handleSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    if (!isMobile || !start || event.changedTouches.length !== 1) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - start.x;
+    const distanceX = Math.abs(deltaX);
+    const distanceY = Math.abs(touch.clientY - start.y);
+    const elapsed = Math.max(performance.now() - start.startedAt, 1);
+    const velocityX = distanceX / elapsed;
+    const distanceThreshold = Math.min(64, window.innerWidth * 0.14);
+    const isRightSwipe =
+      deltaX > 0 &&
+      distanceX > distanceY * 1.25 &&
+      (distanceX >= distanceThreshold || (distanceX >= 28 && velocityX >= 0.45));
+
+    if (!isRightSwipe) return;
+    event.preventDefault();
+    onClose();
+  };
+
   return (
     <div
       data-leaderboard
+      onTouchStart={handleSwipeStart}
+      onTouchEnd={handleSwipeEnd}
+      onTouchCancel={() => {
+        swipeStart.current = null;
+      }}
       style={{
         position: "absolute",
         top: 0,
@@ -103,6 +145,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        touchAction: isMobile ? "pan-y pinch-zoom" : undefined,
         minHeight: 0,
         borderRadius: autumnBack ? "12px" : 0,
         border: "none",
