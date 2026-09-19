@@ -503,6 +503,26 @@ export default function AutumnRegistryPage() {
         <span>Ver Natus</span>
       </a>
       <style>{`
+        button,
+        a,
+        textarea,
+        input {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        button:focus,
+        a:focus,
+        textarea:focus,
+        input:focus {
+          outline: none;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+          outline: 2px solid #8a8a8a;
+          outline-offset: 2px;
+        }
+
         @keyframes shimmer {
           0% {
             background-position: 200% 0;
