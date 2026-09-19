@@ -22,10 +22,30 @@ type PageTurnSnapshot = {
   explanations: Record<number, string>;
 };
 type PageTurnDirection = "forward" | "backward";
+type SwipeStart = { x: number; y: number; startedAt: number };
 
 const PAGE_REVEAL_MS = 820;
 const DESKTOP_SEARCH_SHIFT_MS = 650;
 const MOBILE_PAGE_SLIDE_MS = 620;
+
+function getHorizontalSwipeDirection(
+  start: SwipeStart,
+  end: Pick<Touch, "clientX" | "clientY">,
+): "left" | "right" | null {
+  const deltaX = end.clientX - start.x;
+  const deltaY = end.clientY - start.y;
+  const distanceX = Math.abs(deltaX);
+  const distanceY = Math.abs(deltaY);
+  const elapsed = Math.max(performance.now() - start.startedAt, 1);
+  const velocityX = distanceX / elapsed;
+  const distanceThreshold = Math.min(64, window.innerWidth * 0.14);
+  const isDeliberateHorizontalSwipe =
+    distanceX > distanceY * 1.25 &&
+    (distanceX >= distanceThreshold || (distanceX >= 28 && velocityX >= 0.45));
+
+  if (!isDeliberateHorizontalSwipe) return null;
+  return deltaX < 0 ? "left" : "right";
+}
 
 export default function AutumnRegistryPage() {
   // Search state
@@ -68,7 +88,8 @@ export default function AutumnRegistryPage() {
   const [pageTurnSnapshot, setPageTurnSnapshot] = useState<PageTurnSnapshot | null>(null);
   const [pageTurnDirection, setPageTurnDirection] = useState<PageTurnDirection>("forward");
   const [pageTurnTarget, setPageTurnTarget] = useState<PageTurnSnapshot | null>(null);
-  const mobileSwipeStart = useRef<{ x: number; y: number; startedAt: number } | null>(null);
+  const coverSwipeStart = useRef<SwipeStart | null>(null);
+  const mobileSwipeStart = useRef<SwipeStart | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(typeof window !== "undefined" && window.innerWidth <= 768);
@@ -421,6 +442,45 @@ export default function AutumnRegistryPage() {
     }
   };
 
+  const handleCoverSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (
+      hasSearched ||
+      bookPhase !== "idle" ||
+      backPhase !== "idle" ||
+      openBackPhase !== "idle" ||
+      event.touches.length !== 1
+    ) {
+      coverSwipeStart.current = null;
+      return;
+    }
+
+    const touch = event.touches[0];
+    coverSwipeStart.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startedAt: performance.now(),
+    };
+  };
+
+  const handleCoverSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = coverSwipeStart.current;
+    coverSwipeStart.current = null;
+    if (
+      !start ||
+      hasSearched ||
+      bookPhase !== "idle" ||
+      backPhase !== "idle" ||
+      openBackPhase !== "idle" ||
+      event.changedTouches.length !== 1
+    ) return;
+
+    const direction = getHorizontalSwipeDirection(start, event.changedTouches[0]);
+    if (direction !== "left") return;
+
+    event.preventDefault();
+    handleLeaderboardOpen();
+  };
+
   function finishOpenToBack() {
     finishNewSearch();
     setOpenBackSnapshot(null);
@@ -512,22 +572,11 @@ export default function AutumnRegistryPage() {
     mobileSwipeStart.current = null;
     if (!start || mobileNavigationIsBusy || event.changedTouches.length !== 1) return;
 
-    const touch = event.changedTouches[0];
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-    const distanceX = Math.abs(deltaX);
-    const distanceY = Math.abs(deltaY);
-    const elapsed = Math.max(performance.now() - start.startedAt, 1);
-    const velocityX = distanceX / elapsed;
-    const distanceThreshold = Math.min(64, window.innerWidth * 0.14);
-    const isDeliberateHorizontalSwipe =
-      distanceX > distanceY * 1.25 &&
-      (distanceX >= distanceThreshold || (distanceX >= 28 && velocityX >= 0.45));
-
-    if (!isDeliberateHorizontalSwipe) return;
+    const direction = getHorizontalSwipeDirection(start, event.changedTouches[0]);
+    if (!direction) return;
     event.preventDefault();
 
-    if (deltaX < 0) {
+    if (direction === "left") {
       // Swipe left: reveal the right-hand page, then advance to the next spread.
       if (mobilePage === "left") {
         if (results.length > 2) {
@@ -555,6 +604,10 @@ export default function AutumnRegistryPage() {
 
   const cancelMobileSwipe = () => {
     mobileSwipeStart.current = null;
+  };
+
+  const cancelCoverSwipe = () => {
+    coverSwipeStart.current = null;
   };
 
   const barBtnStyle = {
@@ -1165,13 +1218,15 @@ export default function AutumnRegistryPage() {
           border-radius: 0 26px 26px 0;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          background:
-            repeating-linear-gradient(0deg, rgba(102, 77, 48, 0.022) 0 1px, transparent 1px 5px),
-            linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
+          background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
         .open-to-back-front {
           padding: 1.7rem 1.75rem 3.4rem 1.2rem;
+        }
+
+        .open-to-back-front::after {
+          background-position: 0 2px;
         }
 
         .open-to-back-back {
@@ -1264,9 +1319,7 @@ export default function AutumnRegistryPage() {
         .book-cover-inside {
           transform: rotateY(180deg);
           border-radius: 18px 0 0 18px;
-          background:
-            repeating-linear-gradient(0deg, rgba(90, 72, 52, 0.035) 0 1px, transparent 1px 4px),
-            linear-gradient(90deg, #d6c6ae 0%, #f5ecdd 8%, #fbf6ec 72%, #e7dac6 100%);
+          background: linear-gradient(90deg, #d6c6ae 0%, #f5ecdd 8%, #fbf6ec 72%, #e7dac6 100%);
           box-shadow:
             inset -18px 0 28px rgba(85, 62, 40, 0.16),
             inset 2px 0 rgba(255, 255, 255, 0.6);
@@ -1275,9 +1328,7 @@ export default function AutumnRegistryPage() {
         .book-cover-inside-loading {
           box-sizing: border-box;
           padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
-          background:
-            repeating-linear-gradient(0deg, rgba(102, 77, 48, 0.022) 0 1px, transparent 1px 5px),
-            linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+          background: linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
           box-shadow: inset -14px 0 22px rgba(91, 67, 39, 0.1);
         }
 
@@ -1408,7 +1459,12 @@ export default function AutumnRegistryPage() {
           pointer-events: none;
         }
 
-        .results-page-surface::after {
+        .results-page-surface::after,
+        .book-cover-inside::before,
+        .page-turn-static-left::after,
+        .page-turn-static-right::after,
+        .page-turn-face::after,
+        .open-to-back-front::after {
           content: "";
           position: absolute;
           inset: 18px 14px 26px;
@@ -1418,6 +1474,8 @@ export default function AutumnRegistryPage() {
             rgba(102, 77, 48, 0.022) 0 1px,
             transparent 1px 5px
           );
+          pointer-events: none;
+          z-index: 0;
         }
 
         .results-page-surface-left {
@@ -1505,13 +1563,7 @@ export default function AutumnRegistryPage() {
           -webkit-clip-path: inset(0 round 18px);
           padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
           pointer-events: none;
-          background:
-            repeating-linear-gradient(
-              0deg,
-              rgba(102, 77, 48, 0.022) 0 1px,
-              transparent 1px 5px
-            ),
-            linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+          background: linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
         }
 
         .page-turn-static-right {
@@ -1528,13 +1580,7 @@ export default function AutumnRegistryPage() {
           -webkit-clip-path: inset(0 round 18px);
           padding: var(--page-content-top) var(--page-content-outer) var(--page-content-bottom) var(--page-content-spine);
           pointer-events: none;
-          background:
-            repeating-linear-gradient(
-              0deg,
-              rgba(102, 77, 48, 0.022) 0 1px,
-              transparent 1px 5px
-            ),
-            linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
+          background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
         .page-turn-sheet {
@@ -1572,13 +1618,7 @@ export default function AutumnRegistryPage() {
           overflow: hidden;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          background:
-            repeating-linear-gradient(
-              0deg,
-              rgba(102, 77, 48, 0.022) 0 1px,
-              transparent 1px 5px
-            ),
-            linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
+          background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
         .page-turn-front {
@@ -1593,14 +1633,22 @@ export default function AutumnRegistryPage() {
           transform: rotateY(180deg);
           border-radius: 26px 0 0 26px;
           padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
-          background:
-            repeating-linear-gradient(
-              0deg,
-              rgba(102, 77, 48, 0.022) 0 1px,
-              transparent 1px 5px
-            ),
-            linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+          background: linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
           box-shadow: inset -14px 0 22px rgba(91, 67, 39, 0.1);
+        }
+
+        .page-turn-front::after,
+        .page-turn-static-right::after,
+        .page-turn-scene-backward .page-turn-back::after {
+          background-position: 0 2px;
+        }
+
+        .page-turn-scene-backward .page-turn-front::after {
+          background-position: 0 0;
+        }
+
+        .mobile-open-to-back-back::after {
+          display: none;
         }
 
         .page-turn-scene-backward .page-turn-front {
@@ -1612,6 +1660,8 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-cards {
+          position: relative;
+          z-index: 1;
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -2122,6 +2172,9 @@ export default function AutumnRegistryPage() {
       )}
       <div 
         className={`${!hasSearched || (hasSearched && (loading || loadingMore || results.length > 0)) ? "mobile-fixed" : "mobile-scrollable"} mobile-container autumn-cover-stage${isMobile && hasSearched && (loading || loadingMore || results.length > 0) ? " mobile-has-results" : ""}`}
+        onTouchStart={handleCoverSwipeStart}
+        onTouchEnd={handleCoverSwipeEnd}
+        onTouchCancel={cancelCoverSwipe}
         style={{
           ...styles.container,
           ...((loading || hasSearched) && !isMobile ? { justifyContent: "flex-start", paddingTop: "0px" } : {})
@@ -2999,6 +3052,7 @@ const styles: Record<string, React.CSSProperties> = {
   searchInput: {
     width: "100%",
     padding: "0.5rem",
+    paddingLeft: "0.75rem",
     paddingRight: "72px",
     minHeight: "72px",
     border: "none",

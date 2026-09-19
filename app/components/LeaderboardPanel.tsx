@@ -111,6 +111,18 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
           : "none",
       }}
     >
+      <style>{`
+        .leaderboard-scroll-region-mobile {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .leaderboard-scroll-region-mobile::-webkit-scrollbar {
+          display: none;
+          width: 0;
+          height: 0;
+        }
+      `}</style>
       <div
         style={{
           padding: autumnBack ? "1rem 2px" : "1rem 1.5rem",
@@ -172,12 +184,15 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
         </button>
       </div>
       <div
+        className={isMobile ? "leaderboard-scroll-region-mobile" : undefined}
         style={{
           flex: 1,
           minHeight: 0,
+          overflowX: "hidden",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
           overscrollBehavior: "contain",
+          touchAction: "pan-y",
           padding: "1rem 1.5rem",
           background: autumnBack ? "#ffffff" : undefined,
           margin: autumnBack ? "10px 2px 2px" : 0,
