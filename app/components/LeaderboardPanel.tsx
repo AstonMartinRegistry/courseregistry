@@ -103,6 +103,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        minHeight: 0,
         borderRadius: autumnBack ? "12px" : 0,
         border: "none",
         boxShadow: autumnBack
@@ -173,10 +174,11 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
       <div
         style={{
           flex: 1,
+          minHeight: 0,
           overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain",
           padding: "1rem 1.5rem",
-          display: "flex",
-          flexDirection: "column",
           background: autumnBack ? "#ffffff" : undefined,
           margin: autumnBack ? "10px 2px 2px" : 0,
           borderRadius: autumnBack ? "12px" : 0,

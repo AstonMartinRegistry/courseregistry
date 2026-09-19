@@ -62,7 +62,7 @@ export default function AutumnRegistryPage() {
   const [bookPhase, setBookPhase] = useState<BookPhase>("idle");
   const [pageTurnSnapshot, setPageTurnSnapshot] = useState<PageTurnSnapshot | null>(null);
   const [pageTurnDirection, setPageTurnDirection] = useState<PageTurnDirection>("forward");
-  const [reversePageTurnTarget, setReversePageTurnTarget] = useState<PageTurnSnapshot | null>(null);
+  const [pageTurnTarget, setPageTurnTarget] = useState<PageTurnSnapshot | null>(null);
   const mobileSwipeStart = useRef<{ x: number; y: number; startedAt: number } | null>(null);
 
   useEffect(() => {
@@ -183,6 +183,7 @@ export default function AutumnRegistryPage() {
     setResultsHistory([]);
     setForwardHistory([]);
     setPageTurnSnapshot(null);
+    setPageTurnTarget(null);
     setLoadingMobileRight(false);
     setMobilePage("left");
     setBookPhase(mobileView ? "opening" : "shifting");
@@ -255,6 +256,8 @@ export default function AutumnRegistryPage() {
     }
     setForwardHistory([]);
     setPageTurnSnapshot({ results, explanations });
+    setPageTurnTarget(null);
+    setPageTurnDirection("forward");
     setLoadingMore(true);
     setError(null);
     const turnStartedAt = performance.now();
@@ -366,6 +369,7 @@ export default function AutumnRegistryPage() {
     setResultsHistory([]);
     setForwardHistory([]);
     setPageTurnSnapshot(null);
+    setPageTurnTarget(null);
     setLoadingMobileRight(false);
     setMobilePage("left");
   }
@@ -404,28 +408,14 @@ export default function AutumnRegistryPage() {
     setBackPhase("back");
   }
 
-  const goBack = () => {
-    if (resultsHistory.length === 0) return;
-    setForwardHistory((f) => [...f, { results, explanations, pagination }]);
-    const prev = resultsHistory[resultsHistory.length - 1];
-    setResultsHistory((h) => h.slice(0, -1));
-    setResults(prev.results);
-    setExplanations(prev.explanations);
-    setPagination(prev.pagination);
-    setMobilePage("left");
-  };
-
   const goBackWithAnimation = () => {
-    if (!isMobile || resultsHistory.length === 0 || pageTurnSnapshot) {
-      goBack();
-      return;
-    }
+    if (resultsHistory.length === 0 || pageTurnSnapshot) return;
 
     const previous = resultsHistory[resultsHistory.length - 1];
     setForwardHistory((current) => [...current, { results, explanations, pagination }]);
     setResultsHistory((current) => current.slice(0, -1));
     setPageTurnSnapshot({ results, explanations });
-    setReversePageTurnTarget({
+    setPageTurnTarget({
       results: previous.results,
       explanations: previous.explanations,
     });
@@ -434,23 +424,14 @@ export default function AutumnRegistryPage() {
     setExplanations(previous.explanations);
     setPagination(previous.pagination);
 
-    requestAnimationFrame(() => setMobilePage("right"));
+    if (isMobile) {
+      requestAnimationFrame(() => setMobilePage("right"));
+    }
     window.setTimeout(() => {
       setPageTurnSnapshot(null);
-      setReversePageTurnTarget(null);
+      setPageTurnTarget(null);
       setPageTurnDirection("forward");
     }, 800);
-  };
-
-  const goForward = () => {
-    if (forwardHistory.length === 0) return;
-    setResultsHistory((h) => [...h, { results, explanations, pagination }]);
-    const next = forwardHistory[forwardHistory.length - 1];
-    setForwardHistory((f) => f.slice(0, -1));
-    setResults(next.results);
-    setExplanations(next.explanations);
-    setPagination(next.pagination);
-    setMobilePage("left");
   };
 
   const goForwardWithAnimation = () => {
@@ -460,7 +441,10 @@ export default function AutumnRegistryPage() {
     setResultsHistory((current) => [...current, { results, explanations, pagination }]);
     setForwardHistory((current) => current.slice(0, -1));
     setPageTurnSnapshot({ results, explanations });
-    setReversePageTurnTarget(null);
+    setPageTurnTarget({
+      results: next.results,
+      explanations: next.explanations,
+    });
     setPageTurnDirection("forward");
     setResults(next.results);
     setExplanations(next.explanations);
@@ -474,6 +458,7 @@ export default function AutumnRegistryPage() {
 
     window.setTimeout(() => {
       setPageTurnSnapshot(null);
+      setPageTurnTarget(null);
     }, 800);
   };
 
@@ -554,7 +539,7 @@ export default function AutumnRegistryPage() {
 
   const barBtnStyle = {
     ...styles.resultsBottomBarBtn,
-    ...(isMobile ? { fontSize: "10px", padding: "0.45rem 0.55rem" } : {}),
+    ...(isMobile ? { fontSize: "10px", lineHeight: "14px", padding: "0.45rem 0.55rem" } : {}),
   };
 
   return (
@@ -957,8 +942,9 @@ export default function AutumnRegistryPage() {
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           box-shadow:
-            18px 22px 24px rgba(0, 0, 0, 0.72),
-            inset 2px 2px 1px rgba(255, 255, 255, 0.35);
+            18px 22px 24px rgba(0, 0, 0, 0.78),
+            7px 9px 9px rgba(0, 0, 0, 0.58),
+            -5px -5px 18px rgba(255, 244, 226, 0.16);
         }
 
         .back-book-front {
@@ -976,11 +962,35 @@ export default function AutumnRegistryPage() {
           background:
             linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
             url("/dithered-background-autumn.png") center / cover no-repeat;
+          box-shadow:
+            18px 22px 24px rgba(0, 0, 0, 0.78),
+            7px 9px 9px rgba(0, 0, 0, 0.58),
+            -5px -5px 18px rgba(255, 244, 226, 0.16),
+            inset 2px 2px 1px rgba(255, 255, 255, 0.52),
+            inset -5px -4px 5px rgba(0, 0, 0, 0.3);
         }
 
         .back-book-transition.back .back-book-back {
           z-index: 2;
           pointer-events: auto;
+        }
+
+        .back-book-flat {
+          position: absolute;
+          inset: 0;
+          z-index: 4;
+          overflow: hidden;
+          border-radius: 18px 0 0 18px;
+          pointer-events: auto;
+          background:
+            linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
+            url("/dithered-background-autumn.png") center / cover no-repeat;
+          box-shadow:
+            18px 22px 24px rgba(0, 0, 0, 0.78),
+            7px 9px 9px rgba(0, 0, 0, 0.58),
+            -5px -5px 18px rgba(255, 244, 226, 0.16),
+            inset 2px 2px 1px rgba(255, 255, 255, 0.52),
+            inset -5px -4px 5px rgba(0, 0, 0, 0.3);
         }
 
         .open-to-back-transition {
@@ -1040,8 +1050,11 @@ export default function AutumnRegistryPage() {
             linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
             url("/dithered-background-autumn.png") center / cover no-repeat;
           box-shadow:
-            18px 22px 24px rgba(0, 0, 0, 0.72),
-            inset 2px 2px 1px rgba(255, 255, 255, 0.35);
+            18px 22px 24px rgba(0, 0, 0, 0.78),
+            7px 9px 9px rgba(0, 0, 0, 0.58),
+            -5px -5px 18px rgba(255, 244, 226, 0.16),
+            inset 2px 2px 1px rgba(255, 255, 255, 0.52),
+            inset -5px -4px 5px rgba(0, 0, 0, 0.3);
         }
 
         .search-box-wrapper.back-view-hidden {
@@ -1215,6 +1228,18 @@ export default function AutumnRegistryPage() {
         }
 
         .autumn-results-book {
+          --book-padding: 1.5rem;
+          --page-block-padding: 0.2rem;
+          --page-edge-padding: 0.25rem;
+          --page-spine-padding: 1.5rem;
+          --page-divider-width: 14px;
+          --page-divider-margin: 0.35rem;
+          --page-divider-half: calc(7px + var(--page-divider-margin));
+          --results-controls-height: 25px;
+          --page-content-top: calc(var(--book-padding) + var(--page-block-padding));
+          --page-content-bottom: calc(var(--page-content-top) + var(--results-controls-height));
+          --page-content-outer: calc(var(--book-padding) + var(--page-edge-padding));
+          --page-content-spine: calc(var(--page-spine-padding) + var(--page-divider-half));
           opacity: 1;
           background: transparent !important;
           box-shadow: none;
@@ -1268,6 +1293,19 @@ export default function AutumnRegistryPage() {
         .autumn-results-book > .autumn-results-controls {
           position: relative;
           z-index: 5;
+          height: var(--results-controls-height);
+          min-height: var(--results-controls-height);
+          flex: 0 0 var(--results-controls-height) !important;
+        }
+
+        .autumn-results-book > .autumn-results-controls button {
+          height: 100%;
+          box-sizing: border-box;
+        }
+
+        .autumn-results-book > .autumn-results-controls > div {
+          height: 100%;
+          box-sizing: border-box;
         }
 
         .autumn-results-book::after {
@@ -1315,7 +1353,7 @@ export default function AutumnRegistryPage() {
           border-radius: 18px 0 0 18px;
           clip-path: inset(0 round 18px);
           -webkit-clip-path: inset(0 round 18px);
-          padding: 1.7rem 1.2rem 3.4rem 1.75rem;
+          padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
           pointer-events: none;
           background:
             repeating-linear-gradient(
@@ -1324,6 +1362,29 @@ export default function AutumnRegistryPage() {
               transparent 1px 5px
             ),
             linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+        }
+
+        .page-turn-static-right {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 50%;
+          z-index: 11;
+          box-sizing: border-box;
+          overflow: hidden;
+          border-radius: 0 18px 18px 0;
+          clip-path: inset(0 round 18px);
+          -webkit-clip-path: inset(0 round 18px);
+          padding: var(--page-content-top) var(--page-content-outer) var(--page-content-bottom) var(--page-content-spine);
+          pointer-events: none;
+          background:
+            repeating-linear-gradient(
+              0deg,
+              rgba(102, 77, 48, 0.022) 0 1px,
+              transparent 1px 5px
+            ),
+            linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
         .page-turn-sheet {
@@ -1347,11 +1408,11 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-scene-backward .page-turn-front {
-          padding: 1.7rem 1.2rem 3.4rem 1.75rem;
+          padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
         }
 
         .page-turn-scene-backward .page-turn-back {
-          padding: 1.7rem 1.75rem 3.4rem 1.2rem;
+          padding: var(--page-content-top) var(--page-content-outer) var(--page-content-bottom) var(--page-content-spine);
         }
 
         .page-turn-face {
@@ -1372,7 +1433,7 @@ export default function AutumnRegistryPage() {
 
         .page-turn-front {
           border-radius: 0 26px 26px 0;
-          padding: 1.7rem 1.75rem 3.4rem 1.2rem;
+          padding: var(--page-content-top) var(--page-content-outer) var(--page-content-bottom) var(--page-content-spine);
           box-shadow:
             inset 12px 0 18px rgba(91, 67, 39, 0.08),
             -3px 0 8px rgba(75, 53, 31, 0.16);
@@ -1381,7 +1442,7 @@ export default function AutumnRegistryPage() {
         .page-turn-back {
           transform: rotateY(180deg);
           border-radius: 26px 0 0 26px;
-          padding: 1.7rem 1.2rem 3.4rem 1.75rem;
+          padding: var(--page-content-top) var(--page-content-spine) var(--page-content-bottom) var(--page-content-outer);
           background:
             repeating-linear-gradient(
               0deg,
@@ -1404,18 +1465,12 @@ export default function AutumnRegistryPage() {
           height: 100%;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .page-turn-card {
-          flex: 1;
-          min-height: 0;
-          overflow: hidden;
+          gap: 0;
         }
 
         .autumn-results-book .results-page {
           position: relative;
-          padding: 0.2rem 0.25rem;
+          padding: var(--page-block-padding) var(--page-edge-padding);
           z-index: 2;
           background: transparent;
           transition: opacity 180ms ease-out;
@@ -1425,14 +1480,14 @@ export default function AutumnRegistryPage() {
 
         .autumn-results-book .results-page:first-child {
           border-radius: 0;
-          padding-left: 0.25rem;
-          padding-right: 1.5rem;
+          padding-left: var(--page-edge-padding);
+          padding-right: var(--page-spine-padding);
         }
 
         .autumn-results-book .results-page:last-child {
           border-radius: 0;
-          padding-left: 1.5rem;
-          padding-right: 0.25rem;
+          padding-left: var(--page-spine-padding);
+          padding-right: var(--page-edge-padding);
         }
 
         .search-box-wrapper.book-opening .autumn-results-book .results-page:first-child,
@@ -1459,10 +1514,10 @@ export default function AutumnRegistryPage() {
             min-width: 0 !important;
           }
           .results-page-divider {
-            width: 14px !important;
+            width: var(--page-divider-width) !important;
             height: auto !important;
             min-height: 100% !important;
-            margin: 0 0.35rem !important;
+            margin: 0 var(--page-divider-margin) !important;
             background: transparent !important;
             box-shadow: none;
           }
@@ -1623,22 +1678,6 @@ export default function AutumnRegistryPage() {
           .open-to-back-front {
             padding: 1.5rem;
           }
-          /* Mirror the real pages, including their 0.2rem top inset and half the 12px spine divider. */
-          .page-turn-front {
-            padding: 1.7rem 1.75rem 3.4rem calc(1.5rem + 6px);
-          }
-          .page-turn-back {
-            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
-          }
-          .page-turn-static-left {
-            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
-          }
-          .page-turn-scene-backward .page-turn-front {
-            padding: 1.7rem calc(1.5rem + 6px) 3.4rem 1.75rem;
-          }
-          .page-turn-scene-backward .page-turn-back {
-            padding: 1.7rem 1.75rem 3.4rem calc(1.5rem + 6px);
-          }
           .book-transition.shifting {
             animation-name: autumn-book-shift-mobile;
           }
@@ -1726,6 +1765,7 @@ export default function AutumnRegistryPage() {
             background-size: auto 116%;
           }
           .back-book-back,
+          .back-book-flat,
           .open-to-back-back {
             background-size: auto, auto 128%;
           }
@@ -1824,6 +1864,10 @@ export default function AutumnRegistryPage() {
             width: 100% !important;
           }
           .autumn-results-book {
+            --page-divider-width: 12px;
+            --page-divider-margin: 0;
+            --page-divider-half: 6px;
+            --results-controls-height: 29px;
             touch-action: pan-y pinch-zoom;
             overscroll-behavior-x: contain;
           }
@@ -1832,10 +1876,10 @@ export default function AutumnRegistryPage() {
           }
           .results-list-mobile .results-page-divider {
             display: block !important;
-            width: 12px !important;
+            width: var(--page-divider-width) !important;
             height: auto !important;
             min-height: 100% !important;
-            flex: 0 0 12px !important;
+            flex: 0 0 var(--page-divider-width) !important;
             background: transparent !important;
           }
           .search-box-wrapper.book-closing .results-list-mobile .results-page-divider {
@@ -1848,8 +1892,11 @@ export default function AutumnRegistryPage() {
               linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
               url("/dithered-background-autumn.png") center / auto 128% no-repeat !important;
             box-shadow:
-              18px 22px 24px rgba(0, 0, 0, 0.72),
-              inset 2px 2px 1px rgba(255, 255, 255, 0.35);
+              18px 22px 24px rgba(0, 0, 0, 0.78),
+              7px 9px 9px rgba(0, 0, 0, 0.58),
+              -5px -5px 18px rgba(255, 244, 226, 0.16),
+              inset 2px 2px 1px rgba(255, 255, 255, 0.52),
+              inset -5px -4px 5px rgba(0, 0, 0, 0.3);
           }
           .results-list-mobile .results-page {
             flex: 1 1 0 !important;
@@ -1864,7 +1911,12 @@ export default function AutumnRegistryPage() {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 100%;
             padding: 0 0.25rem;
+            box-sizing: border-box;
+          }
+          .mobile-page-bar > div {
+            height: 100%;
             box-sizing: border-box;
           }
           .mobile-page-bar-left {
@@ -2024,7 +2076,7 @@ export default function AutumnRegistryPage() {
                 snapshot={pageTurnSnapshot}
                 isMobile={isMobile}
                 direction={pageTurnDirection}
-                target={reversePageTurnTarget}
+                target={pageTurnTarget}
               />
             )}
             {(loading || loadingMore) ? (
@@ -2159,7 +2211,7 @@ export default function AutumnRegistryPage() {
                     </button>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
                       {resultsHistory.length > 0 && (
-                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goBack}>
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goBackWithAnimation}>
                           <span>Back</span>
                         </button>
                       )}
@@ -2307,12 +2359,19 @@ function PageTurnOverlay({
   const stationaryCourses = snapshot.results.filter(
     (_, index) => Math.floor(index / 2) % 2 === 0,
   );
+  const stationaryRightCourses = snapshot.results.filter(
+    (_, index) => Math.floor(index / 2) % 2 === 1,
+  );
   const turningCourses = isBackward
     ? snapshot.results.slice(0, 2)
     : isMobile
       ? snapshot.results.slice(2, 4)
       : snapshot.results.filter((_, index) => Math.floor(index / 2) % 2 === 1);
-  const backCourses = isBackward ? target?.results.slice(2, 4) ?? [] : [];
+  const destinationCourses = target
+    ? isBackward
+      ? target.results.slice(2, 4)
+      : target.results.slice(0, 2)
+    : null;
 
   return (
     <>
@@ -2320,7 +2379,21 @@ function PageTurnOverlay({
         <div className="page-turn-static-left" aria-hidden="true">
           <div className="page-turn-cards">
             {stationaryCourses.map((course) => (
-              <div className="page-turn-card" key={course.id}>
+              <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
+                <SimpleCourseCard
+                  course={course}
+                  explanation={snapshot.explanations[course.id]}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {isBackward && (
+        <div className="page-turn-static-right" aria-hidden="true">
+          <div className="page-turn-cards">
+            {stationaryRightCourses.map((course) => (
+              <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
                 <SimpleCourseCard
                   course={course}
                   explanation={snapshot.explanations[course.id]}
@@ -2335,7 +2408,7 @@ function PageTurnOverlay({
           <div className="page-turn-face page-turn-front">
             <div className="page-turn-cards">
               {turningCourses.map((course) => (
-                <div className="page-turn-card" key={course.id}>
+                <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
                   <SimpleCourseCard
                     course={course}
                     explanation={snapshot.explanations[course.id]}
@@ -2346,9 +2419,9 @@ function PageTurnOverlay({
           </div>
           <div className="page-turn-face page-turn-back">
             <div className="page-turn-cards">
-              {isBackward
-                ? backCourses.map((course) => (
-                    <div className="page-turn-card" key={course.id}>
+              {destinationCourses
+                ? destinationCourses.map((course) => (
+                    <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
                       <SimpleCourseCard
                         course={course}
                         explanation={target?.explanations[course.id]}
@@ -2356,7 +2429,7 @@ function PageTurnOverlay({
                     </div>
                   ))
                 : [0, 1].map((index) => (
-                    <div className="page-turn-card" key={index}>
+                    <div className="page-turn-card" style={styles.resultItemWrapper} key={index}>
                       <AutumnLoadingSkeletonCard />
                     </div>
                   ))}
@@ -2435,9 +2508,16 @@ function BackCoverTransition({
           </div>
         </div>
         <div className="back-book-face back-book-back">
-          <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
+          {phase !== "back" && (
+            <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
+          )}
         </div>
       </div>
+      {phase === "back" && (
+        <div className="back-book-flat">
+          <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
+        </div>
+      )}
     </div>
   );
 }
@@ -2484,7 +2564,7 @@ function OpenToBackTransition({
         <div className="open-to-back-face open-to-back-front">
           <div className="page-turn-cards">
             {rightPageCourses.map((course) => (
-              <div className="page-turn-card" key={course.id}>
+              <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
                 <SimpleCourseCard
                   course={course}
                   explanation={snapshot.explanations[course.id]}
@@ -2521,7 +2601,7 @@ function MobileOpenToBackOverlay({
         <div className="page-turn-face page-turn-front">
           <div className="page-turn-cards">
             {rightPageCourses.map((course) => (
-              <div className="page-turn-card" key={course.id}>
+              <div className="page-turn-card" style={styles.resultItemWrapper} key={course.id}>
                 <SimpleCourseCard
                   course={course}
                   explanation={snapshot.explanations[course.id]}
@@ -2790,7 +2870,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    padding: "1.5rem",
+    padding: "var(--book-padding, 1.5rem)",
     boxSizing: "border-box",
     overflow: "auto",
     borderRadius: "18px",
@@ -2853,6 +2933,7 @@ const styles: Record<string, React.CSSProperties> = {
   resultsBottomBarBtn: {
     fontFamily: '"Roboto Mono", monospace',
     fontSize: "9px",
+    lineHeight: "12px",
     color: "#f0f0f0",
     background: "#000000",
     border: "none",
