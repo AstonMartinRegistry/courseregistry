@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import type { CourseResult } from "./lib/types";
 import { STANFORD_NAVIGATOR_URL } from "./lib/constants";
 import { explainCourses } from "./lib/explainCourse";
-import { LeaderboardPanel } from "./components/LeaderboardPanel";
+import { LeaderboardPanel, prefetchLeaderboard } from "./components/LeaderboardPanel";
 
 type BookPhase =
   | "idle"
@@ -69,6 +69,10 @@ export default function AutumnRegistryPage() {
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    void prefetchLeaderboard("autumn26").catch(() => {});
   }, []);
 
   // Scale wrapper to fit viewport
@@ -449,6 +453,30 @@ export default function AutumnRegistryPage() {
     setMobilePage("left");
   };
 
+  const goForwardWithAnimation = () => {
+    if (forwardHistory.length === 0 || pageTurnSnapshot) return;
+
+    const next = forwardHistory[forwardHistory.length - 1];
+    setResultsHistory((current) => [...current, { results, explanations, pagination }]);
+    setForwardHistory((current) => current.slice(0, -1));
+    setPageTurnSnapshot({ results, explanations });
+    setReversePageTurnTarget(null);
+    setPageTurnDirection("forward");
+    setResults(next.results);
+    setExplanations(next.explanations);
+    setPagination(next.pagination);
+
+    if (isMobile) {
+      requestAnimationFrame(() => setMobilePage("left"));
+    } else {
+      setMobilePage("left");
+    }
+
+    window.setTimeout(() => {
+      setPageTurnSnapshot(null);
+    }, 800);
+  };
+
   const barBtnStyle = {
     ...styles.resultsBottomBarBtn,
     ...(isMobile ? { fontSize: "10px", padding: "0.45rem 0.55rem" } : {}),
@@ -752,7 +780,7 @@ export default function AutumnRegistryPage() {
           position: absolute;
           inset: 0;
           z-index: 3;
-          border-radius: 18px;
+          border-radius: 0 18px 18px 0;
           box-shadow:
             inset 2px 2px 1px rgba(255, 255, 255, 0.52),
             inset -5px -4px 5px rgba(0, 0, 0, 0.3),
@@ -761,6 +789,7 @@ export default function AutumnRegistryPage() {
         }
 
         .search-box-wrapper.cover-mode .box-image {
+          border-radius: 0 18px 18px 0;
           box-shadow:
             18px 22px 24px rgba(0, 0, 0, 0.78),
             7px 9px 9px rgba(0, 0, 0, 0.58),
@@ -841,12 +870,14 @@ export default function AutumnRegistryPage() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          border-radius: 0 18px 18px 0;
           background: url("/dithered-background-autumn.png") center / cover no-repeat;
         }
 
         .back-book-back {
           transform: rotateY(180deg);
           pointer-events: none;
+          border-radius: 18px 0 0 18px;
           background:
             linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
             url("/dithered-background-autumn.png") center / cover no-repeat;
@@ -876,8 +907,10 @@ export default function AutumnRegistryPage() {
         .open-to-back-sheet {
           position: absolute;
           inset: 0;
+          border-radius: 26px;
           transform-origin: left center;
           transform-style: preserve-3d;
+          will-change: transform;
         }
 
         .open-to-back-transition.closing .open-to-back-sheet {
@@ -893,7 +926,7 @@ export default function AutumnRegistryPage() {
           inset: 0;
           box-sizing: border-box;
           overflow: hidden;
-          border-radius: 18px;
+          border-radius: 0 26px 26px 0;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           background:
@@ -907,10 +940,13 @@ export default function AutumnRegistryPage() {
 
         .open-to-back-back {
           transform: rotateY(180deg);
-          border-radius: 18px;
+          border-radius: 26px 0 0 26px;
           background:
             linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
             url("/dithered-background-autumn.png") center / cover no-repeat;
+          box-shadow:
+            18px 22px 24px rgba(0, 0, 0, 0.72),
+            inset 2px 2px 1px rgba(255, 255, 255, 0.35);
         }
 
         .search-box-wrapper.back-view-hidden {
@@ -973,6 +1009,7 @@ export default function AutumnRegistryPage() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          border-radius: 0 18px 18px 0;
           background: url("/dithered-background-autumn.png") center / cover no-repeat;
           box-shadow:
             inset 2px 2px 1px rgba(255, 255, 255, 0.48),
@@ -1115,10 +1152,12 @@ export default function AutumnRegistryPage() {
 
         .results-page-surface-left {
           left: 0;
+          border-radius: 18px 0 0 18px;
         }
 
         .results-page-surface-right {
           right: 0;
+          border-radius: 0 18px 18px 0;
           background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
@@ -1178,7 +1217,9 @@ export default function AutumnRegistryPage() {
           z-index: 11;
           box-sizing: border-box;
           overflow: hidden;
-          border-radius: 18px;
+          border-radius: 18px 0 0 18px;
+          clip-path: inset(0 round 18px);
+          -webkit-clip-path: inset(0 round 18px);
           padding: 1.7rem 1.2rem 3.4rem 1.75rem;
           pointer-events: none;
           background:
@@ -1193,8 +1234,10 @@ export default function AutumnRegistryPage() {
         .page-turn-sheet {
           position: absolute;
           inset: 0;
+          border-radius: 26px;
           transform-origin: left center;
           transform-style: preserve-3d;
+          will-change: transform;
           animation: autumn-page-turn 780ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
@@ -1233,7 +1276,7 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-front {
-          border-radius: 18px;
+          border-radius: 0 26px 26px 0;
           padding: 1.7rem 1.75rem 3.4rem 1.2rem;
           box-shadow:
             inset 12px 0 18px rgba(91, 67, 39, 0.08),
@@ -1242,7 +1285,7 @@ export default function AutumnRegistryPage() {
 
         .page-turn-back {
           transform: rotateY(180deg);
-          border-radius: 18px;
+          border-radius: 26px 0 0 26px;
           padding: 1.7rem 1.2rem 3.4rem 1.75rem;
           background:
             repeating-linear-gradient(
@@ -1255,11 +1298,11 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-scene-backward .page-turn-front {
-          border-radius: 18px;
+          border-radius: 26px 0 0 26px;
         }
 
         .page-turn-scene-backward .page-turn-back {
-          border-radius: 18px;
+          border-radius: 0 26px 26px 0;
         }
 
         .page-turn-cards {
@@ -1447,6 +1490,9 @@ export default function AutumnRegistryPage() {
             clip-path: none;
             box-shadow: none;
             overflow: visible !important;
+          }
+          .search-box-wrapper.open-back-closing > .autumn-results-book::after {
+            opacity: 0;
           }
           .search-box-wrapper.open-back-closing .results-list-mobile > .results-page:last-child {
             visibility: hidden;
@@ -1692,6 +1738,9 @@ export default function AutumnRegistryPage() {
             background:
               linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
               url("/dithered-background-autumn.png") center / auto 128% no-repeat !important;
+            box-shadow:
+              18px 22px 24px rgba(0, 0, 0, 0.72),
+              inset 2px 2px 1px rgba(255, 255, 255, 0.35);
           }
           .results-list-mobile .results-page {
             flex: 1 1 0 !important;
@@ -1973,7 +2022,7 @@ export default function AutumnRegistryPage() {
                               ...barBtnStyle,
                               ...(loadingMore || loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
                             }}
-                            onClick={forwardHistory.length > 0 ? goForward : loadMore}
+                            onClick={forwardHistory.length > 0 ? goForwardWithAnimation : loadMore}
                             disabled={loadingMore || loadingMobileRight}
                           >
                             <span>
@@ -2000,7 +2049,7 @@ export default function AutumnRegistryPage() {
                         </button>
                       )}
                       {forwardHistory.length > 0 ? (
-                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goForward}>
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goForwardWithAnimation}>
                           <span>Forward</span>
                         </button>
                       ) : pagination.hasMore ? (

@@ -18,6 +18,29 @@ type LeaderboardData = {
 const leaderboardCache = new Map<CourseTerm, LeaderboardData>();
 const leaderboardRequests = new Map<CourseTerm, Promise<LeaderboardData>>();
 
+export function prefetchLeaderboard(term: CourseTerm): Promise<LeaderboardData> {
+  const cached = leaderboardCache.get(term);
+  if (cached) return Promise.resolve(cached);
+
+  const existing = leaderboardRequests.get(term);
+  if (existing) return existing;
+
+  const request = fetch(`/api/leaderboard?term=${term}`)
+    .then((response) => response.json())
+    .then((data): LeaderboardData => {
+      const normalized = {
+        leaderboard: data.leaderboard ?? [],
+        totalRows: data.totalRows ?? 0,
+      };
+      leaderboardCache.set(term, normalized);
+      return normalized;
+    })
+    .finally(() => leaderboardRequests.delete(term));
+
+  leaderboardRequests.set(term, request);
+  return request;
+}
+
 type Props = {
   onClose: () => void;
   isMobile?: boolean;
@@ -43,21 +66,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
     }
 
     setLoading(true);
-    let request = leaderboardRequests.get(term);
-    if (!request) {
-      request = fetch(`/api/leaderboard?term=${term}`)
-        .then((r) => r.json())
-        .then((d): LeaderboardData => {
-          const data = {
-            leaderboard: d.leaderboard ?? [],
-            totalRows: d.totalRows ?? 0,
-          };
-          leaderboardCache.set(term, data);
-          return data;
-        })
-        .finally(() => leaderboardRequests.delete(term));
-      leaderboardRequests.set(term, request);
-    }
+    const request = prefetchLeaderboard(term);
 
     let active = true;
     request
@@ -138,7 +147,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
               letterSpacing: autumnBack ? "0.04em" : undefined,
             }}
           >
-            Top 200 most searched
+            Top 200 searched
           </h2>
         </div>
         <button
