@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { STANFORD_NAVIGATOR_URL } from "../lib/constants";
+import { CourseTerm, STANFORD_NAVIGATOR_URL } from "../lib/constants";
 
 type LeaderboardEntry = {
   course_id: number;
@@ -10,27 +10,73 @@ type LeaderboardEntry = {
   search_count: number;
 };
 
+type LeaderboardData = {
+  leaderboard: LeaderboardEntry[];
+  totalRows: number;
+};
+
+const leaderboardCache = new Map<CourseTerm, LeaderboardData>();
+const leaderboardRequests = new Map<CourseTerm, Promise<LeaderboardData>>();
+
 type Props = {
   onClose: () => void;
   isMobile?: boolean;
+  term?: CourseTerm;
+  totalCourses?: number;
 };
 
-export function LeaderboardPanel({ onClose, isMobile }: Props) {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [totalRows, setTotalRows] = useState(0);
-  const [loading, setLoading] = useState(true);
+export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props) {
+  const cached = leaderboardCache.get(term);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(cached?.leaderboard ?? []);
+  const [totalRows, setTotalRows] = useState(cached?.totalRows ?? 0);
+  const [loading, setLoading] = useState(!cached);
+  const autumnBack = term === "autumn26";
+  const ruleColor = autumnBack ? "rgba(91, 67, 39, 0.22)" : "#ddd";
 
   useEffect(() => {
+    const existing = leaderboardCache.get(term);
+    if (existing) {
+      setLeaderboard(existing.leaderboard);
+      setTotalRows(existing.totalRows);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    fetch("/api/leaderboard")
-      .then((r) => r.json())
-      .then((d) => {
-        setLeaderboard(d.leaderboard ?? []);
-        setTotalRows(d.totalRows ?? 0);
+    let request = leaderboardRequests.get(term);
+    if (!request) {
+      request = fetch(`/api/leaderboard?term=${term}`)
+        .then((r) => r.json())
+        .then((d): LeaderboardData => {
+          const data = {
+            leaderboard: d.leaderboard ?? [],
+            totalRows: d.totalRows ?? 0,
+          };
+          leaderboardCache.set(term, data);
+          return data;
+        })
+        .finally(() => leaderboardRequests.delete(term));
+      leaderboardRequests.set(term, request);
+    }
+
+    let active = true;
+    request
+      .then((data) => {
+        if (!active) return;
+        setLeaderboard(data.leaderboard);
+        setTotalRows(data.totalRows);
       })
-      .catch(() => setLeaderboard([]))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(() => {
+        if (active) setLeaderboard([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [term]);
 
   return (
     <div
@@ -38,19 +84,27 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
       style={{
         position: "absolute",
         top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "#fff",
+        left: autumnBack ? "14px" : 0,
+        right: autumnBack ? "14px" : 0,
+        bottom: autumnBack ? "14px" : 0,
+        marginTop: autumnBack ? "14px" : 0,
+        background: autumnBack
+          ? "transparent"
+          : "#fff",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        borderRadius: autumnBack ? "12px" : 0,
+        border: "none",
+        boxShadow: autumnBack
+          ? "inset 0 0 24px rgba(94, 69, 42, 0.12), 0 2px 8px rgba(45, 31, 19, 0.2)"
+          : "none",
       }}
     >
       <div
         style={{
-          padding: "1rem 1.5rem",
-          borderBottom: "1px solid #eee",
+          padding: autumnBack ? "1rem 10px" : "1rem 1.5rem",
+          borderBottom: autumnBack ? "none" : "1px solid #eee",
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
@@ -66,24 +120,27 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundImage: "url(/dithered-image-5.jpeg)",
-            backgroundSize: "170%",
-            backgroundPosition: "-50% 20%",
+            backgroundImage: autumnBack
+              ? "none"
+              : "url(/dithered-image-5.jpeg)",
+            backgroundSize: autumnBack ? "auto" : "170%",
+            backgroundPosition: autumnBack ? "center" : "-50% 20%",
             opacity: 1,
           }}
         />
-        <h2
-          style={{
-            fontSize: isMobile ? "1.5em" : "1.4em",
-            margin: 0,
-            fontFamily: '"Jersey 15", sans-serif',
-            color: "#1a1a1a",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          Top 200 most searched
-        </h2>
+        <div style={{ position: "relative", zIndex: 1, textAlign: "left" }}>
+          <h2
+            style={{
+              fontSize: autumnBack ? (isMobile ? "1.9em" : "2em") : (isMobile ? "1.5em" : "1.4em"),
+              margin: 0,
+              fontFamily: '"Jersey 15", sans-serif',
+              color: "#1a1a1a",
+              letterSpacing: autumnBack ? "0.04em" : undefined,
+            }}
+          >
+            Top 200 most searched
+          </h2>
+        </div>
         <button
           type="button"
           onClick={onClose}
@@ -91,9 +148,10 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
             fontFamily: '"Roboto Mono", monospace',
             fontSize: isMobile ? "11px" : "10px",
             padding: isMobile ? "0.35rem 0.5rem" : "0.25rem 0.5rem",
-            background: "#1a1a1a",
+            background: "#000000",
             color: "#f0f0f0",
             border: "none",
+            borderRadius: "8px",
             cursor: "pointer",
             position: "relative",
             zIndex: 1,
@@ -109,6 +167,11 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
           padding: "1rem 1.5rem",
           display: "flex",
           flexDirection: "column",
+          background: autumnBack ? "#ffffff" : undefined,
+          margin: autumnBack ? "10px" : 0,
+          borderRadius: autumnBack ? "12px" : 0,
+          color: autumnBack ? "#18130f" : undefined,
+          textShadow: "none",
         }}
       >
         {loading ? (
@@ -126,7 +189,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
                 display: "flex",
                 gap: "0.75rem",
                 paddingBottom: "0.5rem",
-                borderBottom: "1px solid #ddd",
+                borderBottom: `1px solid ${ruleColor}`,
                 marginBottom: "0.5rem",
               }}
             >
@@ -176,7 +239,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
                 <div
                   style={{
                     height: 1,
-                    background: "#ddd",
+                    background: ruleColor,
                     marginTop: "0.5rem",
                     marginBottom: "0.5rem",
                   }}
@@ -208,7 +271,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
             {/* <div
               style={{
                 paddingBottom: "0.5rem",
-                borderBottom: "1px solid #ddd",
+                borderBottom: `1px solid ${ruleColor}`,
                 marginBottom: "0.25rem",
               }}
             >
@@ -228,7 +291,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
                 display: "flex",
                 gap: "0.75rem",
                 paddingBottom: "0.5rem",
-                borderBottom: "1px solid #ddd",
+                borderBottom: `1px solid ${ruleColor}`,
                 marginBottom: "0.5rem",
               }}
             >
@@ -257,7 +320,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
                     {codes.map((code, i) => (
                       <span key={`${code}-${i}`}>
                         <a
-                          href={STANFORD_NAVIGATOR_URL(code)}
+                          href={STANFORD_NAVIGATOR_URL(code, term)}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
@@ -279,7 +342,7 @@ export function LeaderboardPanel({ onClose, isMobile }: Props) {
                 <div
                   style={{
                     height: 1,
-                    background: "#ddd",
+                    background: ruleColor,
                     marginTop: "0.5rem",
                     marginBottom: "0.5rem",
                   }}

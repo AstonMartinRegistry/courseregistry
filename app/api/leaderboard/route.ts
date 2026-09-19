@@ -1,21 +1,43 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-export async function GET() {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+function getSupabaseConfig(term: string) {
+  if (term === "autumn26") {
+    return {
+      url: process.env.AUTUMN26_SUPABASE_URL,
+      anonKey: process.env.AUTUMN26_SUPABASE_ANON_KEY,
+    };
   }
+  return {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  };
+}
 
+function supabaseHeaders(key: string) {
+  return {
+    apikey: key,
+    ...(key.startsWith("eyJ") ? { Authorization: `Bearer ${key}` } : {}),
+  };
+}
+
+export async function GET(request: NextRequest) {
   try {
+    const term = request.nextUrl.searchParams.get("term") || "autumn26";
+    if (!['autumn26', 'spring26'].includes(term)) {
+      return NextResponse.json({ error: "Unsupported course term" }, { status: 400 });
+    }
+    const { url, anonKey } = getSupabaseConfig(term);
+    if (!url || !anonKey) {
+      return NextResponse.json({ error: `${term} Supabase not configured` }, { status: 500 });
+    }
+    const leaderboardRpc = term === "autumn26" ? "get_leaderboard_autumn26" : "get_leaderboard";
+    const countRpc = term === "autumn26" ? "get_popularity_count_autumn26" : "get_popularity_count";
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/rpc/get_leaderboard`,
+      `${url}/rest/v1/rpc/${leaderboardRpc}`,
       {
         method: "POST",
         headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          ...supabaseHeaders(anonKey),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ limit_count: 200 }),
@@ -29,16 +51,15 @@ export async function GET() {
 
     const data = await response.json();
 
-    // Get total row count from course_popularity via RPC
+    // Get the term-specific discovered-course count via its matching RPC.
     let totalRows = 0;
     try {
       const countRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/rpc/get_popularity_count`,
+        `${url}/rest/v1/rpc/${countRpc}`,
         {
           method: "POST",
           headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            ...supabaseHeaders(anonKey),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({}),

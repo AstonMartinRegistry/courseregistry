@@ -24,11 +24,9 @@
 .DS_Store
 *.pem
 
-# scripts
-/scripts
-
 # supabase migrations
-/supabase/migrations
+/supabase/migrations/*
+!/supabase/migrations/010_create_autumn26_catalog.sql
 
 # debug
 npm-debug.log*
@@ -38,6 +36,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -52,3 +51,5 @@ next-env.d.ts
 !package-lock.json
 !tsconfig.json
 !data/**/*.json
+data/**/embeddings.json.gz
+!data/**/embeddings.int16.gz

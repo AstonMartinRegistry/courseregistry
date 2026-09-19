@@ -10,6 +10,7 @@
     "dedup": "node scripts/dedup.js",
     "load:courses": "node scripts/load-courses.js",
     "load:embeddings": "node scripts/generate-and-load-embeddings.js",
+    "build:local-index": "node scripts/build-local-search-index.js",
     "expand:descriptions": "node scripts/generate-expanded-descriptions.js",
     "apply:expanded": "node scripts/apply-expanded-descriptions.js",
     "generate:rewritten": "node scripts/generate-rewritten-descriptions.js"
