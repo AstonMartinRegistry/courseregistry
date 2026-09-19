@@ -103,7 +103,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
     >
       <div
         style={{
-          padding: autumnBack ? "1rem 10px" : "1rem 1.5rem",
+          padding: autumnBack ? "1rem 2px" : "1rem 1.5rem",
           borderBottom: autumnBack ? "none" : "1px solid #eee",
           flexShrink: 0,
           display: "flex",
@@ -143,6 +143,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
         </div>
         <button
           type="button"
+          className="autumn-black-grain"
           onClick={onClose}
           style={{
             fontFamily: '"Roboto Mono", monospace',
@@ -168,7 +169,7 @@ export function LeaderboardPanel({ onClose, isMobile, term = "spring26" }: Props
           display: "flex",
           flexDirection: "column",
           background: autumnBack ? "#ffffff" : undefined,
-          margin: autumnBack ? "10px" : 0,
+          margin: autumnBack ? "10px 2px 2px" : 0,
           borderRadius: autumnBack ? "12px" : 0,
           color: autumnBack ? "#18130f" : undefined,
           textShadow: "none",

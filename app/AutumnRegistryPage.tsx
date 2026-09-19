@@ -20,6 +20,7 @@ type PageTurnSnapshot = {
   results: CourseResult[];
   explanations: Record<number, string>;
 };
+type PageTurnDirection = "forward" | "backward";
 
 export default function AutumnRegistryPage() {
   // Search state
@@ -45,6 +46,7 @@ export default function AutumnRegistryPage() {
   const [backPhase, setBackPhase] = useState<BackPhase>("idle");
   const [openBackPhase, setOpenBackPhase] = useState<OpenBackPhase>("idle");
   const [openBackSnapshot, setOpenBackSnapshot] = useState<PageTurnSnapshot | null>(null);
+  const [openBackMobileSource, setOpenBackMobileSource] = useState<MobilePage>("left");
   const [resultsHistory, setResultsHistory] = useState<Array<{
     results: CourseResult[];
     explanations: Record<number, string>;
@@ -59,6 +61,8 @@ export default function AutumnRegistryPage() {
   const [mobilePage, setMobilePage] = useState<MobilePage>("left");
   const [bookPhase, setBookPhase] = useState<BookPhase>("idle");
   const [pageTurnSnapshot, setPageTurnSnapshot] = useState<PageTurnSnapshot | null>(null);
+  const [pageTurnDirection, setPageTurnDirection] = useState<PageTurnDirection>("forward");
+  const [reversePageTurnTarget, setReversePageTurnTarget] = useState<PageTurnSnapshot | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(typeof window !== "undefined" && window.innerWidth <= 768);
@@ -249,6 +253,9 @@ export default function AutumnRegistryPage() {
     setLoadingMore(true);
     setError(null);
     const turnStartedAt = performance.now();
+    if (mobileView) {
+      requestAnimationFrame(() => setMobilePage("left"));
+    }
 
     try {
       const response = await fetch("/api/search", {
@@ -282,7 +289,6 @@ export default function AutumnRegistryPage() {
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       setPageTurnSnapshot(null);
       setLoadingMore(false);
-      if (mobileView) setMobilePage("left");
 
       await explainCourses(newCourses, query.trim(), setExplanations, {
         animateReveal: true,
@@ -365,14 +371,20 @@ export default function AutumnRegistryPage() {
   }
 
   const handleNewSearch = () => {
-    if (bookPhase === "open") setBookPhase("closing");
+    if (bookPhase === "open") {
+      setBookPhase("closing");
+    }
   };
 
   const handleLeaderboardOpen = () => {
     if (backPhase !== "idle") return;
     if (hasSearched && bookPhase === "open") {
       setOpenBackSnapshot({ results, explanations });
+      setOpenBackMobileSource(mobilePage);
       setOpenBackPhase("closing");
+      if (isMobile && mobilePage === "right") {
+        requestAnimationFrame(() => setMobilePage("left"));
+      }
       return;
     }
     if (!hasSearched && bookPhase === "idle") {
@@ -396,6 +408,34 @@ export default function AutumnRegistryPage() {
     setExplanations(prev.explanations);
     setPagination(prev.pagination);
     setMobilePage("left");
+  };
+
+  const goBackWithAnimation = () => {
+    if (!isMobile || resultsHistory.length === 0 || pageTurnSnapshot) {
+      goBack();
+      return;
+    }
+
+    const previous = resultsHistory[resultsHistory.length - 1];
+    setForwardHistory((current) => [...current, { results, explanations, pagination }]);
+    setResultsHistory((current) => current.slice(0, -1));
+    setPageTurnSnapshot({ results, explanations });
+    setReversePageTurnTarget({
+      results: previous.results,
+      explanations: previous.explanations,
+    });
+    setPageTurnDirection("backward");
+    setResults(previous.results);
+    setExplanations(previous.explanations);
+    setPagination(previous.pagination);
+
+    requestAnimationFrame(() => setMobilePage("right"));
+    window.setTimeout(() => {
+      setPageTurnSnapshot(null);
+      setReversePageTurnTarget(null);
+      setPageTurnDirection("forward");
+      requestAnimationFrame(() => setMobilePage("left"));
+    }, 800);
   };
 
   const goForward = () => {
@@ -447,6 +487,22 @@ export default function AutumnRegistryPage() {
         @keyframes skeleton-shimmer {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
+        }
+
+        .autumn-black-grain,
+        .autumn-results-controls button,
+        .autumn-meta-percentage,
+        .book-transition-credit,
+        .book-transition-edition,
+        .book-transition-search::after {
+          background-color: #080808 !important;
+          background-image:
+            linear-gradient(rgba(8, 8, 8, 0.76), rgba(8, 8, 8, 0.76)),
+            radial-gradient(ellipse 80% 60% at 14% 10%, rgba(255,255,255,0.08), transparent 55%),
+            radial-gradient(ellipse 70% 50% at 90% 88%, rgba(255,255,255,0.05), transparent 58%),
+            url("/autumn-film-grain.png") !important;
+          background-size: 100% 100%, 100% 100%, 100% 100%, 72px 72px !important;
+          background-repeat: no-repeat, no-repeat, no-repeat, repeat !important;
         }
 
         .autumn-corner-pill {
@@ -544,6 +600,11 @@ export default function AutumnRegistryPage() {
         }
 
         @keyframes autumn-book-recenter-mobile {
+          from { transform: translate(-50%, -50%); }
+          to { transform: translate(-50%, -50%); }
+        }
+
+        @keyframes autumn-mobile-camera-close {
           from { transform: translate(calc(-50% + min(90vw, 480px)), -50%); }
           to { transform: translate(-50%, -50%); }
         }
@@ -600,6 +661,11 @@ export default function AutumnRegistryPage() {
           }
         }
 
+        @keyframes autumn-mobile-pages-close {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+
         @keyframes autumn-pages-reveal {
           from {
             opacity: 0;
@@ -614,6 +680,11 @@ export default function AutumnRegistryPage() {
         @keyframes autumn-page-turn {
           from { transform: rotateY(0deg); }
           to { transform: rotateY(-180deg); }
+        }
+
+        @keyframes autumn-page-turn-backward {
+          from { transform: rotateY(0deg); }
+          to { transform: rotateY(180deg); }
         }
 
         @keyframes autumn-word-reveal {
@@ -822,7 +893,7 @@ export default function AutumnRegistryPage() {
           inset: 0;
           box-sizing: border-box;
           overflow: hidden;
-          border-radius: 0 18px 18px 0;
+          border-radius: 18px;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
           background:
@@ -836,7 +907,7 @@ export default function AutumnRegistryPage() {
 
         .open-to-back-back {
           transform: rotateY(180deg);
-          border-radius: 18px 0 0 18px;
+          border-radius: 18px;
           background:
             linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
             url("/dithered-background-autumn.png") center / cover no-repeat;
@@ -997,6 +1068,7 @@ export default function AutumnRegistryPage() {
           height: 28px;
           display: grid;
           place-items: center;
+          padding-top: 3px;
           border-radius: 8px;
           background: #000;
           color: #fff;
@@ -1012,34 +1084,67 @@ export default function AutumnRegistryPage() {
 
         .autumn-results-book {
           opacity: 1;
-          background:
-            repeating-linear-gradient(
-              0deg,
-              rgba(102, 77, 48, 0.022) 0 1px,
-              transparent 1px 5px
-            ),
-            linear-gradient(
-              90deg,
-              #eee4d5 0%,
-              #fffaf1 4%,
-              #fffdf8 48%,
-              #d8c9b5 50%,
-              #fffdf8 52%,
-              #fffaf1 96%,
-              #eee4d5 100%
-            ) !important;
-          box-shadow:
-            18px 22px 30px rgba(0, 0, 0, 0.58);
+          background: transparent !important;
+          box-shadow: none;
+          overflow: visible !important;
+        }
+
+        .results-page-surface {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 50%;
+          z-index: 1;
+          border-radius: 18px;
+          background: linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
+          box-shadow: 0 18px 28px rgba(0, 0, 0, 0.5);
+          pointer-events: none;
+        }
+
+        .results-page-surface::after {
+          content: "";
+          position: absolute;
+          inset: 18px 14px 26px;
+          border-radius: 8px;
+          background: repeating-linear-gradient(
+            0deg,
+            rgba(102, 77, 48, 0.022) 0 1px,
+            transparent 1px 5px
+          );
+        }
+
+        .results-page-surface-left {
+          left: 0;
+        }
+
+        .results-page-surface-right {
+          right: 0;
+          background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
+        }
+
+        .results-page-surface-right::after {
+          background-position: 0 2px;
+        }
+
+        .autumn-results-book > .results-list {
+          position: relative;
+          z-index: 2;
+        }
+
+        .autumn-results-book > .autumn-results-controls {
+          position: relative;
+          z-index: 5;
         }
 
         .autumn-results-book::after {
           content: "";
           position: absolute;
-          top: 0;
-          bottom: 0;
+          top: 18px;
+          bottom: 18px;
           left: 50%;
           width: 14px;
-          z-index: 4;
+          z-index: 3;
+          opacity: 0.4;
           transform: translateX(-50%);
           background: linear-gradient(
             90deg,
@@ -1073,6 +1178,7 @@ export default function AutumnRegistryPage() {
           z-index: 11;
           box-sizing: border-box;
           overflow: hidden;
+          border-radius: 18px;
           padding: 1.7rem 1.2rem 3.4rem 1.75rem;
           pointer-events: none;
           background:
@@ -1092,6 +1198,24 @@ export default function AutumnRegistryPage() {
           animation: autumn-page-turn 780ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
+        .page-turn-scene.page-turn-scene-backward {
+          right: 50%;
+          left: 0;
+        }
+
+        .page-turn-scene-backward .page-turn-sheet {
+          transform-origin: right center;
+          animation-name: autumn-page-turn-backward;
+        }
+
+        .page-turn-scene-backward .page-turn-front {
+          padding: 1.7rem 1.2rem 3.4rem 1.75rem;
+        }
+
+        .page-turn-scene-backward .page-turn-back {
+          padding: 1.7rem 1.75rem 3.4rem 1.2rem;
+        }
+
         .page-turn-face {
           position: absolute;
           inset: 0;
@@ -1109,6 +1233,7 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-front {
+          border-radius: 18px;
           padding: 1.7rem 1.75rem 3.4rem 1.2rem;
           box-shadow:
             inset 12px 0 18px rgba(91, 67, 39, 0.08),
@@ -1117,6 +1242,7 @@ export default function AutumnRegistryPage() {
 
         .page-turn-back {
           transform: rotateY(180deg);
+          border-radius: 18px;
           padding: 1.7rem 1.2rem 3.4rem 1.75rem;
           background:
             repeating-linear-gradient(
@@ -1126,6 +1252,14 @@ export default function AutumnRegistryPage() {
             ),
             linear-gradient(90deg, #eee4d5, #fffaf1 8%, #fffdf8);
           box-shadow: inset -14px 0 22px rgba(91, 67, 39, 0.1);
+        }
+
+        .page-turn-scene-backward .page-turn-front {
+          border-radius: 18px;
+        }
+
+        .page-turn-scene-backward .page-turn-back {
+          border-radius: 18px;
         }
 
         .page-turn-cards {
@@ -1144,8 +1278,23 @@ export default function AutumnRegistryPage() {
         .autumn-results-book .results-page {
           position: relative;
           padding: 0.2rem 0.25rem;
+          z-index: 2;
           background: transparent;
           transition: opacity 180ms ease-out;
+          overflow: hidden;
+          border-radius: 0;
+        }
+
+        .autumn-results-book .results-page:first-child {
+          border-radius: 0;
+          padding-left: 0.25rem;
+          padding-right: 1.5rem;
+        }
+
+        .autumn-results-book .results-page:last-child {
+          border-radius: 0;
+          padding-left: 1.5rem;
+          padding-right: 0.25rem;
         }
 
         .search-box-wrapper.book-opening .autumn-results-book .results-page:first-child,
@@ -1283,9 +1432,6 @@ export default function AutumnRegistryPage() {
             -webkit-text-fill-color: #ffffff;
           }
 
-          .autumn-results-book::after {
-            display: none;
-          }
           .search-box-wrapper.book-opening > .autumn-results-book {
             visibility: visible;
             opacity: 0;
@@ -1293,11 +1439,20 @@ export default function AutumnRegistryPage() {
             animation: autumn-mobile-pages-follow 820ms cubic-bezier(0.42, 0, 0.2, 1) both !important;
           }
           .search-box-wrapper.book-closing > .autumn-results-book {
-            visibility: hidden;
+            visibility: visible;
+            animation: autumn-mobile-pages-close 820ms cubic-bezier(0.42, 0, 0.2, 1) both !important;
           }
           .search-box-wrapper.open-back-closing > .autumn-results-book {
-            visibility: hidden;
+            visibility: visible;
             clip-path: none;
+            box-shadow: none;
+            overflow: visible !important;
+          }
+          .search-box-wrapper.open-back-closing .results-list-mobile > .results-page:last-child {
+            visibility: hidden;
+          }
+          .search-box-wrapper.open-back-closing .results-page-surface-right {
+            visibility: hidden;
           }
           .book-transition {
             width: 90%;
@@ -1318,6 +1473,9 @@ export default function AutumnRegistryPage() {
             aspect-ratio: 4 / 6.4;
             transform: translate(min(45vw, 240px), -50%);
           }
+          .open-to-back-transition.closing.follow-mobile-page {
+            animation: autumn-mobile-camera-open 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
+          }
           .open-to-back-transition.centering {
             animation-name: autumn-closed-back-center-mobile;
           }
@@ -1337,10 +1495,10 @@ export default function AutumnRegistryPage() {
             animation: autumn-mobile-camera-open 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
           }
           .book-transition.closing {
-            transform: translate(calc(-50% + min(90vw, 480px)), -50%);
+            animation: autumn-mobile-camera-close 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
           }
           .book-transition.recentering {
-            animation-name: autumn-book-recenter-mobile;
+            animation: autumn-book-recenter-mobile 80ms linear forwards;
           }
           .book-transition-title {
             top: 13%;
@@ -1410,9 +1568,11 @@ export default function AutumnRegistryPage() {
             transform: scale(1.16);
             transform-origin: center;
           }
-          .book-cover-front,
+          .book-cover-front {
+            background-size: auto 116%;
+          }
           .back-book-front {
-            background-size: auto 128%;
+            background-size: auto 116%;
           }
           .back-book-back,
           .open-to-back-back {
@@ -1439,11 +1599,19 @@ export default function AutumnRegistryPage() {
             transition: transform 620ms cubic-bezier(0.22, 0.78, 0.24, 1);
             will-change: transform;
           }
+          .search-box-wrapper.has-results.mobile-book.mobile-page-turning {
+            transition-duration: 780ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          }
           .search-box-wrapper.has-results.mobile-book.mobile-page-left {
             transform: translate(-25%, -50%) !important;
           }
           .search-box-wrapper.has-results.mobile-book.mobile-page-right {
             transform: translate(-75%, -50%) !important;
+          }
+          .search-box-wrapper.has-results.mobile-book.open-back-following {
+            transition-duration: 780ms;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           }
           .search-box-wrapper.has-results.mobile-book.book-opening {
             transition: none !important;
@@ -1515,6 +1683,16 @@ export default function AutumnRegistryPage() {
             flex: 0 0 12px !important;
             background: transparent !important;
           }
+          .search-box-wrapper.book-closing .results-list-mobile .results-page-divider {
+            width: 0 !important;
+            flex-basis: 0 !important;
+          }
+          .mobile-open-to-back-back {
+            padding: 0 !important;
+            background:
+              linear-gradient(rgba(15, 14, 13, 0.08), rgba(15, 14, 13, 0.08)),
+              url("/dithered-background-autumn.png") center / auto 128% no-repeat !important;
+          }
           .results-list-mobile .results-page {
             flex: 1 1 0 !important;
             min-width: 0 !important;
@@ -1530,6 +1708,12 @@ export default function AutumnRegistryPage() {
             justify-content: space-between;
             padding: 0 0.25rem;
             box-sizing: border-box;
+          }
+          .mobile-page-bar-left {
+            padding-right: 1.5rem;
+          }
+          .mobile-page-bar-right {
+            padding-left: 1.5rem;
           }
           .results-list-mobile .simple-card-descr {
             min-height: 240px !important;
@@ -1559,11 +1743,12 @@ export default function AutumnRegistryPage() {
           onClose={() => setBackPhase("to-front")}
         />
       )}
-      {openBackPhase !== "idle" && openBackSnapshot && (
+      {openBackPhase !== "idle" && openBackSnapshot && (!isMobile || openBackPhase === "centering") && (
         <OpenToBackTransition
           phase={openBackPhase}
           snapshot={openBackSnapshot}
           isMobile={isMobile}
+          followMobilePage={openBackMobileSource === "right"}
           onClosed={() => setOpenBackPhase("centering")}
           onCentered={finishOpenToBack}
         />
@@ -1576,7 +1761,7 @@ export default function AutumnRegistryPage() {
         }}
       >
       <div
-        className={`search-box-wrapper ${!hasSearched ? "cover-mode" : ""} ${backPhase !== "idle" || openBackPhase === "centering" ? "back-view-hidden" : ""} ${openBackPhase === "closing" ? "open-back-closing" : ""} ${hasSearched ? "has-results" : ""} ${isMobile && hasSearched ? `mobile-book mobile-page-${mobilePage}` : ""} ${hasSearched && (bookPhase === "shifting" || bookPhase === "recentering") ? "book-pages-hidden" : ""} ${bookPhase === "opening" ? "book-opening" : ""} ${bookPhase === "closing" ? "book-closing" : ""}`}
+        className={`search-box-wrapper ${!hasSearched ? "cover-mode" : ""} ${backPhase !== "idle" || openBackPhase === "centering" ? "back-view-hidden" : ""} ${openBackPhase === "closing" ? "open-back-closing" : ""} ${openBackPhase === "closing" && openBackMobileSource === "right" ? "open-back-following" : ""} ${hasSearched ? "has-results" : ""} ${isMobile && hasSearched ? `mobile-book mobile-page-${mobilePage}` : ""} ${isMobile && pageTurnSnapshot ? "mobile-page-turning" : ""} ${hasSearched && (bookPhase === "shifting" || bookPhase === "recentering") ? "book-pages-hidden" : ""} ${bookPhase === "opening" ? "book-opening" : ""} ${bookPhase === "closing" ? "book-closing" : ""}`}
         style={
           wrapperSize && hasSearched && !loading && !loadingMore && results.length === 0
               ? {
@@ -1588,7 +1773,7 @@ export default function AutumnRegistryPage() {
       >
         {!hasSearched ? (
           <>
-            <div style={styles.creatorByBox}>
+            <div className="autumn-black-grain" style={styles.creatorByBox}>
               Campus Curiosities Vol 5 |{" "}
               <a
                 href="https://stanfordlabregistry.com"
@@ -1612,7 +1797,7 @@ export default function AutumnRegistryPage() {
             <div className="box-overlay-1">
               <h1 className="mobile-title" style={styles.title}>Stanford<br />Course Registry</h1>
             </div>
-            <div style={styles.spring26Badge}>Autumn 26 Edition</div>
+            <div className="autumn-black-grain" style={styles.spring26Badge}>Autumn 26 Edition</div>
             <div className="box-overlay-2">
               <form onSubmit={handleSearch} className="mobile-search-container" style={styles.searchContainer}>
                 <textarea
@@ -1631,6 +1816,7 @@ export default function AutumnRegistryPage() {
                 />
                 <button
                   type="submit"
+                  className="autumn-black-grain"
                   style={styles.searchButton}
                   disabled={loading}
                 >
@@ -1661,10 +1847,20 @@ export default function AutumnRegistryPage() {
           </>
         ) : (
           <div className={`autumn-results-book ${pageTurnSnapshot ? "page-turning" : ""}`} style={styles.resultsBox}>
+            <div className="results-page-surface results-page-surface-left" aria-hidden="true" />
+            <div className="results-page-surface results-page-surface-right" aria-hidden="true" />
+            {isMobile && openBackPhase === "closing" && openBackSnapshot && (
+              <MobileOpenToBackOverlay
+                snapshot={openBackSnapshot}
+                onClosed={() => setOpenBackPhase("centering")}
+              />
+            )}
             {pageTurnSnapshot && (
               <PageTurnOverlay
                 snapshot={pageTurnSnapshot}
                 isMobile={isMobile}
+                direction={pageTurnDirection}
+                target={reversePageTurnTarget}
               />
             )}
             {(loading || loadingMore) ? (
@@ -1727,70 +1923,90 @@ export default function AutumnRegistryPage() {
                   )}
                 </div>
                 {isMobile ? (
-                  <div style={styles.resultsBottomBar} className="mobile-two-page-bar">
-                    <div className="mobile-page-bar">
-                      <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
-                        <span>New query</span>
-                      </button>
-                      {(results.length > 2 || pagination.hasMore) && (
-                        <button
-                          type="button"
-                          style={{
-                            ...barBtnStyle,
-                            ...(loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
-                          }}
-                          onClick={() => {
-                            if (results.length > 2) {
-                              setMobilePage("right");
-                            } else {
-                              void loadMobileRightPage();
-                            }
-                          }}
-                          disabled={loadingMobileRight}
-                        >
-                          <span>{loadingMobileRight ? "Loading…" : "Load more"}</span>
+                  <div style={styles.resultsBottomBar} className="mobile-two-page-bar autumn-results-controls">
+                    {mobilePage === "left" && (
+                      <div className="mobile-page-bar mobile-page-bar-left">
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={handleNewSearch}>
+                          <span>New query</span>
                         </button>
-                      )}
-                    </div>
+                        <div style={{ display: "flex", gap: "0.5rem" }}>
+                          {resultsHistory.length > 0 && (
+                            <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goBackWithAnimation}>
+                              <span>Back</span>
+                            </button>
+                          )}
+                          {(results.length > 2 || pagination.hasMore) && (
+                            <button
+                              type="button"
+                              className="autumn-black-grain"
+                              style={{
+                                ...barBtnStyle,
+                                ...(loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
+                              }}
+                              onClick={() => {
+                                if (results.length > 2) {
+                                  setMobilePage("right");
+                                } else {
+                                  void loadMobileRightPage();
+                                }
+                              }}
+                              disabled={loadingMobileRight}
+                            >
+                              <span>
+                                {loadingMobileRight ? "Loading…" : results.length > 2 ? "Forward" : "Load more"}
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     {mobilePage === "right" && (
-                      <div className="mobile-page-bar">
-                        <button type="button" style={barBtnStyle} onClick={() => setMobilePage("left")}>
+                      <div className="mobile-page-bar mobile-page-bar-right" style={{ gridColumn: 2 }}>
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={() => setMobilePage("left")}>
                           <span>Back</span>
                         </button>
-                        {(loadingMobileRight || pagination.hasMore) && (
+                        {(forwardHistory.length > 0 || loadingMobileRight || pagination.hasMore) && (
                           <button
                             type="button"
+                            className="autumn-black-grain"
                             style={{
                               ...barBtnStyle,
                               ...(loadingMore || loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
                             }}
-                            onClick={loadMore}
+                            onClick={forwardHistory.length > 0 ? goForward : loadMore}
                             disabled={loadingMore || loadingMobileRight}
                           >
-                            <span>{loadingMore || loadingMobileRight ? "Loading…" : "Load more"}</span>
+                            <span>
+                              {loadingMore || loadingMobileRight
+                                ? "Loading…"
+                                : forwardHistory.length > 0
+                                  ? "Forward"
+                                  : "Load more"}
+                            </span>
                           </button>
                         )}
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div style={styles.resultsBottomBar}>
-                    <button type="button" style={barBtnStyle} onClick={handleNewSearch}>
+                  <div style={styles.resultsBottomBar} className="autumn-results-controls">
+                    <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={handleNewSearch}>
                       <span>New query</span>
                     </button>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
                       {resultsHistory.length > 0 && (
-                        <button type="button" style={barBtnStyle} onClick={goBack}>
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goBack}>
                           <span>Back</span>
                         </button>
                       )}
                       {forwardHistory.length > 0 ? (
-                        <button type="button" style={barBtnStyle} onClick={goForward}>
+                        <button type="button" className="autumn-black-grain" style={barBtnStyle} onClick={goForward}>
                           <span>Forward</span>
                         </button>
                       ) : pagination.hasMore ? (
                         <button
                           type="button"
+                          className="autumn-black-grain"
                           style={{
                             ...barBtnStyle,
                             ...(loadingMore ? { opacity: 0.7, cursor: "wait" } : {}),
@@ -1866,7 +2082,7 @@ function BookTransition({
         }}
       >
         <div className="book-cover-face book-cover-front">
-          <div style={styles.creatorByBox}>
+          <div className="autumn-black-grain" style={styles.creatorByBox}>
             Campus Curiosities Vol 5 | stanfordlabregistry.com
           </div>
           <div className="box-overlay-1">
@@ -1876,7 +2092,7 @@ function BookTransition({
               Course Registry
             </h2>
           </div>
-          <div style={styles.spring26Badge}>Autumn 26 Edition</div>
+          <div className="autumn-black-grain" style={styles.spring26Badge}>Autumn 26 Edition</div>
           <div className="box-overlay-2">
             <div className="mobile-search-container" style={styles.searchContainer}>
               <textarea
@@ -1888,7 +2104,7 @@ function BookTransition({
                 value={query}
                 style={styles.searchInput}
               />
-              <span style={{ ...styles.searchButton, cursor: "default" }}>
+              <span className="autumn-black-grain" style={{ ...styles.searchButton, cursor: "default" }}>
                 <svg
                   width="14"
                   height="14"
@@ -1915,20 +2131,28 @@ function BookTransition({
 function PageTurnOverlay({
   snapshot,
   isMobile,
+  direction,
+  target,
 }: {
   snapshot: PageTurnSnapshot;
   isMobile: boolean;
+  direction: PageTurnDirection;
+  target: PageTurnSnapshot | null;
 }) {
+  const isBackward = direction === "backward";
   const stationaryCourses = snapshot.results.filter(
     (_, index) => Math.floor(index / 2) % 2 === 0,
   );
-  const turningCourses = isMobile
-    ? snapshot.results.slice(2, 4)
-    : snapshot.results.filter((_, index) => Math.floor(index / 2) % 2 === 1);
+  const turningCourses = isBackward
+    ? snapshot.results.slice(0, 2)
+    : isMobile
+      ? snapshot.results.slice(2, 4)
+      : snapshot.results.filter((_, index) => Math.floor(index / 2) % 2 === 1);
+  const backCourses = isBackward ? target?.results.slice(2, 4) ?? [] : [];
 
   return (
     <>
-      {!isMobile && (
+      {!isBackward && (
         <div className="page-turn-static-left" aria-hidden="true">
           <div className="page-turn-cards">
             {stationaryCourses.map((course) => (
@@ -1942,7 +2166,7 @@ function PageTurnOverlay({
           </div>
         </div>
       )}
-      <div className="page-turn-scene" aria-hidden="true">
+      <div className={`page-turn-scene ${isBackward ? "page-turn-scene-backward" : ""}`} aria-hidden="true">
         <div className="page-turn-sheet">
           <div className="page-turn-face page-turn-front">
             <div className="page-turn-cards">
@@ -1958,11 +2182,20 @@ function PageTurnOverlay({
           </div>
           <div className="page-turn-face page-turn-back">
             <div className="page-turn-cards">
-              {[0, 1].map((index) => (
-                <div className="page-turn-card" key={index}>
-                  <AutumnLoadingSkeletonCard />
-                </div>
-              ))}
+              {isBackward
+                ? backCourses.map((course) => (
+                    <div className="page-turn-card" key={course.id}>
+                      <SimpleCourseCard
+                        course={course}
+                        explanation={target?.explanations[course.id]}
+                      />
+                    </div>
+                  ))
+                : [0, 1].map((index) => (
+                    <div className="page-turn-card" key={index}>
+                      <AutumnLoadingSkeletonCard />
+                    </div>
+                  ))}
             </div>
           </div>
         </div>
@@ -1997,7 +2230,7 @@ function BackCoverTransition({
         }}
       >
         <div className="back-book-face back-book-front" aria-hidden={phase === "back"}>
-          <div style={styles.creatorByBox}>
+          <div className="autumn-black-grain" style={styles.creatorByBox}>
             Campus Curiosities Vol 5 | stanfordlabregistry.com
           </div>
           <div className="box-overlay-1">
@@ -2007,7 +2240,7 @@ function BackCoverTransition({
               Course Registry
             </h2>
           </div>
-          <div style={styles.spring26Badge}>Autumn 26 Edition</div>
+          <div className="autumn-black-grain" style={styles.spring26Badge}>Autumn 26 Edition</div>
           <div className="box-overlay-2">
             <div className="mobile-search-container" style={styles.searchContainer}>
               <textarea
@@ -2019,7 +2252,7 @@ function BackCoverTransition({
                 value={query}
                 style={styles.searchInput}
               />
-              <span style={{ ...styles.searchButton, cursor: "default" }}>
+              <span className="autumn-black-grain" style={{ ...styles.searchButton, cursor: "default" }}>
                 <svg
                   width="14"
                   height="14"
@@ -2049,12 +2282,14 @@ function OpenToBackTransition({
   phase,
   snapshot,
   isMobile,
+  followMobilePage,
   onClosed,
   onCentered,
 }: {
   phase: Exclude<OpenBackPhase, "idle">;
   snapshot: PageTurnSnapshot;
   isMobile: boolean;
+  followMobilePage: boolean;
   onClosed: () => void;
   onCentered: () => void;
 }) {
@@ -2064,7 +2299,7 @@ function OpenToBackTransition({
 
   return (
     <div
-      className={`open-to-back-transition ${phase}`}
+      className={`open-to-back-transition ${phase} ${followMobilePage ? "follow-mobile-page" : ""}`}
       onAnimationEnd={(event) => {
         if (phase === "centering" && event.currentTarget === event.target) {
           onCentered();
@@ -2096,6 +2331,43 @@ function OpenToBackTransition({
         </div>
         <div className="open-to-back-face open-to-back-back">
           <LeaderboardPanel onClose={() => {}} isMobile={isMobile} term="autumn26" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileOpenToBackOverlay({
+  snapshot,
+  onClosed,
+}: {
+  snapshot: PageTurnSnapshot;
+  onClosed: () => void;
+}) {
+  const rightPageCourses = snapshot.results.slice(2, 4);
+
+  return (
+    <div className="page-turn-scene" aria-hidden="true">
+      <div
+        className="page-turn-sheet"
+        onAnimationEnd={(event) => {
+          if (event.currentTarget === event.target) onClosed();
+        }}
+      >
+        <div className="page-turn-face page-turn-front">
+          <div className="page-turn-cards">
+            {rightPageCourses.map((course) => (
+              <div className="page-turn-card" key={course.id}>
+                <SimpleCourseCard
+                  course={course}
+                  explanation={snapshot.explanations[course.id]}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="page-turn-face page-turn-back mobile-open-to-back-back">
+          <LeaderboardPanel onClose={() => {}} isMobile term="autumn26" />
         </div>
       </div>
     </div>
@@ -2212,7 +2484,7 @@ function SimpleCourseCard({
           </span>
         </div>
         {typeof course.similarity === "number" && (
-          <span className="autumn-meta-reveal autumn-meta-percentage" style={styles.simpleCardSimilarity}>
+          <span className="autumn-meta-reveal autumn-meta-percentage autumn-black-grain" style={styles.simpleCardSimilarity}>
             <span>{(course.similarity * 100).toFixed(1)}%</span>
           </span>
         )}
@@ -2288,7 +2560,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   spring26Badge: {
     position: "absolute",
-    top: "18px",
+    top: "max(0px, calc((min(90vw, 480px) - (50ch + 1.4rem)) / 2))",
     right: 0,
     background: "#000000",
     color: "#f0f0f0",
@@ -2329,7 +2601,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: "absolute",
     right: "8px",
     bottom: "20px",
-    padding: 0,
+    padding: "3px 0 0",
     height: "28px",
     width: "28px",
     border: "none",
