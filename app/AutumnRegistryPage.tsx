@@ -584,8 +584,20 @@ export default function AutumnRegistryPage() {
         }
 
         @keyframes autumn-mobile-pages-follow {
-          from { transform: translateX(-50%); }
-          to { transform: translateX(0); }
+          0% {
+            opacity: 0;
+            transform: translateX(calc(-50% + 12px));
+          }
+          12% {
+            opacity: 0;
+          }
+          22% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
 
         @keyframes autumn-pages-reveal {
@@ -1276,8 +1288,9 @@ export default function AutumnRegistryPage() {
           }
           .search-box-wrapper.book-opening > .autumn-results-book {
             visibility: visible;
+            opacity: 0;
             clip-path: inset(0 0 0 50%);
-            animation: autumn-mobile-pages-follow 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards !important;
+            animation: autumn-mobile-pages-follow 820ms cubic-bezier(0.42, 0, 0.2, 1) both !important;
           }
           .search-box-wrapper.book-closing > .autumn-results-book {
             visibility: hidden;
@@ -1290,19 +1303,19 @@ export default function AutumnRegistryPage() {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 6;
+            aspect-ratio: 4 / 6.4;
           }
           .back-book-transition {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 6;
+            aspect-ratio: 4 / 6.4;
           }
           .open-to-back-transition {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 6;
+            aspect-ratio: 4 / 6.4;
             transform: translate(min(45vw, 240px), -50%);
           }
           .open-to-back-transition.centering {
@@ -1384,7 +1397,7 @@ export default function AutumnRegistryPage() {
             transform: translate(-50%, -50%);
             width: 90%;
             max-width: 480px;
-            aspect-ratio: 4 / 6;
+            aspect-ratio: 4 / 6.4;
             padding: 0;
             text-align: center;
             display: flex;
@@ -1394,16 +1407,16 @@ export default function AutumnRegistryPage() {
             z-index: 2;
           }
           .search-box-wrapper.cover-mode .box-image img {
-            transform: scale(1.12);
+            transform: scale(1.16);
             transform-origin: center;
           }
           .book-cover-front,
           .back-book-front {
-            background-size: auto 120%;
+            background-size: auto 128%;
           }
           .back-book-back,
           .open-to-back-back {
-            background-size: auto, auto 120%;
+            background-size: auto, auto 128%;
           }
           .search-box-wrapper.has-results,
           .search-box-wrapper.has-leaderboard {
@@ -1414,7 +1427,7 @@ export default function AutumnRegistryPage() {
             aspect-ratio: auto !important;
             width: 90% !important;
             max-width: 480px !important;
-            height: min(135vw, 720px) !important;
+            height: min(144vw, 768px) !important;
             border-radius: 18px;
           }
           .search-box-wrapper.has-results {
@@ -1431,6 +1444,9 @@ export default function AutumnRegistryPage() {
           }
           .search-box-wrapper.has-results.mobile-book.mobile-page-right {
             transform: translate(-75%, -50%) !important;
+          }
+          .search-box-wrapper.has-results.mobile-book.book-opening {
+            transition: none !important;
           }
           .search-box-wrapper.has-leaderboard {
             overflow: hidden !important;
@@ -1487,6 +1503,9 @@ export default function AutumnRegistryPage() {
           .results-list-mobile {
             flex-direction: row !important;
             width: 100% !important;
+          }
+          .search-box-wrapper:not(.book-pages-hidden) > .autumn-results-book {
+            animation: none;
           }
           .results-list-mobile .results-page-divider {
             display: block !important;
@@ -1733,24 +1752,26 @@ export default function AutumnRegistryPage() {
                         </button>
                       )}
                     </div>
-                    <div className="mobile-page-bar">
-                      <button type="button" style={barBtnStyle} onClick={() => setMobilePage("left")}>
-                        <span>Back</span>
-                      </button>
-                      {(loadingMobileRight || pagination.hasMore) && (
-                        <button
-                          type="button"
-                          style={{
-                            ...barBtnStyle,
-                            ...(loadingMore || loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
-                          }}
-                          onClick={loadMore}
-                          disabled={loadingMore || loadingMobileRight}
-                        >
-                          <span>{loadingMore || loadingMobileRight ? "Loading…" : "Load more"}</span>
+                    {mobilePage === "right" && (
+                      <div className="mobile-page-bar">
+                        <button type="button" style={barBtnStyle} onClick={() => setMobilePage("left")}>
+                          <span>Back</span>
                         </button>
-                      )}
-                    </div>
+                        {(loadingMobileRight || pagination.hasMore) && (
+                          <button
+                            type="button"
+                            style={{
+                              ...barBtnStyle,
+                              ...(loadingMore || loadingMobileRight ? { opacity: 0.7, cursor: "wait" } : {}),
+                            }}
+                            onClick={loadMore}
+                            disabled={loadingMore || loadingMobileRight}
+                          >
+                            <span>{loadingMore || loadingMobileRight ? "Loading…" : "Load more"}</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div style={styles.resultsBottomBar}>
