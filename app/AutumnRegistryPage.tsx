@@ -163,6 +163,7 @@ export default function AutumnRegistryPage() {
     if (!query.trim()) {
       return;
     }
+    const mobileView = typeof window !== "undefined" && window.innerWidth <= 768;
     window.scrollTo(0, 0);
     const t0 = performance.now();
     console.log("🔍 [TIMING] Search started at", new Date().toISOString());
@@ -175,12 +176,11 @@ export default function AutumnRegistryPage() {
     setPageTurnSnapshot(null);
     setLoadingMobileRight(false);
     setMobilePage("left");
-    setBookPhase("shifting");
+    setBookPhase(mobileView ? "opening" : "shifting");
     setHasSearched(true);
     setPagination({ hasMore: false, lastScore: null, lastId: null });
 
     try {
-      const mobileView = typeof window !== "undefined" && window.innerWidth <= 768;
       const requestBody = { query: query.trim(), limit: mobileView ? 2 : 4, term: "autumn26" };
       console.log("📤 Sending request:", requestBody);
       
@@ -426,6 +426,14 @@ export default function AutumnRegistryPage() {
       >
         <span>Most searched</span>
       </button>
+      <a
+        href="https://vernatus.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="autumn-corner-pill mobile-ver-natus"
+      >
+        <span>Ver Natus</span>
+      </a>
       <style>{`
         @keyframes shimmer {
           0% {
@@ -501,6 +509,10 @@ export default function AutumnRegistryPage() {
           outline-offset: 2px;
         }
 
+        .mobile-ver-natus {
+          display: none;
+        }
+
         @media (max-width: 600px), (pointer: coarse) {
           .autumn-corner-pill {
             --pill-pad: 3px;
@@ -564,6 +576,16 @@ export default function AutumnRegistryPage() {
         @keyframes autumn-book-shift-mobile {
           from { transform: translate(-50%, -50%); }
           to { transform: translate(calc(-50% + min(90vw, 480px)), -50%); }
+        }
+
+        @keyframes autumn-mobile-camera-open {
+          from { transform: translate(-50%, -50%); }
+          to { transform: translate(calc(-50% + min(90vw, 480px)), -50%); }
+        }
+
+        @keyframes autumn-mobile-pages-follow {
+          from { transform: translateX(-50%); }
+          to { transform: translateX(0); }
         }
 
         @keyframes autumn-pages-reveal {
@@ -1222,12 +1244,40 @@ export default function AutumnRegistryPage() {
         }
 
         @media (max-width: 768px) {
+          .mobile-ver-natus {
+            position: fixed;
+            top: auto;
+            left: 50%;
+            right: auto;
+            bottom: calc(max(12px, env(safe-area-inset-bottom)) + 6px);
+            z-index: 100;
+            display: inline-flex;
+            transform: translateX(-50%);
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff;
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            white-space: nowrap;
+          }
+          .mobile-ver-natus::before {
+            background: transparent;
+            box-shadow: none;
+          }
+          .mobile-ver-natus span {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff;
+          }
+
           .autumn-results-book::after {
             display: none;
           }
           .search-box-wrapper.book-opening > .autumn-results-book {
             visibility: visible;
-            clip-path: none;
+            clip-path: inset(0 0 0 50%);
+            animation: autumn-mobile-pages-follow 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards !important;
           }
           .search-box-wrapper.book-closing > .autumn-results-book {
             visibility: hidden;
@@ -1240,19 +1290,19 @@ export default function AutumnRegistryPage() {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 5.8;
+            aspect-ratio: 4 / 6;
           }
           .back-book-transition {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 5.8;
+            aspect-ratio: 4 / 6;
           }
           .open-to-back-transition {
             width: 90%;
             max-width: 480px;
             height: auto;
-            aspect-ratio: 4 / 5.8;
+            aspect-ratio: 4 / 6;
             transform: translate(min(45vw, 240px), -50%);
           }
           .open-to-back-transition.centering {
@@ -1271,7 +1321,7 @@ export default function AutumnRegistryPage() {
             animation-name: autumn-book-shift-mobile;
           }
           .book-transition.opening {
-            transform: translate(calc(-50% + min(90vw, 480px)), -50%);
+            animation: autumn-mobile-camera-open 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
           }
           .book-transition.closing {
             transform: translate(calc(-50% + min(90vw, 480px)), -50%);
@@ -1334,7 +1384,7 @@ export default function AutumnRegistryPage() {
             transform: translate(-50%, -50%);
             width: 90%;
             max-width: 480px;
-            aspect-ratio: 4 / 5.8;
+            aspect-ratio: 4 / 6;
             padding: 0;
             text-align: center;
             display: flex;
@@ -1344,16 +1394,16 @@ export default function AutumnRegistryPage() {
             z-index: 2;
           }
           .search-box-wrapper.cover-mode .box-image img {
-            transform: scale(1.1);
+            transform: scale(1.12);
             transform-origin: center;
           }
           .book-cover-front,
           .back-book-front {
-            background-size: auto 116%;
+            background-size: auto 120%;
           }
           .back-book-back,
           .open-to-back-back {
-            background-size: auto, auto 116%;
+            background-size: auto, auto 120%;
           }
           .search-box-wrapper.has-results,
           .search-box-wrapper.has-leaderboard {
@@ -1364,8 +1414,7 @@ export default function AutumnRegistryPage() {
             aspect-ratio: auto !important;
             width: 90% !important;
             max-width: 480px !important;
-            height: 80vh !important; /* fallback */
-            height: 80svh !important;
+            height: min(135vw, 720px) !important;
             border-radius: 18px;
           }
           .search-box-wrapper.has-results {
