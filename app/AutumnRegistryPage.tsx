@@ -619,14 +619,16 @@ export default function AutumnRegistryPage() {
   return (
     <>
       <a href="/spring-2026" className="autumn-corner-pill autumn-corner-pill-left">
-        <span>Spring 26</span>
+        <span className="autumn-pill-gas" aria-hidden="true" />
+        <span className="autumn-pill-label">Spring 26</span>
       </a>
       <button
         type="button"
         className="autumn-corner-pill autumn-corner-pill-right"
         onClick={handleLeaderboardOpen}
       >
-        <span>Most searched</span>
+        <span className="autumn-pill-gas" aria-hidden="true" />
+        <span className="autumn-pill-label">Most searched</span>
       </button>
       <a
         href="https://vernatus.com"
@@ -634,7 +636,7 @@ export default function AutumnRegistryPage() {
         rel="noopener noreferrer"
         className="autumn-corner-pill mobile-ver-natus"
       >
-        <span>Ver Natus</span>
+        <span className="autumn-pill-label">Ver Natus</span>
       </a>
       <style>{`
         button,
@@ -788,17 +790,37 @@ export default function AutumnRegistryPage() {
 
         .autumn-corner-pill-left::before,
         .autumn-corner-pill-right::before {
+          display: none;
+        }
+
+        .autumn-pill-gas {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
           display: block;
+          overflow: hidden;
+          border-radius: 999px;
+          -webkit-clip-path: inset(0 round 999px);
+          clip-path: inset(0 round 999px);
+          pointer-events: none;
+          transform: translateZ(0);
+          -webkit-mask-image: -webkit-radial-gradient(white, black);
+          mask-image: linear-gradient(#fff, #fff);
+        }
+
+        .autumn-pill-gas::before {
+          content: "";
+          position: absolute;
           inset: -90%;
           border-radius: 42%;
-          box-shadow: none;
           filter: blur(4px);
           opacity: 1;
           mix-blend-mode: screen;
+          pointer-events: none;
           will-change: transform;
         }
 
-        .autumn-corner-pill-left::before {
+        .autumn-corner-pill-left .autumn-pill-gas::before {
           background:
             radial-gradient(ellipse 34% 42% at 14% 28%, rgba(255, 255, 255, 0.5), transparent 68%),
             radial-gradient(ellipse 38% 20% at 68% 22%, rgba(176, 205, 224, 0.34), transparent 67%),
@@ -806,7 +828,7 @@ export default function AutumnRegistryPage() {
           animation: autumn-pill-wave 11.5s cubic-bezier(0.45, 0, 0.55, 1) -2.8s infinite alternate;
         }
 
-        .autumn-corner-pill-right::before {
+        .autumn-corner-pill-right .autumn-pill-gas::before {
           background:
             radial-gradient(ellipse 18% 48% at 78% 18%, rgba(255, 255, 255, 0.46), transparent 68%),
             radial-gradient(ellipse 46% 18% at 32% 48%, rgba(164, 194, 215, 0.38), transparent 66%),
@@ -815,8 +837,7 @@ export default function AutumnRegistryPage() {
           animation: autumn-pill-wave 13.4s cubic-bezier(0.45, 0, 0.55, 1) -7.1s infinite alternate-reverse;
         }
 
-        .autumn-corner-pill-left::after,
-        .autumn-corner-pill-right::after {
+        .autumn-pill-gas::after {
           content: "";
           position: absolute;
           inset: -65%;
@@ -827,14 +848,14 @@ export default function AutumnRegistryPage() {
           will-change: transform, border-radius;
         }
 
-        .autumn-corner-pill-left::after {
+        .autumn-corner-pill-left .autumn-pill-gas::after {
           background:
             radial-gradient(ellipse 44% 24% at 24% 36%, rgba(255, 255, 255, 0.42), transparent 68%),
             radial-gradient(ellipse 22% 46% at 72% 68%, rgba(146, 181, 205, 0.4), transparent 70%);
           animation: autumn-pill-gas-drift 14.2s cubic-bezier(0.45, 0, 0.55, 1) -8.4s infinite alternate;
         }
 
-        .autumn-corner-pill-right::after {
+        .autumn-corner-pill-right .autumn-pill-gas::after {
           background:
             radial-gradient(ellipse 30% 38% at 76% 30%, rgba(255, 255, 255, 0.44), transparent 69%),
             radial-gradient(ellipse 42% 20% at 30% 72%, rgba(140, 177, 202, 0.38), transparent 68%),
@@ -842,7 +863,7 @@ export default function AutumnRegistryPage() {
           animation: autumn-pill-gas-drift 16.8s cubic-bezier(0.45, 0, 0.55, 1) -3.6s infinite alternate-reverse;
         }
 
-        .autumn-corner-pill span {
+        .autumn-pill-label {
           position: relative;
           z-index: 1;
         }
@@ -1011,10 +1032,8 @@ export default function AutumnRegistryPage() {
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .autumn-corner-pill-left::before,
-          .autumn-corner-pill-right::before,
-          .autumn-corner-pill-left::after,
-          .autumn-corner-pill-right::after {
+          .autumn-pill-gas::before,
+          .autumn-pill-gas::after {
             animation: none;
           }
           .autumn-reveal-word {
