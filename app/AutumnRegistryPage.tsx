@@ -934,60 +934,44 @@ export default function AutumnRegistryPage() {
          * child layers never render on the opposite side of the cover.
          */
         @keyframes autumn-front-face-to-back {
-          0%, 16% {
+          0%, 35.99% {
             opacity: 1;
             visibility: visible;
           }
-          30% {
-            opacity: 0;
-            visibility: visible;
-          }
-          30.01%, 100% {
+          36%, 100% {
             opacity: 0;
             visibility: hidden;
           }
         }
 
         @keyframes autumn-front-face-to-front {
-          0%, 38.99% {
+          0%, 35.99% {
             opacity: 0;
             visibility: hidden;
           }
-          39% {
-            opacity: 0;
-            visibility: visible;
-          }
-          53%, 100% {
+          36%, 100% {
             opacity: 1;
             visibility: visible;
           }
         }
 
         @keyframes autumn-back-face-to-back {
-          0%, 38.99% {
+          0%, 35.99% {
             opacity: 0;
             visibility: hidden;
           }
-          39% {
-            opacity: 0;
-            visibility: visible;
-          }
-          53%, 100% {
+          36%, 100% {
             opacity: 1;
             visibility: visible;
           }
         }
 
         @keyframes autumn-back-face-to-front {
-          0%, 16% {
+          0%, 35.99% {
             opacity: 1;
             visibility: visible;
           }
-          30% {
-            opacity: 0;
-            visibility: visible;
-          }
-          30.01%, 100% {
+          36%, 100% {
             opacity: 0;
             visibility: hidden;
           }
@@ -1062,30 +1046,22 @@ export default function AutumnRegistryPage() {
         }
 
         @keyframes autumn-page-front-visibility {
-          0%, 16% {
+          0%, 34.99% {
             opacity: 1;
             visibility: visible;
           }
-          30% {
-            opacity: 0;
-            visibility: visible;
-          }
-          30.01%, 100% {
+          35%, 100% {
             opacity: 0;
             visibility: hidden;
           }
         }
 
         @keyframes autumn-page-back-visibility {
-          0%, 37.99% {
+          0%, 34.99% {
             opacity: 0;
             visibility: hidden;
           }
-          38% {
-            opacity: 0;
-            visibility: visible;
-          }
-          52%, 100% {
+          35%, 100% {
             opacity: 1;
             visibility: visible;
           }
@@ -1239,19 +1215,19 @@ export default function AutumnRegistryPage() {
         }
 
         .back-book-transition.to-back .back-book-front > * {
-          animation: autumn-front-face-to-back 820ms linear forwards;
+          animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
         .back-book-transition.to-back .back-book-back > * {
-          animation: autumn-back-face-to-back 820ms linear forwards;
+          animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
         .back-book-transition.to-front .back-book-front > * {
-          animation: autumn-front-face-to-front 820ms linear forwards;
+          animation: autumn-front-face-to-front 820ms steps(1, end) forwards;
         }
 
         .back-book-transition.to-front .back-book-back > * {
-          animation: autumn-back-face-to-front 820ms linear forwards;
+          animation: autumn-back-face-to-front 820ms steps(1, end) forwards;
         }
 
         .back-book-transition.back .back-book-front > * {
@@ -1350,11 +1326,11 @@ export default function AutumnRegistryPage() {
         }
 
         .open-to-back-transition.closing .open-to-back-front > * {
-          animation: autumn-front-face-to-back 820ms linear forwards;
+          animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
         .open-to-back-transition.closing .open-to-back-back > * {
-          animation: autumn-back-face-to-back 820ms linear forwards;
+          animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
         .open-to-back-transition.centering .open-to-back-sheet {
@@ -1450,20 +1426,20 @@ export default function AutumnRegistryPage() {
         }
 
         .book-transition.opening .book-cover-front > * {
-          animation: autumn-front-face-to-back 820ms linear forwards;
+          animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
         .book-transition.opening .book-cover-inside > * {
-          animation: autumn-back-face-to-back 820ms linear forwards;
+          animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
         .book-transition.closing .book-cover-front > * {
-          animation: autumn-front-face-to-front 820ms linear forwards;
+          animation: autumn-front-face-to-front 820ms steps(1, end) forwards;
         }
 
         .book-transition.closing .book-cover-inside > *,
         .book-transition.closing .book-cover-inside::after {
-          animation: autumn-back-face-to-front 820ms linear forwards;
+          animation: autumn-back-face-to-front 820ms steps(1, end) forwards;
         }
 
         .book-transition.recentering .book-cover-rig {
@@ -1781,11 +1757,11 @@ export default function AutumnRegistryPage() {
         }
 
         .page-turn-sheet > .page-turn-front > * {
-          animation: autumn-page-front-visibility 820ms linear forwards;
+          animation: autumn-page-front-visibility 820ms steps(1, end) forwards;
         }
 
         .page-turn-sheet > .page-turn-back > * {
-          animation: autumn-page-back-visibility 820ms linear forwards;
+          animation: autumn-page-back-visibility 820ms steps(1, end) forwards;
         }
 
         .page-turn-scene.page-turn-scene-backward {
