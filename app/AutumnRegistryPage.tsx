@@ -1213,23 +1213,23 @@ export default function AutumnRegistryPage() {
           animation: autumn-book-to-front 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
         }
 
-        .back-book-transition.to-back .back-book-front {
+        .back-book-transition.to-back .back-book-front > * {
           animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-back .back-book-back {
+        .back-book-transition.to-back .back-book-back > * {
           animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-front .back-book-front {
+        .back-book-transition.to-front .back-book-front > * {
           animation: autumn-front-face-to-front 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-front .back-book-back {
+        .back-book-transition.to-front .back-book-back > * {
           animation: autumn-back-face-to-front 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.back .back-book-front {
+        .back-book-transition.back .back-book-front > * {
           opacity: 0;
           visibility: hidden;
         }
@@ -1241,7 +1241,6 @@ export default function AutumnRegistryPage() {
           border-radius: 18px;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          will-change: opacity, visibility;
           box-shadow:
             18px 22px 24px rgba(0, 0, 0, 0.78),
             7px 9px 9px rgba(0, 0, 0, 0.58),
@@ -1325,11 +1324,11 @@ export default function AutumnRegistryPage() {
           animation: autumn-open-page-to-back 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
         }
 
-        .open-to-back-transition.closing .open-to-back-front {
+        .open-to-back-transition.closing .open-to-back-front > * {
           animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
-        .open-to-back-transition.closing .open-to-back-back {
+        .open-to-back-transition.closing .open-to-back-back > * {
           animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
@@ -1337,12 +1336,12 @@ export default function AutumnRegistryPage() {
           transform: rotateY(-180deg);
         }
 
-        .open-to-back-transition.centering .open-to-back-front {
+        .open-to-back-transition.centering .open-to-back-front > * {
           opacity: 0;
           visibility: hidden;
         }
 
-        .open-to-back-transition.centering .open-to-back-back {
+        .open-to-back-transition.centering .open-to-back-back > * {
           opacity: 1;
           visibility: visible;
         }
@@ -1355,7 +1354,6 @@ export default function AutumnRegistryPage() {
           border-radius: 0 26px 26px 0;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          will-change: opacity, visibility;
           background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
@@ -1733,11 +1731,11 @@ export default function AutumnRegistryPage() {
           animation: autumn-page-turn 780ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .page-turn-sheet > .page-turn-front {
+        .page-turn-sheet > .page-turn-front > * {
           animation: autumn-page-front-visibility 780ms steps(1, end) forwards;
         }
 
-        .page-turn-sheet > .page-turn-back {
+        .page-turn-sheet > .page-turn-back > * {
           animation: autumn-page-back-visibility 780ms steps(1, end) forwards;
         }
 
@@ -1766,7 +1764,6 @@ export default function AutumnRegistryPage() {
           overflow: hidden;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          will-change: opacity, visibility;
           background: linear-gradient(90deg, #fffdf8, #fffaf1 92%, #eee4d5);
         }
 
@@ -1955,9 +1952,6 @@ export default function AutumnRegistryPage() {
           }
           @supports (height: 100svh) {
             :root {
-              --autumn-mobile-page-width: min(90vw, 46.25svh, 480px);
-              --autumn-mobile-half-page-width: min(45vw, 23.125svh, 240px);
-              --autumn-mobile-spread-width: min(180vw, 92.5svh, 960px);
               --autumn-mobile-book-height: min(144vw, 74svh, 768px);
             }
           }
@@ -2016,20 +2010,20 @@ export default function AutumnRegistryPage() {
           .book-transition {
             width: var(--autumn-mobile-page-width);
             max-width: none;
-            height: auto;
-            aspect-ratio: 4 / 6.4;
+            height: var(--autumn-mobile-book-height);
+            aspect-ratio: auto;
           }
           .back-book-transition {
             width: var(--autumn-mobile-page-width);
             max-width: none;
-            height: auto;
-            aspect-ratio: 4 / 6.4;
+            height: var(--autumn-mobile-book-height);
+            aspect-ratio: auto;
           }
           .open-to-back-transition {
             width: var(--autumn-mobile-page-width);
             max-width: none;
-            height: auto;
-            aspect-ratio: 4 / 6.4;
+            height: var(--autumn-mobile-book-height);
+            aspect-ratio: auto;
             transform: translate(var(--autumn-mobile-half-page-width), -50%);
           }
           .open-to-back-transition.closing.follow-mobile-page {
@@ -2116,7 +2110,8 @@ export default function AutumnRegistryPage() {
             transform: translate(-50%, -50%);
             width: var(--autumn-mobile-page-width);
             max-width: none;
-            aspect-ratio: 4 / 6.4;
+            height: var(--autumn-mobile-book-height);
+            aspect-ratio: auto;
             padding: 0;
             text-align: center;
             display: flex;
