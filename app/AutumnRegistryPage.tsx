@@ -1214,23 +1214,23 @@ export default function AutumnRegistryPage() {
           animation: autumn-book-to-front 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
         }
 
-        .back-book-transition.to-back .back-book-front > * {
+        .back-book-transition.to-back .back-book-front-content {
           animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-back .back-book-back > * {
+        .back-book-transition.to-back .back-book-back-content {
           animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-front .back-book-front > * {
+        .back-book-transition.to-front .back-book-front-content {
           animation: autumn-front-face-to-front 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.to-front .back-book-back > * {
+        .back-book-transition.to-front .back-book-back-content {
           animation: autumn-back-face-to-front 820ms steps(1, end) forwards;
         }
 
-        .back-book-transition.back .back-book-front > * {
+        .back-book-transition.back .back-book-front-content {
           opacity: 0;
           visibility: hidden;
         }
@@ -1249,15 +1249,13 @@ export default function AutumnRegistryPage() {
         }
 
         .back-book-front {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          transform: rotateY(0deg) translateZ(0.1px);
           border-radius: 0 18px 18px 0;
           background: url("/dithered-background-autumn.png") center / cover no-repeat;
         }
 
         .back-book-back {
-          transform: rotateY(180deg);
+          transform: rotateY(180deg) translateZ(0.1px);
           pointer-events: none;
           border-radius: 18px 0 0 18px;
           background:
@@ -1269,6 +1267,26 @@ export default function AutumnRegistryPage() {
             -5px -5px 18px rgba(255, 244, 226, 0.16),
             inset 2px 2px 1px rgba(255, 255, 255, 0.52),
             inset -5px -4px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-book-face-content {
+          position: absolute;
+          inset: 0;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          transform: translateZ(0.1px);
+          -webkit-transform: translateZ(0.1px);
+          isolation: isolate;
+        }
+
+        .back-book-front-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .back-book-face .leaderboard-scroll-region-mobile {
+          -webkit-overflow-scrolling: auto !important;
         }
 
         .back-book-transition.back .back-book-back {
@@ -1977,7 +1995,7 @@ export default function AutumnRegistryPage() {
           }
           @supports (height: 100svh) {
             :root {
-              --autumn-mobile-book-height: min(144vw, 74svh, 768px);
+              --autumn-mobile-book-height: min(144vw, 77svh, 768px);
             }
           }
           .mobile-ver-natus {
@@ -2878,48 +2896,52 @@ function BackCoverTransition({
         }}
       >
         <div className="back-book-face back-book-front" aria-hidden={phase === "back"}>
-          <div className="autumn-black-grain" style={styles.creatorByBox}>
-            {AUTUMN_VOLUME_LABEL} | stanfordlabregistry.com
-          </div>
-          <div className="box-overlay-1">
-            <h2 className="mobile-title" style={styles.title}>
-              Stanford
-              <br />
-              Course Registry
-            </h2>
-          </div>
-          <div className="autumn-black-grain" style={styles.spring26Badge}>Autumn 26 Edition</div>
-          <div className="box-overlay-2">
-            <div className="mobile-search-container" style={styles.searchContainer}>
-              <textarea
-                aria-hidden="true"
-                tabIndex={-1}
-                readOnly
-                rows={4}
-                placeholder="Describe your dream course..."
-                value={query}
-                style={styles.searchInput}
-              />
-              <span className="autumn-black-grain" style={{ ...styles.searchButton, cursor: "default" }}>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                </svg>
-              </span>
+          <div className="back-book-face-content back-book-front-content">
+            <div className="autumn-black-grain" style={styles.creatorByBox}>
+              {AUTUMN_VOLUME_LABEL} | stanfordlabregistry.com
+            </div>
+            <div className="box-overlay-1">
+              <h2 className="mobile-title" style={styles.title}>
+                Stanford
+                <br />
+                Course Registry
+              </h2>
+            </div>
+            <div className="autumn-black-grain" style={styles.spring26Badge}>Autumn 26 Edition</div>
+            <div className="box-overlay-2">
+              <div className="mobile-search-container" style={styles.searchContainer}>
+                <textarea
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  readOnly
+                  rows={4}
+                  placeholder="Describe your dream course..."
+                  value={query}
+                  style={styles.searchInput}
+                />
+                <span className="autumn-black-grain" style={{ ...styles.searchButton, cursor: "default" }}>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                  </svg>
+                </span>
+              </div>
             </div>
           </div>
         </div>
         <div className="back-book-face back-book-back">
-          <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
+          <div className="back-book-face-content back-book-back-content">
+            <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
+          </div>
         </div>
       </div>
       {phase === "back" && (
