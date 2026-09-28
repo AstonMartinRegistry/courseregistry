@@ -512,7 +512,7 @@ export default function AutumnRegistryPage() {
       setPageTurnSnapshot(null);
       setPageTurnTarget(null);
       setPageTurnDirection("forward");
-    }, 800);
+    }, PAGE_REVEAL_MS);
   };
 
   const goForwardWithAnimation = () => {
@@ -540,7 +540,7 @@ export default function AutumnRegistryPage() {
     window.setTimeout(() => {
       setPageTurnSnapshot(null);
       setPageTurnTarget(null);
-    }, 800);
+    }, PAGE_REVEAL_MS);
   };
 
   const mobileNavigationIsBusy =
@@ -934,44 +934,60 @@ export default function AutumnRegistryPage() {
          * child layers never render on the opposite side of the cover.
          */
         @keyframes autumn-front-face-to-back {
-          0%, 35.99% {
+          0%, 16% {
             opacity: 1;
             visibility: visible;
           }
-          36%, 100% {
+          30% {
+            opacity: 0;
+            visibility: visible;
+          }
+          30.01%, 100% {
             opacity: 0;
             visibility: hidden;
           }
         }
 
         @keyframes autumn-front-face-to-front {
-          0%, 35.99% {
+          0%, 38.99% {
             opacity: 0;
             visibility: hidden;
           }
-          36%, 100% {
+          39% {
+            opacity: 0;
+            visibility: visible;
+          }
+          53%, 100% {
             opacity: 1;
             visibility: visible;
           }
         }
 
         @keyframes autumn-back-face-to-back {
-          0%, 35.99% {
+          0%, 38.99% {
             opacity: 0;
             visibility: hidden;
           }
-          36%, 100% {
+          39% {
+            opacity: 0;
+            visibility: visible;
+          }
+          53%, 100% {
             opacity: 1;
             visibility: visible;
           }
         }
 
         @keyframes autumn-back-face-to-front {
-          0%, 35.99% {
+          0%, 16% {
             opacity: 1;
             visibility: visible;
           }
-          36%, 100% {
+          30% {
+            opacity: 0;
+            visibility: visible;
+          }
+          30.01%, 100% {
             opacity: 0;
             visibility: hidden;
           }
@@ -1046,22 +1062,30 @@ export default function AutumnRegistryPage() {
         }
 
         @keyframes autumn-page-front-visibility {
-          0%, 34.99% {
+          0%, 16% {
             opacity: 1;
             visibility: visible;
           }
-          35%, 100% {
+          30% {
+            opacity: 0;
+            visibility: visible;
+          }
+          30.01%, 100% {
             opacity: 0;
             visibility: hidden;
           }
         }
 
         @keyframes autumn-page-back-visibility {
-          0%, 34.99% {
+          0%, 37.99% {
             opacity: 0;
             visibility: hidden;
           }
-          35%, 100% {
+          38% {
+            opacity: 0;
+            visibility: visible;
+          }
+          52%, 100% {
             opacity: 1;
             visibility: visible;
           }
@@ -1173,6 +1197,7 @@ export default function AutumnRegistryPage() {
           z-index: 80;
           pointer-events: none;
           perspective: 1500px;
+          -webkit-perspective: 1500px;
           transform: translate(-50%, -50%);
         }
 
@@ -1214,19 +1239,19 @@ export default function AutumnRegistryPage() {
         }
 
         .back-book-transition.to-back .back-book-front > * {
-          animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
+          animation: autumn-front-face-to-back 820ms linear forwards;
         }
 
         .back-book-transition.to-back .back-book-back > * {
-          animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
+          animation: autumn-back-face-to-back 820ms linear forwards;
         }
 
         .back-book-transition.to-front .back-book-front > * {
-          animation: autumn-front-face-to-front 820ms steps(1, end) forwards;
+          animation: autumn-front-face-to-front 820ms linear forwards;
         }
 
         .back-book-transition.to-front .back-book-back > * {
-          animation: autumn-back-face-to-front 820ms steps(1, end) forwards;
+          animation: autumn-back-face-to-front 820ms linear forwards;
         }
 
         .back-book-transition.back .back-book-front > * {
@@ -1325,11 +1350,11 @@ export default function AutumnRegistryPage() {
         }
 
         .open-to-back-transition.closing .open-to-back-front > * {
-          animation: autumn-front-face-to-back 820ms steps(1, end) forwards;
+          animation: autumn-front-face-to-back 820ms linear forwards;
         }
 
         .open-to-back-transition.closing .open-to-back-back > * {
-          animation: autumn-back-face-to-back 820ms steps(1, end) forwards;
+          animation: autumn-back-face-to-back 820ms linear forwards;
         }
 
         .open-to-back-transition.centering .open-to-back-sheet {
@@ -1412,6 +1437,8 @@ export default function AutumnRegistryPage() {
           inset: 0;
           transform-origin: left center;
           transform-style: preserve-3d;
+          -webkit-transform-style: preserve-3d;
+          will-change: transform;
         }
 
         .book-transition.opening .book-cover-rig {
@@ -1422,12 +1449,34 @@ export default function AutumnRegistryPage() {
           animation: autumn-book-close 820ms cubic-bezier(0.42, 0, 0.2, 1) forwards;
         }
 
+        .book-transition.opening .book-cover-front > * {
+          animation: autumn-front-face-to-back 820ms linear forwards;
+        }
+
+        .book-transition.opening .book-cover-inside > * {
+          animation: autumn-back-face-to-back 820ms linear forwards;
+        }
+
+        .book-transition.closing .book-cover-front > * {
+          animation: autumn-front-face-to-front 820ms linear forwards;
+        }
+
+        .book-transition.closing .book-cover-inside > *,
+        .book-transition.closing .book-cover-inside::after {
+          animation: autumn-back-face-to-front 820ms linear forwards;
+        }
+
         .book-transition.recentering .book-cover-rig {
           transform: rotateY(0deg);
         }
 
         .book-transition.open-loading .book-cover-rig {
           transform: rotateY(-178deg);
+        }
+
+        .book-transition.open-loading .book-cover-front > * {
+          opacity: 0;
+          visibility: hidden;
         }
 
         .book-cover-face {
@@ -1728,15 +1777,15 @@ export default function AutumnRegistryPage() {
           transform-style: preserve-3d;
           -webkit-transform-style: preserve-3d;
           will-change: transform;
-          animation: autumn-page-turn 780ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          animation: autumn-page-turn 820ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         .page-turn-sheet > .page-turn-front > * {
-          animation: autumn-page-front-visibility 780ms steps(1, end) forwards;
+          animation: autumn-page-front-visibility 820ms linear forwards;
         }
 
         .page-turn-sheet > .page-turn-back > * {
-          animation: autumn-page-back-visibility 780ms steps(1, end) forwards;
+          animation: autumn-page-back-visibility 820ms linear forwards;
         }
 
         .page-turn-scene.page-turn-scene-backward {
@@ -2157,7 +2206,7 @@ export default function AutumnRegistryPage() {
             will-change: transform;
           }
           .search-box-wrapper.has-results.mobile-book.mobile-page-turning {
-            transition-duration: 780ms;
+            transition-duration: 820ms;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           }
           .search-box-wrapper.has-results.mobile-book.mobile-page-left {
@@ -2167,7 +2216,7 @@ export default function AutumnRegistryPage() {
             transform: translate(-75%, -50%) !important;
           }
           .search-box-wrapper.has-results.mobile-book.open-back-following {
-            transition-duration: 780ms;
+            transition-duration: 820ms;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           }
           .search-box-wrapper.has-results.mobile-book.book-opening {
@@ -2894,9 +2943,7 @@ function BackCoverTransition({
           </div>
         </div>
         <div className="back-book-face back-book-back">
-          {phase !== "back" && (
-            <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
-          )}
+          <LeaderboardPanel onClose={onClose} isMobile={isMobile} term="autumn26" />
         </div>
       </div>
       {phase === "back" && (
